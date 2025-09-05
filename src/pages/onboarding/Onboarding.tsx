@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { toast } from "sonner";
 import {
   setCurrentStep,
   setDescription,
@@ -71,7 +72,13 @@ export default function Onboarding() {
   }, [currentStepIndex, goToStep]);
 
   const handleNext = useCallback(async () => {
-    if (!isValid) return;
+    if (!isValid) {
+      // Show toast with validation error
+      if (errors.length > 0) {
+        toast.error(errors[0]);
+      }
+      return;
+    }
     
     if (currentStepIndex >= TOTAL_STEPS - 1) {
       // Submit onboarding data
@@ -81,12 +88,13 @@ export default function Onboarding() {
       } catch (error) {
         // Error is handled in Redux state
         console.error('Failed to submit onboarding:', error);
+        toast.error('Failed to submit onboarding. Please try again.');
       }
       return;
     }
     
     goToStep(currentStepIndex + 1);
-  }, [isValid, currentStepIndex, dispatch, formData, navigate, goToStep]);
+  }, [isValid, currentStepIndex, dispatch, formData, navigate, goToStep, errors]);
 
   // Step components configuration
   const steps = [
@@ -148,9 +156,6 @@ export default function Onboarding() {
   ];
 
   const currentStepData = steps[currentStepIndex];
-  
-  // Get tooltip text for validation
-  const tooltipText = errors.length > 0 ? errors[0] : "";
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -183,9 +188,8 @@ export default function Onboarding() {
           totalSteps={TOTAL_STEPS}
           onBack={handleBack}
           onNext={handleNext}
-          isNextDisabled={!isValid || submission.isLoading}
+          isNextDisabled={!isValid}
           isLoading={submission.isLoading}
-          tooltipText={!isValid ? tooltipText : undefined}
         />
       </nav>
     </div>

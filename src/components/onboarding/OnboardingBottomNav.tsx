@@ -1,10 +1,4 @@
 import { Button } from "@/components/ui/button";
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 
 type OnboardingBottomNavProps = {
@@ -19,7 +13,6 @@ type OnboardingBottomNavProps = {
   showSkip?: boolean;
   onSkip?: () => void;
   className?: string;
-  tooltipText?: string;
 };
 
 export default function OnboardingBottomNav({
@@ -34,22 +27,10 @@ export default function OnboardingBottomNav({
   showSkip,
   onSkip,
   className,
-  tooltipText,
 }: OnboardingBottomNavProps) {
   const isFirst = currentStep <= 1;
   const isLast = currentStep >= totalSteps;
   const effectiveNextLabel = nextLabel ?? (isLast ? "Finish" : "Next");
-
-  const nextButton = (
-    <Button 
-      size="lg" 
-      onClick={onNext} 
-      disabled={isNextDisabled || isLoading}
-      className="px-8 py-3 min-w-24 text-base font-medium"
-    >
-      {effectiveNextLabel}
-    </Button>
-  );
 
   return (
     <div
@@ -75,20 +56,17 @@ export default function OnboardingBottomNav({
               Skip
             </Button>
           )}
-          {tooltipText && isNextDisabled ? (
-            <TooltipProvider delayDuration={200}>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  {nextButton}
-                </TooltipTrigger>
-                <TooltipContent side="top" className="bg-popover text-popover-foreground border">
-                  <p>{tooltipText}</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          ) : (
-            nextButton
-          )}
+          <Button 
+            size="lg" 
+            onClick={onNext} 
+            disabled={isLoading}
+            className={cn(
+              "px-8 py-3 min-w-24 text-base font-medium",
+              isNextDisabled && "opacity-50"
+            )}
+          >
+            {effectiveNextLabel}
+          </Button>
         </div>
       </div>
     </div>
