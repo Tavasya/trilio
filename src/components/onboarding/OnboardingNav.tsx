@@ -40,19 +40,19 @@ export default function OnboardingNav({
         className
       )}
     >
-      <div className="px-6 py-6 flex items-center justify-between">
+      <div className="px-20 py-6 flex items-center justify-between">
         <Button 
           variant="outline" 
           size="lg" 
           onClick={onBack} 
           disabled={isFirst || isLoading}
-          className="px-8 py-3 min-w-24"
+          className="px-8 py-3 min-w-24 text-base font-medium"
         >
           {backLabel}
         </Button>
         <div className="flex items-center gap-4">
           {showSkip && onSkip && (
-            <Button variant="ghost" size="lg" onClick={onSkip} disabled={isLoading}>
+            <Button variant="ghost" size="lg" onClick={onSkip} disabled={isLoading} className="text-base font-medium">
               Skip
             </Button>
           )}
@@ -60,7 +60,7 @@ export default function OnboardingNav({
             size="lg" 
             onClick={onNext} 
             disabled={isNextDisabled || isLoading}
-            className="px-8 py-3 min-w-24"
+            className="px-8 py-3 min-w-24 text-base font-medium"
           >
             {effectiveNextLabel}
           </Button>
