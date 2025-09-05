@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { memo } from 'react';
 
 const contentAreas = [
   { id: "content-planning", label: "Content Planning", description: "Help me plan what to post and when" },
@@ -13,14 +12,14 @@ type ContentFocusStepProps = {
   initialValues?: string[];
 };
 
-export default function ContentFocusStep({ onNext, initialValues = [] }: ContentFocusStepProps) {
-  const [selectedAreas, setSelectedAreas] = useState<string[]>(initialValues);
-
+const ContentFocusStep = memo(function ContentFocusStep({ 
+  onNext, 
+  initialValues = [] 
+}: ContentFocusStepProps) {
   const toggleArea = (areaId: string) => {
-    const newAreas = selectedAreas.includes(areaId) 
-      ? selectedAreas.filter(id => id !== areaId)
-      : [...selectedAreas, areaId];
-    setSelectedAreas(newAreas);
+    const newAreas = initialValues.includes(areaId) 
+      ? initialValues.filter(id => id !== areaId)
+      : [...initialValues, areaId];
     onNext(newAreas);
   };
 
@@ -33,13 +32,27 @@ export default function ContentFocusStep({ onNext, initialValues = [] }: Content
         </p>
       </div>
 
-      <div className="space-y-3 flex flex-col items-center">
+      <div 
+        className="space-y-3 flex flex-col items-center"
+        role="group"
+        aria-label="Select areas where you need help"
+      >
         {contentAreas.map((area) => (
           <button
             key={area.id}
+            type="button"
+            role="checkbox"
+            aria-checked={initialValues.includes(area.id)}
+            aria-label={`${area.label}: ${area.description}`}
             onClick={() => toggleArea(area.id)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                toggleArea(area.id);
+              }
+            }}
             className={`w-full max-w-md p-4 text-left rounded-lg border transition-colors ${
-              selectedAreas.includes(area.id)
+              initialValues.includes(area.id)
                 ? "border-primary bg-primary/5 text-primary"
                 : "border-border hover:border-primary/50"
             }`}
@@ -52,4 +65,6 @@ export default function ContentFocusStep({ onNext, initialValues = [] }: Content
 
     </div>
   );
-}
+});
+
+export default ContentFocusStep;

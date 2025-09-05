@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { memo } from 'react';
 
 const audienceTypes = [
   "Industry Peers",
@@ -17,14 +16,14 @@ type TargetAudienceStepProps = {
   initialValues?: string[];
 };
 
-export default function TargetAudienceStep({ onNext, initialValues = [] }: TargetAudienceStepProps) {
-  const [selectedAudiences, setSelectedAudiences] = useState<string[]>(initialValues);
-
+const TargetAudienceStep = memo(function TargetAudienceStep({ 
+  onNext, 
+  initialValues = [] 
+}: TargetAudienceStepProps) {
   const toggleAudience = (audience: string) => {
-    const newAudiences = selectedAudiences.includes(audience) 
-      ? selectedAudiences.filter(a => a !== audience)
-      : [...selectedAudiences, audience];
-    setSelectedAudiences(newAudiences);
+    const newAudiences = initialValues.includes(audience) 
+      ? initialValues.filter(a => a !== audience)
+      : [...initialValues, audience];
     onNext(newAudiences);
   };
 
@@ -38,13 +37,27 @@ export default function TargetAudienceStep({ onNext, initialValues = [] }: Targe
       </div>
 
       <div className="space-y-4">
-        <div className="flex flex-wrap gap-3 justify-center">
+        <div 
+          className="flex flex-wrap gap-3 justify-center"
+          role="group"
+          aria-label="Select your target audiences"
+        >
           {audienceTypes.map((audience) => (
             <button
               key={audience}
+              type="button"
+              role="checkbox"
+              aria-checked={initialValues.includes(audience)}
+              aria-label={`Select ${audience}`}
               onClick={() => toggleAudience(audience)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  toggleAudience(audience);
+                }
+              }}
               className={`px-4 py-2 text-center rounded-lg border transition-colors whitespace-nowrap ${
-                selectedAudiences.includes(audience)
+                initialValues.includes(audience)
                   ? "border-primary bg-primary/5 text-primary"
                   : "border-border hover:border-primary/50"
               }`}
@@ -57,4 +70,6 @@ export default function TargetAudienceStep({ onNext, initialValues = [] }: Targe
 
     </div>
   );
-}
+});
+
+export default TargetAudienceStep;

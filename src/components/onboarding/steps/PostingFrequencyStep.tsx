@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { memo } from 'react';
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 
@@ -16,14 +16,15 @@ type PostingFrequencyStepProps = {
   initialValue?: string;
 };
 
-export default function PostingFrequencyStep({ onNext, initialValue = "" }: PostingFrequencyStepProps) {
-  const [selectedFrequency, setSelectedFrequency] = useState(initialValue || "weekly-single");
-
+const PostingFrequencyStep = memo(function PostingFrequencyStep({ 
+  onNext, 
+  initialValue = "" 
+}: PostingFrequencyStepProps) {
+  const selectedFrequency = initialValue || "weekly-single";
   const currentIndex = frequencies.findIndex(f => f.value === selectedFrequency);
 
   const handleSliderChange = (value: number) => {
     const frequency = frequencies[value];
-    setSelectedFrequency(frequency.value);
     onNext(frequency.value);
   };
 
@@ -37,9 +38,16 @@ export default function PostingFrequencyStep({ onNext, initialValue = "" }: Post
       </div>
 
       <div className="space-y-6">
-        {/* Slider */}
-        <div className="px-4">
+        <div 
+          className="px-4"
+          role="group"
+          aria-label="Select your posting frequency"
+        >
+          <label htmlFor="frequency-slider" className="sr-only">
+            Posting frequency slider
+          </label>
           <Slider
+            id="frequency-slider"
             min={0}
             max={frequencies.length - 1}
             value={currentIndex}
@@ -77,12 +85,17 @@ export default function PostingFrequencyStep({ onNext, initialValue = "" }: Post
               height: 8,
               marginTop: -2,
             }}
+            ariaLabelForHandle={`Posting frequency: ${frequencies[currentIndex]?.label}`}
+            ariaValueTextFormatterForHandle={() => frequencies[currentIndex]?.description || ''}
           />
         </div>
 
-        {/* Selected Frequency Display */}
         <div className="text-center space-y-1">
-          <div className="text-2xl font-semibold text-primary">
+          <div 
+            className="text-2xl font-semibold text-primary"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             {frequencies[currentIndex]?.label}
           </div>
           <div className="text-muted-foreground">
@@ -92,4 +105,6 @@ export default function PostingFrequencyStep({ onNext, initialValue = "" }: Post
       </div>
     </div>
   );
-}
+});
+
+export default PostingFrequencyStep;

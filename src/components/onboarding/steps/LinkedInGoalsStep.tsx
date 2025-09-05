@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { memo } from 'react';
 
 const goals = [
   "Build Professional Network",
@@ -17,14 +16,14 @@ type LinkedInGoalsStepProps = {
   initialValues?: string[];
 };
 
-export default function LinkedInGoalsStep({ onNext, initialValues = [] }: LinkedInGoalsStepProps) {
-  const [selectedGoals, setSelectedGoals] = useState<string[]>(initialValues);
-
+const LinkedInGoalsStep = memo(function LinkedInGoalsStep({ 
+  onNext, 
+  initialValues = [] 
+}: LinkedInGoalsStepProps) {
   const toggleGoal = (goal: string) => {
-    const newGoals = selectedGoals.includes(goal) 
-      ? selectedGoals.filter(g => g !== goal)
-      : [...selectedGoals, goal];
-    setSelectedGoals(newGoals);
+    const newGoals = initialValues.includes(goal) 
+      ? initialValues.filter(g => g !== goal)
+      : [...initialValues, goal];
     onNext(newGoals);
   };
 
@@ -38,13 +37,27 @@ export default function LinkedInGoalsStep({ onNext, initialValues = [] }: Linked
       </div>
 
       <div className="space-y-4">
-        <div className="flex flex-wrap gap-3 justify-center">
+        <div 
+          className="flex flex-wrap gap-3 justify-center"
+          role="group"
+          aria-label="Select your LinkedIn goals"
+        >
           {goals.map((goal) => (
             <button
               key={goal}
+              type="button"
+              role="checkbox"
+              aria-checked={initialValues.includes(goal)}
+              aria-label={`Select ${goal}`}
               onClick={() => toggleGoal(goal)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  toggleGoal(goal);
+                }
+              }}
               className={`px-4 py-2 text-center rounded-lg border transition-colors whitespace-nowrap ${
-                selectedGoals.includes(goal)
+                initialValues.includes(goal)
                   ? "border-primary bg-primary/5 text-primary"
                   : "border-border hover:border-primary/50"
               }`}
@@ -57,4 +70,6 @@ export default function LinkedInGoalsStep({ onNext, initialValues = [] }: Linked
 
     </div>
   );
-}
+});
+
+export default LinkedInGoalsStep;

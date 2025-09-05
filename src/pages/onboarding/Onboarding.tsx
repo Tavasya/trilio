@@ -1,5 +1,17 @@
-import { useMemo, useState, useEffect } from "react";
+import { useCallback, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import {
+  setCurrentStep,
+  setDescription,
+  setPostingFrequency,
+  setContentFocus,
+  setLinkedInGoals,
+  setTargetAudience,
+  submitOnboarding,
+  selectIsCurrentStepValid,
+  selectCurrentStepErrors
+} from "@/store/slices/onboardingSlice";
 import OnboardingBottomNav from "@/components/onboarding/OnboardingBottomNav";
 import OnboardingProgress from "@/components/onboarding/OnboardingProgress";
 import OnboardingTopNav from "@/components/onboarding/OnboardingTopNav";
@@ -9,147 +21,173 @@ import ContentFocusStep from "@/components/onboarding/steps/ContentFocusStep";
 import LinkedInGoalsStep from "@/components/onboarding/steps/LinkedInGoalsStep";
 import TargetAudienceStep from "@/components/onboarding/steps/TargetAudienceStep";
 
+const TOTAL_STEPS = 5;
+
 export default function Onboarding() {
   const navigate = useNavigate();
   const { step } = useParams();
+  const dispatch = useAppDispatch();
+  
+  const { formData, submission } = useAppSelector(state => state.onboarding);
+  const isValid = useAppSelector(selectIsCurrentStepValid);
+  const errors = useAppSelector(selectCurrentStepErrors);
 
-  // Form state management
-  const [formData, setFormData] = useState({
-    description: [] as string[],
-    postingFrequency: "",
-    contentFocus: [] as string[],
-    linkedinGoals: [] as string[],
-    targetAudience: [] as string[]
-  });
+  const currentStepIndex = Math.max(0, Math.min(TOTAL_STEPS - 1, (Number(step) || 1) - 1));
+  const currentStep = currentStepIndex + 1;
 
-  // Animation state
-  const [isVisible, setIsVisible] = useState(true);
+  // Update Redux when step changes
+  useEffect(() => {
+    dispatch(setCurrentStep(currentStep));
+  }, [currentStep, dispatch]);
 
-  const steps = useMemo(() => [
-    { 
-      id: "describe-yourself", 
-      title: "Describe Yourself", 
+  // Memoized callbacks to prevent re-renders
+  const handleDescriptionChange = useCallback((values: string[]) => {
+    dispatch(setDescription(values));
+  }, [dispatch]);
+
+  const handlePostingFrequencyChange = useCallback((value: string) => {
+    dispatch(setPostingFrequency(value));
+  }, [dispatch]);
+
+  const handleContentFocusChange = useCallback((values: string[]) => {
+    dispatch(setContentFocus(values));
+  }, [dispatch]);
+
+  const handleLinkedInGoalsChange = useCallback((values: string[]) => {
+    dispatch(setLinkedInGoals(values));
+  }, [dispatch]);
+
+  const handleTargetAudienceChange = useCallback((values: string[]) => {
+    dispatch(setTargetAudience(values));
+  }, [dispatch]);
+
+  const goToStep = useCallback((index: number) => {
+    const clamped = Math.max(0, Math.min(TOTAL_STEPS - 1, index));
+    navigate(`/onboarding/${clamped + 1}`);
+  }, [navigate]);
+
+  const handleBack = useCallback(() => {
+    goToStep(currentStepIndex - 1);
+  }, [currentStepIndex, goToStep]);
+
+  const handleNext = useCallback(async () => {
+    if (!isValid) return;
+    
+    if (currentStepIndex >= TOTAL_STEPS - 1) {
+      // Submit onboarding data
+      try {
+        await dispatch(submitOnboarding(formData)).unwrap();
+        navigate("/dashboard");
+      } catch (error) {
+        // Error is handled in Redux state
+        console.error('Failed to submit onboarding:', error);
+      }
+      return;
+    }
+    
+    goToStep(currentStepIndex + 1);
+  }, [isValid, currentStepIndex, dispatch, formData, navigate, goToStep]);
+
+  // Step components configuration
+  const steps = [
+    {
+      id: "describe-yourself",
+      title: "Describe Yourself",
+      description: "This helps us understand your professional identity",
       element: (
         <DescribeYourselfStep 
-          onNext={(values) => setFormData(prev => ({ ...prev, description: values }))}
+          onNext={handleDescriptionChange}
           initialValues={formData.description}
         />
       )
     },
-    { 
-      id: "posting-frequency", 
-      title: "Posting Frequency", 
+    {
+      id: "posting-frequency",
+      title: "Posting Frequency",
+      description: "How often do you usually post?",
       element: (
         <PostingFrequencyStep 
-          onNext={(value) => setFormData(prev => ({ ...prev, postingFrequency: value }))}
+          onNext={handlePostingFrequencyChange}
           initialValue={formData.postingFrequency}
         />
       )
     },
-    { 
-      id: "content-focus", 
-      title: "Content Focus", 
+    {
+      id: "content-focus",
+      title: "Content Focus",
+      description: "What do you need help with most?",
       element: (
         <ContentFocusStep 
-          onNext={(values) => setFormData(prev => ({ ...prev, contentFocus: values }))}
+          onNext={handleContentFocusChange}
           initialValues={formData.contentFocus}
         />
       )
     },
-    { 
-      id: "linkedin-goals", 
-      title: "LinkedIn Goals", 
+    {
+      id: "linkedin-goals",
+      title: "LinkedIn Goals",
+      description: "What do you want to achieve?",
       element: (
         <LinkedInGoalsStep 
-          onNext={(values) => setFormData(prev => ({ ...prev, linkedinGoals: values }))}
+          onNext={handleLinkedInGoalsChange}
           initialValues={formData.linkedinGoals}
         />
       )
     },
-    { 
-      id: "target-audience", 
-      title: "Target Audience", 
+    {
+      id: "target-audience",
+      title: "Target Audience",
+      description: "Who are you targeting?",
       element: (
         <TargetAudienceStep 
-          onNext={(values) => setFormData(prev => ({ ...prev, targetAudience: values }))}
+          onNext={handleTargetAudienceChange}
           initialValues={formData.targetAudience}
         />
       )
-    },
-  ], [formData]);
-
-  const totalSteps = steps.length;
-  const currentStepIndex = Math.max(0, Math.min(totalSteps - 1, (Number(step) || 1) - 1));
-  const currentStep = currentStepIndex + 1; // 1-based
-
-  // Validation based on current step
-  const isValid = useMemo(() => {
-    switch (currentStepIndex) {
-      case 0: return formData.description.length > 0;
-      case 1: return formData.postingFrequency !== "";
-      case 2: return formData.contentFocus.length > 0;
-      case 3: return formData.linkedinGoals.length > 0;
-      case 4: return formData.targetAudience.length > 0;
-      default: return false;
     }
-  }, [currentStepIndex, formData]);
+  ];
 
-  const goToStep = (index: number) => {
-    const clamped = Math.max(0, Math.min(totalSteps - 1, index));
-    
-    // Fade out, then navigate, then fade in
-    setIsVisible(false);
-    setTimeout(() => {
-      navigate(`/onboarding/${clamped + 1}`);
-      setIsVisible(true);
-    }, 150);
-  };
-
-  // Fade in when step changes
-  useEffect(() => {
-    setIsVisible(true);
-  }, [currentStepIndex]);
-
-  const handleBack = () => {
-    goToStep(currentStepIndex - 1);
-  };
-
-  const handleNext = () => {
-    if (!isValid) return;
-    if (currentStepIndex >= totalSteps - 1) {
-      // Onboarding complete - save data and navigate to dashboard
-      console.log("Onboarding completed with data:", formData);
-      // Here you would typically save to a backend or local storage
-      navigate("/dashboard");
-      return;
-    }
-    goToStep(currentStepIndex + 1);
-  };
-
+  const currentStepData = steps[currentStepIndex];
+  
+  // Get tooltip text for validation
+  const tooltipText = errors.length > 0 ? errors[0] : "";
 
   return (
     <div className="min-h-screen flex flex-col">
       <OnboardingTopNav />
       
-      <div className="flex-1 overflow-y-auto flex items-center justify-center">
-        <div className={`mx-auto max-w-3xl p-6 w-full transition-opacity duration-300 ${
-          isVisible ? 'opacity-100' : 'opacity-0'
-        }`}>
-          {steps[currentStepIndex].element}
+      <main 
+        className="flex-1 overflow-y-auto flex items-center justify-center"
+        role="main"
+        aria-labelledby="step-heading"
+      >
+        <div className="mx-auto max-w-3xl p-6 w-full">
+          {/* Step content */}
+          <div
+            id="step-heading"
+            aria-label={`Step ${currentStep} of ${TOTAL_STEPS}: ${currentStepData.title}`}
+          >
+            {currentStepData.element}
+          </div>
         </div>
-      </div>
+      </main>
 
-      <div className="sticky bottom-0 bg-background">
-        <OnboardingProgress currentStep={currentStep} totalSteps={totalSteps} />
+      <nav 
+        className="sticky bottom-0 bg-background"
+        role="navigation"
+        aria-label="Onboarding navigation"
+      >
+        <OnboardingProgress currentStep={currentStep} totalSteps={TOTAL_STEPS} />
         <OnboardingBottomNav
           currentStep={currentStep}
-          totalSteps={totalSteps}
+          totalSteps={TOTAL_STEPS}
           onBack={handleBack}
           onNext={handleNext}
-          isNextDisabled={!isValid}
+          isNextDisabled={!isValid || submission.isLoading}
+          isLoading={submission.isLoading}
+          tooltipText={!isValid ? tooltipText : undefined}
         />
-      </div>
+      </nav>
     </div>
   );
 }
-

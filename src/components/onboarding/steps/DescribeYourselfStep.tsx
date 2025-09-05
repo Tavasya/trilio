@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { memo } from 'react';
 
 const descriptions = [
   "Thought Leader",
@@ -21,12 +20,15 @@ type DescribeYourselfStepProps = {
   initialValues?: string[];
 };
 
-export default function DescribeYourselfStep({ onNext, initialValues = [] }: DescribeYourselfStepProps) {
-  const [selectedDescriptions, setSelectedDescriptions] = useState<string[]>(initialValues);
-
-  // Update parent when selection changes
-  const handleSelectionChange = (values: string[]) => {
-    onNext(values);
+const DescribeYourselfStep = memo(function DescribeYourselfStep({ 
+  onNext, 
+  initialValues = [] 
+}: DescribeYourselfStepProps) {
+  const handleSelectionChange = (description: string) => {
+    const newSelections = initialValues.includes(description)
+      ? initialValues.filter(d => d !== description)
+      : [...initialValues, description];
+    onNext(newSelections);
   };
 
   return (
@@ -38,20 +40,28 @@ export default function DescribeYourselfStep({ onNext, initialValues = [] }: Des
         </p>
       </div>
 
-      <div className="space-y-4">
+      <div 
+        className="space-y-4"
+        role="group"
+        aria-label="Select your professional descriptions"
+      >
         <div className="flex flex-wrap gap-3 justify-center">
           {descriptions.map((description) => (
             <button
               key={description}
-              onClick={() => {
-                const newSelections = selectedDescriptions.includes(description)
-                  ? selectedDescriptions.filter(d => d !== description)
-                  : [...selectedDescriptions, description];
-                setSelectedDescriptions(newSelections);
-                handleSelectionChange(newSelections);
+              type="button"
+              role="checkbox"
+              aria-checked={initialValues.includes(description)}
+              aria-label={`Select ${description}`}
+              onClick={() => handleSelectionChange(description)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  e.preventDefault();
+                  handleSelectionChange(description);
+                }
               }}
-              className={`px-4 py-2 text-center rounded-lg border transition-colors whitespace-nowrap ${
-                selectedDescriptions.includes(description)
+              className={`px-4 py-2 text-center rounded-lg border transition-colors whitespace-nowrap
+                ${initialValues.includes(description)
                   ? "border-primary bg-primary/5 text-primary"
                   : "border-border hover:border-primary/50"
               }`}
@@ -63,4 +73,6 @@ export default function DescribeYourselfStep({ onNext, initialValues = [] }: Des
       </div>
     </div>
   );
-}
+});
+
+export default DescribeYourselfStep;
