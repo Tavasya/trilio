@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import OnboardingProgress from "./OnboardingProgress";
 import { cn } from "@/lib/utils";
 
 type OnboardingNavProps = {
@@ -41,23 +40,30 @@ export default function OnboardingNav({
         className
       )}
     >
-      <div className="mx-auto max-w-3xl p-4 flex flex-col gap-3">
-        <OnboardingProgress currentStep={currentStep} totalSteps={totalSteps} showNumbers />
-
-        <div className="flex items-center justify-between gap-3">
-          <Button variant="outline" onClick={onBack} disabled={isFirst || isLoading}>
-            {backLabel}
-          </Button>
-          <div className="flex items-center gap-2">
-            {showSkip && onSkip && (
-              <Button variant="ghost" onClick={onSkip} disabled={isLoading}>
-                Skip
-              </Button>
-            )}
-            <Button onClick={onNext} disabled={isNextDisabled || isLoading}>
-              {effectiveNextLabel}
+      <div className="px-6 py-6 flex items-center justify-between">
+        <Button 
+          variant="outline" 
+          size="lg" 
+          onClick={onBack} 
+          disabled={isFirst || isLoading}
+          className="px-8 py-3 min-w-24"
+        >
+          {backLabel}
+        </Button>
+        <div className="flex items-center gap-4">
+          {showSkip && onSkip && (
+            <Button variant="ghost" size="lg" onClick={onSkip} disabled={isLoading}>
+              Skip
             </Button>
-          </div>
+          )}
+          <Button 
+            size="lg" 
+            onClick={onNext} 
+            disabled={isNextDisabled || isLoading}
+            className="px-8 py-3 min-w-24"
+          >
+            {effectiveNextLabel}
+          </Button>
         </div>
       </div>
     </div>

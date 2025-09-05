@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import OnboardingNav from "@/components/onboarding/OnboardingNav";
+import OnboardingProgress from "@/components/onboarding/OnboardingProgress";
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -47,6 +48,8 @@ export default function Onboarding() {
         </div>
       </div>
 
+      <OnboardingProgress currentStep={currentStep} totalSteps={totalSteps} />
+      
       <OnboardingNav
         currentStep={currentStep}
         totalSteps={totalSteps}
