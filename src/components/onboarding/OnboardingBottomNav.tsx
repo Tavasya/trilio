@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-type OnboardingNavProps = {
+type OnboardingBottomNavProps = {
   currentStep: number; // 1-based index
   totalSteps: number;
   onBack: () => void;
@@ -15,7 +15,7 @@ type OnboardingNavProps = {
   className?: string;
 };
 
-export default function OnboardingNav({
+export default function OnboardingBottomNav({
   currentStep,
   totalSteps,
   onBack,
@@ -27,7 +27,7 @@ export default function OnboardingNav({
   showSkip,
   onSkip,
   className,
-}: OnboardingNavProps) {
+}: OnboardingBottomNavProps) {
   const isFirst = currentStep <= 1;
   const isLast = currentStep >= totalSteps;
   const effectiveNextLabel = nextLabel ?? (isLast ? "Finish" : "Next");

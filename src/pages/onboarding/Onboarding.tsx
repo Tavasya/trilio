@@ -1,7 +1,8 @@
 import { useMemo, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import OnboardingNav from "@/components/onboarding/OnboardingNav";
+import OnboardingBottomNav from "@/components/onboarding/OnboardingBottomNav";
 import OnboardingProgress from "@/components/onboarding/OnboardingProgress";
+import OnboardingTopNav from "@/components/onboarding/OnboardingTopNav";
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -39,6 +40,8 @@ export default function Onboarding() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      <OnboardingTopNav />
+      
       <div className="flex-1">
         <div className="mx-auto max-w-3xl p-6">
           <h1 className="text-2xl font-semibold">{steps[currentStepIndex].title}</h1>
@@ -50,7 +53,7 @@ export default function Onboarding() {
 
       <OnboardingProgress currentStep={currentStep} totalSteps={totalSteps} />
       
-      <OnboardingNav
+      <OnboardingBottomNav
         currentStep={currentStep}
         totalSteps={totalSteps}
         onBack={handleBack}
