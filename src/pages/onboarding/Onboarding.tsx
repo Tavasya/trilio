@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import OnboardingBottomNav from "@/components/onboarding/OnboardingBottomNav";
 import OnboardingProgress from "@/components/onboarding/OnboardingProgress";
@@ -21,6 +21,9 @@ export default function Onboarding() {
     linkedinGoals: [] as string[],
     targetAudience: [] as string[]
   });
+
+  // Animation state
+  const [isVisible, setIsVisible] = useState(true);
 
   const steps = useMemo(() => [
     { 
@@ -93,8 +96,19 @@ export default function Onboarding() {
 
   const goToStep = (index: number) => {
     const clamped = Math.max(0, Math.min(totalSteps - 1, index));
-    navigate(`/onboarding/${clamped + 1}`);
+    
+    // Fade out, then navigate, then fade in
+    setIsVisible(false);
+    setTimeout(() => {
+      navigate(`/onboarding/${clamped + 1}`);
+      setIsVisible(true);
+    }, 150);
   };
+
+  // Fade in when step changes
+  useEffect(() => {
+    setIsVisible(true);
+  }, [currentStepIndex]);
 
   const handleBack = () => {
     goToStep(currentStepIndex - 1);
@@ -118,7 +132,9 @@ export default function Onboarding() {
       <OnboardingTopNav />
       
       <div className="flex-1 overflow-y-auto flex items-center justify-center">
-        <div className="mx-auto max-w-3xl p-6 w-full">
+        <div className={`mx-auto max-w-3xl p-6 w-full transition-opacity duration-300 ${
+          isVisible ? 'opacity-100' : 'opacity-0'
+        }`}>
           {steps[currentStepIndex].element}
         </div>
       </div>
