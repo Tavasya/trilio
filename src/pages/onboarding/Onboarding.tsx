@@ -9,6 +9,7 @@ import {
   setContentFocus,
   setLinkedInGoals,
   setTargetAudience,
+  setSelectedCreators,
   submitOnboarding,
   selectIsCurrentStepValid,
   selectCurrentStepErrors
@@ -21,8 +22,9 @@ import PostingFrequencyStep from "@/components/onboarding/steps/PostingFrequency
 import ContentFocusStep from "@/components/onboarding/steps/ContentFocusStep";
 import LinkedInGoalsStep from "@/components/onboarding/steps/LinkedInGoalsStep";
 import TargetAudienceStep from "@/components/onboarding/steps/TargetAudienceStep";
+import FindingCreatorsStep from "@/components/onboarding/steps/FindingCreatorsStep";
 
-const TOTAL_STEPS = 5;
+const TOTAL_STEPS = 6;
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -60,6 +62,10 @@ export default function Onboarding() {
 
   const handleTargetAudienceChange = useCallback((values: string[]) => {
     dispatch(setTargetAudience(values));
+  }, [dispatch]);
+
+  const handleSelectedCreatorsChange = useCallback((values: string[]) => {
+    dispatch(setSelectedCreators(values));
   }, [dispatch]);
 
   const goToStep = useCallback((index: number) => {
@@ -150,6 +156,17 @@ export default function Onboarding() {
         <TargetAudienceStep 
           onNext={handleTargetAudienceChange}
           initialValues={formData.targetAudience}
+        />
+      )
+    },
+    {
+      id: "finding-creators",
+      title: "Finding Your Path",
+      description: "Analyzing successful creators",
+      element: (
+        <FindingCreatorsStep 
+          onNext={handleSelectedCreatorsChange}
+          initialValues={formData.selectedCreators}
         />
       )
     }

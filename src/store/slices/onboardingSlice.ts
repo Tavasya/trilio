@@ -7,6 +7,7 @@ interface OnboardingFormData {
   contentFocus: string[];
   linkedinGoals: string[];
   targetAudience: string[];
+  selectedCreators: string[];
 }
 
 interface OnboardingState {
@@ -31,7 +32,8 @@ const initialState: OnboardingState = {
     postingFrequency: '',
     contentFocus: [],
     linkedinGoals: [],
-    targetAudience: []
+    targetAudience: [],
+    selectedCreators: []
   },
   validation: {
     errors: {}
@@ -92,6 +94,11 @@ const validateStep = (step: number, formData: OnboardingFormData): string[] => {
         errors.push('Please select at least one target audience');
       }
       break;
+    case 6:
+      if (!formData.selectedCreators || formData.selectedCreators.length === 0) {
+        errors.push('Please select at least one creator to learn from');
+      }
+      break;
   }
   
   return errors;
@@ -118,7 +125,11 @@ const onboardingSlice = createSlice({
     if (savedData) {
       return {
         ...initialState,
-        formData: savedData
+        formData: {
+          ...initialState.formData,
+          ...savedData,
+          selectedCreators: savedData.selectedCreators || []
+        }
       };
     }
     return initialState;
@@ -155,6 +166,11 @@ const onboardingSlice = createSlice({
       state.validation.errors[5] = validateStep(5, state.formData);
       saveDataToStorage(state.formData);
     },
+    setSelectedCreators: (state, action: PayloadAction<string[]>) => {
+      state.formData.selectedCreators = action.payload;
+      state.validation.errors[6] = validateStep(6, state.formData);
+      saveDataToStorage(state.formData);
+    },
     resetOnboarding: () => {
       localStorage.removeItem(STORAGE_KEY);
       return initialState;
@@ -186,8 +202,10 @@ export const selectIsCurrentStepValid = (state: { onboarding: OnboardingState })
   return !errors || errors.length === 0;
 };
 
+// Memoized selector to prevent unnecessary re-renders
+const EMPTY_ERRORS: string[] = [];
 export const selectCurrentStepErrors = (state: { onboarding: OnboardingState }) => {
-  return state.onboarding.validation.errors[state.onboarding.currentStep] || [];
+  return state.onboarding.validation.errors[state.onboarding.currentStep] || EMPTY_ERRORS;
 };
 
 export const selectIsStepValid = (state: { onboarding: OnboardingState }, step: number) => {
@@ -202,6 +220,7 @@ export const {
   setContentFocus,
   setLinkedInGoals,
   setTargetAudience,
+  setSelectedCreators,
   resetOnboarding,
   clearError
 } = onboardingSlice.actions;

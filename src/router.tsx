@@ -1,7 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import { Suspense } from "react";
 
-import App from "./App";
+import Landing from "@/pages/landing/Landing";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import AppLayout from "./layouts/AppLayout";
 import Research from '@/pages/research/Research'
@@ -18,7 +18,7 @@ export default function AppRoutes() {
     return(
         <Suspense fallback={<LoadingSpinner />}>
             <Routes>
-                <Route path="/" element={<App />} />
+                <Route path="/" element={<Landing />} />
                 <Route path="/onboarding" element={<Navigate to="/onboarding/1" replace />} />
                 <Route path="/onboarding/:step" element={<Onboarding />} />
                 <Route element={<AppLayout />} >
