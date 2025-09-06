@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/react-router';
+import { SignedIn, SignedOut, SignInButton, SignUpButton, useUser } from '@clerk/react-router';
 import Hero from "@/components/landing/Hero";
 import QuickStartTasks from "@/components/landing/QuickStartTasks";
 import TestimonialCarousel from "@/components/landing/TestimonialCarousel";
@@ -51,15 +51,16 @@ export default function Landing() {
                       scrolledPastPurple ? 'text-gray-700 hover:bg-gray-100/50' : 'text-gray-700 hover:bg-white/50'
                     }`}
                   >
-                    Sign In
+                    Login
                   </Button>
                 </SignInButton>
-                <Button
-                  onClick={() => navigate("/onboarding/1")}
-                  className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
-                >
-                  Try for Free
-                </Button>
+                <SignUpButton mode="modal">
+                  <Button
+                    className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
+                  >
+                    Try for Free
+                  </Button>
+                </SignUpButton>
               </SignedOut>
               <SignedIn>
                 <Button

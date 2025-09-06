@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { SignedIn, SignedOut, useUser } from '@clerk/react-router';
+import { SignedIn, SignedOut, SignUpButton, useUser } from '@clerk/react-router';
 import trilioLogo from "@/lib/logo/trilio-logo.png";
 
 export default function SalesSection() {
@@ -138,12 +138,13 @@ export default function SalesSection() {
             ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
             <SignedOut>
-              <button 
-                onClick={() => navigate("/onboarding/1")}
-                className="px-6 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium h-12 flex items-center"
-              >
-                Try for Free
-              </button>
+              <SignUpButton mode="modal">
+                <button 
+                  className="px-6 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium h-12 flex items-center"
+                >
+                  Try for Free
+                </button>
+              </SignUpButton>
               <button className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center">
                 Book a Call
               </button>
