@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { SignedIn, SignedOut } from '@clerk/react-router';
+import { SignedIn, SignedOut, useUser } from '@clerk/react-router';
 import trilioLogo from "@/lib/logo/trilio-logo.png";
 
 export default function SalesSection() {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const ctaRef = useRef<HTMLDivElement | null>(null);
@@ -149,7 +150,16 @@ export default function SalesSection() {
             </SignedOut>
             <SignedIn>
               <button 
-                onClick={() => navigate("/onboarding/1")}
+                onClick={() => {
+                  // Check if user has completed onboarding
+                  const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${user?.id}`);
+                  
+                  if (hasCompletedOnboarding) {
+                    navigate("/dashboard");
+                  } else {
+                    navigate("/onboarding/1");
+                  }
+                }}
                 className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center"
               >
                 Go to App

@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { SignedIn, SignedOut, SignInButton } from '@clerk/react-router';
+import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/react-router';
 import Hero from "@/components/landing/Hero";
 import QuickStartTasks from "@/components/landing/QuickStartTasks";
 import TestimonialCarousel from "@/components/landing/TestimonialCarousel";
@@ -10,6 +10,7 @@ import trilioLogo from "@/lib/logo/trilio-logo.png";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [scrolledPastPurple, setScrolledPastPurple] = useState(false);
 
   useEffect(() => {
@@ -62,7 +63,16 @@ export default function Landing() {
               </SignedOut>
               <SignedIn>
                 <Button
-                  onClick={() => navigate("/onboarding/1")}
+                  onClick={() => {
+                    // Check if user has completed onboarding
+                    const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${user?.id}`);
+                    
+                    if (hasCompletedOnboarding) {
+                      navigate("/dashboard");
+                    } else {
+                      navigate("/onboarding/1");
+                    }
+                  }}
                   className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
                 >
                   Go to App
