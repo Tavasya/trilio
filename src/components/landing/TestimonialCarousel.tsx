@@ -1,4 +1,3 @@
-import React, { useState, useEffect } from "react";
 import { Heart, MessageCircle, Share2, Send } from "lucide-react";
 
 interface Testimonial {

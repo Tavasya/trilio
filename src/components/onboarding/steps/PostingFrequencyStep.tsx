@@ -23,8 +23,9 @@ const PostingFrequencyStep = memo(function PostingFrequencyStep({
   const selectedFrequency = initialValue || "weekly-single";
   const currentIndex = frequencies.findIndex(f => f.value === selectedFrequency);
 
-  const handleSliderChange = (value: number) => {
-    const frequency = frequencies[value];
+  const handleSliderChange = (value: number | number[]) => {
+    const val = Array.isArray(value) ? value[0] : value;
+    const frequency = frequencies[val];
     onNext(frequency.value);
   };
 

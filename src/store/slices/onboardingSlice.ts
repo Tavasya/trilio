@@ -107,7 +107,7 @@ const validateStep = (step: number, formData: OnboardingFormData): string[] => {
 // Async thunk for submitting onboarding data
 export const submitOnboarding = createAsyncThunk(
   'onboarding/submit',
-  async (formData: OnboardingFormData) => {
+  async (_formData: OnboardingFormData) => {
     // Simulate API call - replace with actual API endpoint
     await new Promise(resolve => setTimeout(resolve, 1000));
     

@@ -67,7 +67,7 @@ export default function QuickStartTasks() {
           key={task.id}
           className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-normal transition-colors ${task.color}`}
         >
-          {React.cloneElement(task.icon as React.ReactElement, { className: "w-3 h-3" })}
+          {task.icon}
           <span>{task.label}</span>
         </button>
       ))}

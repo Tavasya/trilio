@@ -1,4 +1,3 @@
-import { ArrowRight } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import trilioLogo from "@/lib/logo/trilio-logo.png";
 
@@ -70,7 +69,7 @@ export default function SalesSection() {
           return (
             <div 
               key={index} 
-              ref={(el) => itemRefs.current[index] = el}
+              ref={(el) => {itemRefs.current[index] = el;}}
               className={`flex flex-col md:flex-row items-center gap-12 transition-all duration-700 ${
                 isEven ? '' : 'md:flex-row-reverse'
               } ${
