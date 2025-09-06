@@ -21,7 +21,7 @@ export default function Hero() {
                 <Upload className="w-4 h-4 text-gray-500" />
               </button>
               
-              <button className="p-2 bg-secondary text-secondary-foreground hover:bg-secondary/90 rounded-full transition-colors">
+              <button className="p-2 bg-primary text-white hover:bg-primary/90 rounded-full transition-colors">
                 <ArrowUp className="w-4 h-4" />
               </button>
             </div>

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import Hero from "@/components/landing/Hero";
 import QuickStartTasks from "@/components/landing/QuickStartTasks";
@@ -8,27 +9,53 @@ import trilioLogo from "@/lib/logo/trilio-logo.png";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const [scrolledPastPurple, setScrolledPastPurple] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Purple div height is approximately viewport height
+      const scrollThreshold = window.innerHeight - 100;
+      setScrolledPastPurple(window.scrollY > scrollThreshold);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   return (
     <div className="min-h-screen bg-white">
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 px-6 py-4">
-        <div className="flex items-center justify-between">
-          <img src={trilioLogo} alt="Trilio" className="w-8 h-8" />
-          
-          <div className="flex items-center gap-3">
-            <Button
-              variant="ghost"
-              className="text-gray-700 hover:bg-white/50 px-4 py-2"
-            >
-              Login
-            </Button>
-            <Button
-              onClick={() => navigate("/onboarding/1")}
-              className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
-            >
-              Try for Free
-            </Button>
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolledPastPurple 
+          ? 'px-8 pt-4' 
+          : ''
+      }`}>
+        <div className={`transition-all duration-300 ${
+          scrolledPastPurple 
+            ? 'rounded-2xl bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 backdrop-blur-sm shadow-sm' 
+            : ''
+        }`}>
+          <div className={`flex items-center justify-between transition-all duration-300 ${
+            scrolledPastPurple ? 'px-8 py-3' : 'px-6 py-4'
+          }`}>
+            <img src={trilioLogo} alt="Trilio" className="w-10 h-10" />
+            
+            <div className="flex items-center gap-3">
+              <Button
+                variant="ghost"
+                className={`px-4 py-2 transition-colors ${
+                  scrolledPastPurple ? 'text-gray-700 hover:bg-gray-100/50' : 'text-gray-700 hover:bg-white/50'
+                }`}
+              >
+                Login
+              </Button>
+              <Button
+                onClick={() => navigate("/onboarding/1")}
+                className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
+              >
+                Try for Free
+              </Button>
+            </div>
           </div>
         </div>
       </header>
@@ -66,7 +93,7 @@ export default function Landing() {
             <a href="#" className="hover:text-gray-900">Terms of Service</a>
             <a href="#" className="hover:text-gray-900">Privacy Policy</a>
             <a href="#" className="hover:text-gray-900">Cookie Policy</a>
-            <a href="#" className="hover:text-gray-900">LinkedIn</a>
+            <a href="https://www.linkedin.com/company/trilio-company" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900">LinkedIn</a>
             <a href="#" className="hover:text-gray-900">Contact</a>
             <a href="#" className="hover:text-gray-900">Support</a>
           </div>
