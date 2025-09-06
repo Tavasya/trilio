@@ -101,7 +101,7 @@ export default function Onboarding() {
         navigate("/dashboard");
       } catch (error) {
         // Error is handled in Redux state
-        console.error('Failed to submit onboarding:', error);
+        // Error is already shown via toast
         toast.error('Failed to submit onboarding. Please try again.');
       }
       return;
