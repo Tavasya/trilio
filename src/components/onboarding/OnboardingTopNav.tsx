@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link } from 'react-router';
 import trilioLogo from '@/lib/logo/trilio-logo.png'
 
 export default function OnboardingTopNav() {
