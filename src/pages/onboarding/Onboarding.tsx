@@ -20,12 +20,13 @@ import OnboardingProgress from "@/components/onboarding/OnboardingProgress";
 import OnboardingTopNav from "@/components/onboarding/OnboardingTopNav";
 import DescribeYourselfStep from "@/components/onboarding/steps/DescribeYourselfStep";
 import PostingFrequencyStep from "@/components/onboarding/steps/PostingFrequencyStep";
+import ConnectLinkedInStep from "@/components/onboarding/steps/ConnectLinkedInStep";
 import ContentFocusStep from "@/components/onboarding/steps/ContentFocusStep";
 import LinkedInGoalsStep from "@/components/onboarding/steps/LinkedInGoalsStep";
 import TargetAudienceStep from "@/components/onboarding/steps/TargetAudienceStep";
 import FindingCreatorsStep from "@/components/onboarding/steps/FindingCreatorsStep";
 
-const TOTAL_STEPS = 6;
+const TOTAL_STEPS = 7;
 
 export default function Onboarding() {
   const navigate = useNavigate();
@@ -133,6 +134,12 @@ export default function Onboarding() {
           initialValue={formData.postingFrequency}
         />
       )
+    },
+    {
+      id: "connect-linkedin",
+      title: "Connect LinkedIn",
+      description: "Connect your LinkedIn account",
+      element: <ConnectLinkedInStep />
     },
     {
       id: "content-focus",

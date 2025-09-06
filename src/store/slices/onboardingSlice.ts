@@ -80,21 +80,24 @@ const validateStep = (step: number, formData: OnboardingFormData): string[] => {
       }
       break;
     case 3:
+      // LinkedIn connection step - no validation required (optional)
+      break;
+    case 4:
       if (formData.contentFocus.length === 0) {
         errors.push('Please select at least one content focus area');
       }
       break;
-    case 4:
+    case 5:
       if (formData.linkedinGoals.length === 0) {
         errors.push('Please select at least one LinkedIn goal');
       }
       break;
-    case 5:
+    case 6:
       if (formData.targetAudience.length === 0) {
         errors.push('Please select at least one target audience');
       }
       break;
-    case 6:
+    case 7:
       if (!formData.selectedCreators || formData.selectedCreators.length === 0) {
         errors.push('Please select at least one creator to learn from');
       }
