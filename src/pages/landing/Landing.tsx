@@ -1,6 +1,7 @@
-import { useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { SignedIn, SignedOut, SignInButton, useUser } from '@clerk/react-router';
 import Hero from "@/components/landing/Hero";
 import QuickStartTasks from "@/components/landing/QuickStartTasks";
 import TestimonialCarousel from "@/components/landing/TestimonialCarousel";
@@ -9,6 +10,7 @@ import trilioLogo from "@/lib/logo/trilio-logo.png";
 
 export default function Landing() {
   const navigate = useNavigate();
+  const { user } = useUser();
   const [scrolledPastPurple, setScrolledPastPurple] = useState(false);
 
   useEffect(() => {
@@ -41,20 +43,41 @@ export default function Landing() {
             <img src={trilioLogo} alt="Trilio" className="w-10 h-10" />
             
             <div className="flex items-center gap-3">
-              <Button
-                variant="ghost"
-                className={`px-4 py-2 transition-colors ${
-                  scrolledPastPurple ? 'text-gray-700 hover:bg-gray-100/50' : 'text-gray-700 hover:bg-white/50'
-                }`}
-              >
-                Login
-              </Button>
-              <Button
-                onClick={() => navigate("/onboarding/1")}
-                className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
-              >
-                Try for Free
-              </Button>
+              <SignedOut>
+                <SignInButton mode="modal">
+                  <Button
+                    variant="ghost"
+                    className={`px-4 py-2 transition-colors ${
+                      scrolledPastPurple ? 'text-gray-700 hover:bg-gray-100/50' : 'text-gray-700 hover:bg-white/50'
+                    }`}
+                  >
+                    Sign In
+                  </Button>
+                </SignInButton>
+                <Button
+                  onClick={() => navigate("/onboarding/1")}
+                  className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
+                >
+                  Try for Free
+                </Button>
+              </SignedOut>
+              <SignedIn>
+                <Button
+                  onClick={() => {
+                    // Check if user has completed onboarding
+                    const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${user?.id}`);
+                    
+                    if (hasCompletedOnboarding) {
+                      navigate("/dashboard");
+                    } else {
+                      navigate("/onboarding/1");
+                    }
+                  }}
+                  className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
+                >
+                  Go to App
+                </Button>
+              </SignedIn>
             </div>
           </div>
         </div>

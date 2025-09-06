@@ -1,6 +1,7 @@
 import { useCallback, useEffect } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { useUser } from "@clerk/react-router";
 import { toast } from "sonner";
 import {
   setCurrentStep,
@@ -30,6 +31,7 @@ export default function Onboarding() {
   const navigate = useNavigate();
   const { step } = useParams();
   const dispatch = useAppDispatch();
+  const { user } = useUser();
   
   const { formData, submission } = useAppSelector(state => state.onboarding);
   const isValid = useAppSelector(selectIsCurrentStepValid);
@@ -90,17 +92,23 @@ export default function Onboarding() {
       // Submit onboarding data
       try {
         await dispatch(submitOnboarding(formData)).unwrap();
+        
+        // Mark onboarding as completed for this user
+        if (user?.id) {
+          localStorage.setItem(`onboarding_completed_${user.id}`, 'true');
+        }
+        
         navigate("/dashboard");
       } catch (error) {
         // Error is handled in Redux state
-        console.error('Failed to submit onboarding:', error);
+        // Error is already shown via toast
         toast.error('Failed to submit onboarding. Please try again.');
       }
       return;
     }
     
     goToStep(currentStepIndex + 1);
-  }, [isValid, currentStepIndex, dispatch, formData, navigate, goToStep, errors]);
+  }, [isValid, currentStepIndex, dispatch, formData, navigate, goToStep, errors, user?.id]);
 
   // Step components configuration
   const steps = [

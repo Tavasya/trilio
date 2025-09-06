@@ -1,7 +1,11 @@
 import { useEffect, useRef, useState } from "react";
+import { useNavigate } from "react-router";
+import { SignedIn, SignedOut, useUser } from '@clerk/react-router';
 import trilioLogo from "@/lib/logo/trilio-logo.png";
 
 export default function SalesSection() {
+  const navigate = useNavigate();
+  const { user } = useUser();
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const ctaRef = useRef<HTMLDivElement | null>(null);
@@ -133,12 +137,34 @@ export default function SalesSection() {
           <div className={`flex justify-center gap-4 transition-all duration-700 delay-500 ${
             ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}>
-            <button className="px-6 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium h-12 flex items-center">
-              Try for Free
-            </button>
-            <button className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center">
-              Book a Call
-            </button>
+            <SignedOut>
+              <button 
+                onClick={() => navigate("/onboarding/1")}
+                className="px-6 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium h-12 flex items-center"
+              >
+                Try for Free
+              </button>
+              <button className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center">
+                Book a Call
+              </button>
+            </SignedOut>
+            <SignedIn>
+              <button 
+                onClick={() => {
+                  // Check if user has completed onboarding
+                  const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${user?.id}`);
+                  
+                  if (hasCompletedOnboarding) {
+                    navigate("/dashboard");
+                  } else {
+                    navigate("/onboarding/1");
+                  }
+                }}
+                className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center"
+              >
+                Go to App
+              </button>
+            </SignedIn>
           </div>
         </div>
       </div>
