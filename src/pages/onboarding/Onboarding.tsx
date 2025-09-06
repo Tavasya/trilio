@@ -1,6 +1,6 @@
 import { useCallback, useEffect } from "react";
 import { useNavigate, useParams } from "react-router";
-import { useAppDispatch, useAppSelector } from "@/hooks/redux";
+import { useAppDispatch, useAppSelector } from "../../store";
 import { useUser } from "@clerk/react-router";
 import { toast } from "sonner";
 import {
@@ -14,7 +14,7 @@ import {
   submitOnboarding,
   selectIsCurrentStepValid,
   selectCurrentStepErrors
-} from "@/store/slices/onboardingSlice";
+} from "../../features/onboarding/onboardingSlice";
 import OnboardingBottomNav from "@/components/onboarding/OnboardingBottomNav";
 import OnboardingProgress from "@/components/onboarding/OnboardingProgress";
 import OnboardingTopNav from "@/components/onboarding/OnboardingTopNav";
@@ -100,7 +100,7 @@ export default function Onboarding() {
         }
         
         navigate("/dashboard");
-      } catch (error) {
+      } catch {
         // Error is handled in Redux state
         // Error is already shown via toast
         toast.error('Failed to submit onboarding. Please try again.');
