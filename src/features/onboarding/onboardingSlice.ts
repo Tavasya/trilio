@@ -110,14 +110,15 @@ const validateStep = (step: number, formData: OnboardingFormData): string[] => {
 // Async thunk for submitting onboarding data
 export const submitOnboarding = createAsyncThunk(
   'onboarding/submit',
-  async (_formData: OnboardingFormData) => {
-    // Simulate API call - replace with actual API endpoint
-    await new Promise(resolve => setTimeout(resolve, 1000));
+  async (formData: OnboardingFormData) => {
+    const { onboardingService } = await import('./onboardingService');
+    
+    const response = await onboardingService.submitOnboarding(formData);
     
     // Clear localStorage on successful submission
     localStorage.removeItem(STORAGE_KEY);
     
-    return { success: true };
+    return response;
   }
 );
 
