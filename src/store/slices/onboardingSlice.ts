@@ -156,22 +156,22 @@ const onboardingSlice = createSlice({
     },
     setContentFocus: (state, action: PayloadAction<string[]>) => {
       state.formData.contentFocus = action.payload;
-      state.validation.errors[3] = validateStep(3, state.formData);
+      state.validation.errors[4] = validateStep(4, state.formData);
       saveDataToStorage(state.formData);
     },
     setLinkedInGoals: (state, action: PayloadAction<string[]>) => {
       state.formData.linkedinGoals = action.payload;
-      state.validation.errors[4] = validateStep(4, state.formData);
+      state.validation.errors[5] = validateStep(5, state.formData);
       saveDataToStorage(state.formData);
     },
     setTargetAudience: (state, action: PayloadAction<string[]>) => {
       state.formData.targetAudience = action.payload;
-      state.validation.errors[5] = validateStep(5, state.formData);
+      state.validation.errors[6] = validateStep(6, state.formData);
       saveDataToStorage(state.formData);
     },
     setSelectedCreators: (state, action: PayloadAction<string[]>) => {
       state.formData.selectedCreators = action.payload;
-      state.validation.errors[6] = validateStep(6, state.formData);
+      state.validation.errors[7] = validateStep(7, state.formData);
       saveDataToStorage(state.formData);
     },
     resetOnboarding: () => {
