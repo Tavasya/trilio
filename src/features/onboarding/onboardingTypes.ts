@@ -24,3 +24,11 @@ export interface OnboardingSubmissionResponse {
   success: boolean;
   message?: string;
 }
+
+export interface OnboardingStatusResponse {
+  onboarding_completed: boolean;
+}
+
+export interface CompleteOnboardingResponse {
+  onboarding_completed: boolean;
+}

@@ -1,18 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-
-interface OnboardingFormData {
-  description: string[];
-  postingFrequency: string;
-  contentFocus: string[];
-  linkedinGoals: string[];
-  targetAudience: string[];
-  selectedCreators: string[];
-}
+import type { OnboardingFormData, OnboardingStatusResponse } from './onboardingTypes';
+import { onboardingService } from './onboardingService';
 
 interface OnboardingState {
   currentStep: number;
   formData: OnboardingFormData;
+  onboardingCompleted: boolean;
   validation: {
     errors: Record<number, string[]>;
   };
@@ -35,6 +29,7 @@ const initialState: OnboardingState = {
     targetAudience: [],
     selectedCreators: []
   },
+  onboardingCompleted: false,
   validation: {
     errors: {}
   },
@@ -107,6 +102,28 @@ const validateStep = (step: number, formData: OnboardingFormData): string[] => {
   return errors;
 };
 
+// Async thunk for fetching onboarding status
+export const fetchOnboardingStatus = createAsyncThunk(
+  'onboarding/fetchStatus',
+  async (token: string): Promise<OnboardingStatusResponse> => {
+    return await onboardingService.getOnboardingStatus(token);
+  }
+);
+
+
+// Async thunk for completing onboarding (marks as complete in DB)
+export const completeOnboarding = createAsyncThunk(
+  'onboarding/complete',
+  async (token: string) => {
+    const response = await onboardingService.completeOnboarding(token);
+    
+    // Clear localStorage on successful completion
+    localStorage.removeItem(STORAGE_KEY);
+    
+    return response;
+  }
+);
+
 // Async thunk for submitting onboarding data
 export const submitOnboarding = createAsyncThunk(
   'onboarding/submit',
@@ -117,9 +134,6 @@ export const submitOnboarding = createAsyncThunk(
     
     // Simulate API call for now
     await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Clear localStorage on successful submission
-    localStorage.removeItem(STORAGE_KEY);
     
     // Return mock successful response
     return { success: true, data: formData };
@@ -189,6 +203,22 @@ const onboardingSlice = createSlice({
   },
   extraReducers: (builder) => {
     builder
+      .addCase(fetchOnboardingStatus.fulfilled, (state, action) => {
+        state.onboardingCompleted = action.payload.onboarding_completed;
+      })
+      .addCase(completeOnboarding.pending, (state) => {
+        state.submission.isLoading = true;
+        state.submission.error = null;
+      })
+      .addCase(completeOnboarding.fulfilled, (state) => {
+        state.submission.isLoading = false;
+        state.submission.isComplete = true;
+        state.onboardingCompleted = true; // Update local state
+      })
+      .addCase(completeOnboarding.rejected, (state, action) => {
+        state.submission.isLoading = false;
+        state.submission.error = action.error.message || 'Failed to complete onboarding';
+      })
       .addCase(submitOnboarding.pending, (state) => {
         state.submission.isLoading = true;
         state.submission.error = null;
