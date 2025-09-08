@@ -1,5 +1,5 @@
 import { API_CONFIG } from '../../shared/config/api';
-import type { OnboardingStatusResponse, CompleteOnboardingResponse, LinkedInConnectResponse } from './onboardingTypes';
+import type { OnboardingStatusResponse, CompleteOnboardingResponse } from './onboardingTypes';
 
 export interface OnboardingSubmissionData {
   description: string[];
@@ -62,22 +62,6 @@ export class OnboardingService {
     return response.json();
   }
 
-  async connectLinkedIn(token: string): Promise<LinkedInConnectResponse> {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/api/onboarding/linkedin-connect`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
-      },
-    });
-
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || 'Failed to connect LinkedIn');
-    }
-
-    return response.json();
-  }
 }
 
 export const onboardingService = new OnboardingService();

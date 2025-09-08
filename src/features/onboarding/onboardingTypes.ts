@@ -27,14 +27,8 @@ export interface OnboardingSubmissionResponse {
 
 export interface OnboardingStatusResponse {
   onboarding_completed: boolean;
-  linkedin_connected: boolean;
 }
 
 export interface CompleteOnboardingResponse {
-  message: string;
   onboarding_completed: boolean;
-}
-
-export interface LinkedInConnectResponse {
-  linkedin_connected: boolean;
 }

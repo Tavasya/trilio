@@ -6,7 +6,6 @@ import { onboardingService } from './onboardingService';
 interface OnboardingState {
   currentStep: number;
   formData: OnboardingFormData;
-  linkedinConnected: boolean;
   onboardingCompleted: boolean;
   validation: {
     errors: Record<number, string[]>;
@@ -30,7 +29,6 @@ const initialState: OnboardingState = {
     targetAudience: [],
     selectedCreators: []
   },
-  linkedinConnected: false,
   onboardingCompleted: false,
   validation: {
     errors: {}
@@ -112,14 +110,6 @@ export const fetchOnboardingStatus = createAsyncThunk(
   }
 );
 
-// Async thunk for connecting LinkedIn account
-export const connectLinkedIn = createAsyncThunk(
-  'onboarding/connectLinkedIn',
-  async (token: string) => {
-    const response = await onboardingService.connectLinkedIn(token);
-    return response;
-  }
-);
 
 // Async thunk for completing onboarding (marks as complete in DB)
 export const completeOnboarding = createAsyncThunk(
@@ -214,14 +204,7 @@ const onboardingSlice = createSlice({
   extraReducers: (builder) => {
     builder
       .addCase(fetchOnboardingStatus.fulfilled, (state, action) => {
-        state.linkedinConnected = action.payload.linkedin_connected;
         state.onboardingCompleted = action.payload.onboarding_completed;
-      })
-      .addCase(connectLinkedIn.fulfilled, (state, action) => {
-        state.linkedinConnected = action.payload.linkedin_connected;
-      })
-      .addCase(connectLinkedIn.rejected, (state, action) => {
-        state.submission.error = action.error.message || 'Failed to connect LinkedIn';
       })
       .addCase(completeOnboarding.pending, (state) => {
         state.submission.isLoading = true;

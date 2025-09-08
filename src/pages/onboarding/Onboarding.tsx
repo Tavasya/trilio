@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo } from "react";
 import { useNavigate, useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "../../store";
-import { useUser, useAuth } from "@clerk/react-router";
+import { useAuth } from "@clerk/react-router";
 import { toast } from "sonner";
 import {
   setCurrentStep,
@@ -21,27 +21,24 @@ import OnboardingProgress from "@/components/onboarding/OnboardingProgress";
 import OnboardingTopNav from "@/components/onboarding/OnboardingTopNav";
 import DescribeYourselfStep from "@/components/onboarding/steps/DescribeYourselfStep";
 import PostingFrequencyStep from "@/components/onboarding/steps/PostingFrequencyStep";
-import ConnectLinkedInStep from "@/components/onboarding/steps/ConnectLinkedInStep";
 import ContentFocusStep from "@/components/onboarding/steps/ContentFocusStep";
 import LinkedInGoalsStep from "@/components/onboarding/steps/LinkedInGoalsStep";
 import TargetAudienceStep from "@/components/onboarding/steps/TargetAudienceStep";
 import FindingCreatorsStep from "@/components/onboarding/steps/FindingCreatorsStep";
 
-const BASE_TOTAL_STEPS = 7;
+const BASE_TOTAL_STEPS = 6;
 
 export default function Onboarding() {
   const navigate = useNavigate();
   const { step } = useParams();
   const dispatch = useAppDispatch();
-  const { user } = useUser();
   const { getToken } = useAuth();
   
-  const { formData, submission, linkedinConnected } = useAppSelector(state => state.onboarding);
+  const { formData, submission } = useAppSelector(state => state.onboarding);
   const isValid = useAppSelector(selectIsCurrentStepValid);
   const errors = useAppSelector(selectCurrentStepErrors);
 
-  // Dynamic step calculation based on LinkedIn connection status
-  const totalSteps = linkedinConnected ? BASE_TOTAL_STEPS - 1 : BASE_TOTAL_STEPS;
+  const totalSteps = BASE_TOTAL_STEPS;
   const urlStep = Number(step) || 1;
   
   const currentStep = urlStep;
@@ -119,7 +116,7 @@ export default function Onboarding() {
     goToStep(nextStep);
   }, [isValid, urlStep, totalSteps, dispatch, formData, navigate, goToStep, errors, getToken]);
 
-  // Step components configuration - dynamically exclude LinkedIn step if already connected
+  // Step components configuration
   const steps = useMemo(() => {
     const allSteps = [
       {
@@ -143,12 +140,6 @@ export default function Onboarding() {
             initialValue={formData.postingFrequency}
           />
         )
-      },
-      {
-        id: "connect-linkedin",
-        title: "Connect LinkedIn",
-        description: "Connect your LinkedIn account",
-        element: <ConnectLinkedInStep />
       },
       {
         id: "content-focus",
@@ -196,12 +187,8 @@ export default function Onboarding() {
       }
     ];
 
-    // Filter out LinkedIn step if already connected
-    return linkedinConnected 
-      ? allSteps.filter(step => step.id !== "connect-linkedin")
-      : allSteps;
+    return allSteps;
   }, [
-    linkedinConnected,
     handleDescriptionChange,
     handlePostingFrequencyChange,
     handleContentFocusChange,
@@ -211,16 +198,10 @@ export default function Onboarding() {
     formData
   ]);
 
-  // Map URL step to step data - accounting for LinkedIn skip
+  // Map URL step to step data
   const getStepDataIndex = useCallback((urlStepNumber: number): number => {
-    if (!linkedinConnected) {
-      return urlStepNumber - 1; // Normal 0-based indexing
-    }
-    
-    // LinkedIn connected: the steps array has LinkedIn step filtered out
-    // URL step maps directly to filtered array index
-    return urlStepNumber - 1;
-  }, [linkedinConnected]);
+    return urlStepNumber - 1; // Normal 0-based indexing
+  }, []);
 
   const stepDataIndex = getStepDataIndex(urlStep);
   const currentStepData = steps[stepDataIndex];
