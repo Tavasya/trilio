@@ -2,10 +2,12 @@ import { configureStore } from "@reduxjs/toolkit";
 import { useDispatch, useSelector } from 'react-redux';
 import type { TypedUseSelectorHook } from 'react-redux';
 import onboardingReducer from "./features/onboarding/onboardingSlice";
+import calendarReducer from "./store/slices/calendarSlice";
 
 const store = configureStore({
     reducer: {
         onboarding: onboardingReducer,
+        calendar: calendarReducer,
     },
 });
 
