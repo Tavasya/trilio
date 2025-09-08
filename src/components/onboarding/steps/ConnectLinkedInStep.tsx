@@ -2,6 +2,7 @@ import { memo } from 'react';
 import { Linkedin } from 'lucide-react';
 
 const ConnectLinkedInStep = memo(function ConnectLinkedInStep() {
+
   return (
     <div className="space-y-8">
       <div className="text-center space-y-2">
