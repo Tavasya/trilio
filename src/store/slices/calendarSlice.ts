@@ -4,8 +4,8 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 interface CalendarState {
   selectedMonth: number;
   selectedYear: number;
-  selectedDate: Date | null;
-  selectedWeek: Date;
+  selectedDate: string | null; // ISO string format
+  selectedWeek: string; // ISO string format
 }
 
 const getStartOfWeek = (date: Date): Date => {
@@ -18,8 +18,8 @@ const getStartOfWeek = (date: Date): Date => {
 const initialState: CalendarState = {
   selectedMonth: new Date().getMonth(),
   selectedYear: new Date().getFullYear(),
-  selectedDate: new Date(),
-  selectedWeek: getStartOfWeek(new Date()),
+  selectedDate: new Date().toISOString(),
+  selectedWeek: getStartOfWeek(new Date()).toISOString(),
 };
 
 const calendarSlice = createSlice({
@@ -33,32 +33,32 @@ const calendarSlice = createSlice({
       state.selectedYear = action.payload;
     },
     setSelectedDate: (state, action: PayloadAction<Date | null>) => {
-      state.selectedDate = action.payload;
+      state.selectedDate = action.payload ? action.payload.toISOString() : null;
       if (action.payload) {
-        state.selectedWeek = getStartOfWeek(action.payload);
+        state.selectedWeek = getStartOfWeek(action.payload).toISOString();
         state.selectedMonth = action.payload.getMonth();
         state.selectedYear = action.payload.getFullYear();
       }
     },
     setSelectedWeek: (state, action: PayloadAction<Date>) => {
-      state.selectedWeek = getStartOfWeek(action.payload);
+      state.selectedWeek = getStartOfWeek(action.payload).toISOString();
     },
     nextWeek: (state) => {
       const nextWeek = new Date(state.selectedWeek);
       nextWeek.setDate(nextWeek.getDate() + 7);
-      state.selectedWeek = nextWeek;
+      state.selectedWeek = nextWeek.toISOString();
     },
     previousWeek: (state) => {
       const prevWeek = new Date(state.selectedWeek);
       prevWeek.setDate(prevWeek.getDate() - 7);
-      state.selectedWeek = prevWeek;
+      state.selectedWeek = prevWeek.toISOString();
     },
     resetToToday: (state) => {
       const today = new Date();
       state.selectedMonth = today.getMonth();
       state.selectedYear = today.getFullYear();
-      state.selectedDate = today;
-      state.selectedWeek = getStartOfWeek(today);
+      state.selectedDate = today.toISOString();
+      state.selectedWeek = getStartOfWeek(today).toISOString();
     },
   },
 });

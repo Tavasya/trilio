@@ -6,6 +6,7 @@ import Dashboard from "@/pages/dashboard/Dashboard";
 import AppLayout from "./layouts/AppLayout";
 import Research from '@/pages/research/Research'
 import Posts from '@/pages/posts/Posts'
+import CreatePost from '@/pages/create-post/CreatePost'
 import Onboarding from '@/pages/onboarding/Onboarding'
 import ProtectedRoute from '@/components/ProtectedRoute'
 
@@ -34,6 +35,7 @@ export default function AppRoutes() {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/research" element={<Research />} />
                     <Route path="/posts" element={<Posts />} />
+                    <Route path="/create-post" element={<CreatePost />} />
                 </Route>
             </Routes>
         </Suspense>

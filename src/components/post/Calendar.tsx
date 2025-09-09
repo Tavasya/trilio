@@ -73,10 +73,12 @@ const Calendar: React.FC = () => {
         selectedMonth === new Date().getMonth() &&
         selectedYear === new Date().getFullYear();
       
-      const isSelected = selectedDate && 
-        day === selectedDate.getDate() &&
-        selectedMonth === selectedDate.getMonth() &&
-        selectedYear === selectedDate.getFullYear();
+      const isSelected = selectedDate && (() => {
+        const selected = new Date(selectedDate);
+        return day === selected.getDate() &&
+          selectedMonth === selected.getMonth() &&
+          selectedYear === selected.getFullYear();
+      })();
 
       days.push(
         <div

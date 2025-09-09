@@ -30,10 +30,10 @@ export default function AppLayout() {
             </SidebarHeader>
 
             <div className="p-4">
-              <button className='w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md'>
+              <Link to="/create-post" className='w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md'>
                   <PlusCircle className='h-4 w-4' />
                   <span>Create Post</span>
-              </button>
+              </Link>
             </div>
 
             <SidebarContent>
@@ -90,6 +90,7 @@ export default function AppLayout() {
                   {location.pathname === '/dashboard' && 'Dashboard'}
                   {location.pathname === '/research' && 'Research'}
                   {location.pathname === '/posts' && 'My Posts'}
+                  {location.pathname === '/create-post' && 'Create Post'}
                 </h1>
               </div>
               
