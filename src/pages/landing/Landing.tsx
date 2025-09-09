@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { SignedIn, SignedOut, SignInButton, SignUpButton, useUser } from '@clerk/react-router';
+import { SignedIn, SignedOut, SignInButton, SignUpButton, useUser, useClerk } from '@clerk/react-router';
 import Hero from "@/components/landing/Hero";
 import QuickStartTasks from "@/components/landing/QuickStartTasks";
 import TestimonialCarousel from "@/components/landing/TestimonialCarousel";
@@ -11,7 +11,9 @@ import trilioLogo from "@/lib/logo/trilio-logo.png";
 export default function Landing() {
   const navigate = useNavigate();
   const { user } = useUser();
+  const { loaded } = useClerk();
   const [scrolledPastPurple, setScrolledPastPurple] = useState(false);
+  const [backgroundLoaded, setBackgroundLoaded] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -24,25 +26,33 @@ export default function Landing() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
+  useEffect(() => {
+    // Trigger fade-in animation after component mounts
+    const timer = setTimeout(() => {
+      setBackgroundLoaded(true);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Fixed Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-[padding] duration-300 ${
         scrolledPastPurple 
           ? 'px-8 pt-4' 
           : ''
       }`}>
-        <div className={`transition-all duration-300 ${
+        <div className={`transition-[border-radius,background-color,box-shadow] duration-300 ${
           scrolledPastPurple 
             ? 'rounded-2xl bg-gradient-to-r from-primary/5 via-primary/10 to-primary/5 backdrop-blur-sm shadow-sm' 
             : ''
         }`}>
-          <div className={`flex items-center justify-between transition-all duration-300 ${
+          <div className={`flex items-center justify-between transition-[padding] duration-300 ${
             scrolledPastPurple ? 'px-8 py-3' : 'px-6 py-4'
           }`}>
             <img src={trilioLogo} alt="Trilio" className="w-10 h-10" />
             
-            <div className="flex items-center gap-3">
+            <div className={`flex items-center gap-3 ${!loaded ? 'invisible' : 'visible'}`}>
               <SignedOut>
                 <SignInButton mode="modal">
                   <Button
@@ -86,9 +96,21 @@ export default function Landing() {
 
       {/* Primary Rounded Container with Carousel - All in first viewport */}
       <div className="pt-1 px-1">
-        <div className="bg-gradient-to-b from-primary/15 via-primary/10 to-primary/5 rounded-xl relative min-h-[calc(100vh-8px)] flex flex-col">
+        <div className="relative min-h-[calc(100vh-8px)] flex flex-col rounded-xl">
+          {/* Background with fade-in effect */}
+          <div className={`absolute inset-0 bg-gradient-to-b from-primary/15 via-primary/10 to-primary/5 rounded-xl transition-opacity duration-1000 ${
+            backgroundLoaded ? 'opacity-100' : 'opacity-0'
+          }`}>
+            {/* Gradient spots for visual interest */}
+            <div className="absolute inset-0 overflow-hidden rounded-xl">
+              <div className="absolute top-20 -left-20 w-96 h-96 bg-purple-400/20 rounded-full blur-3xl" />
+              <div className="absolute bottom-20 -right-20 w-96 h-96 bg-pink-400/20 rounded-full blur-3xl" />
+              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-3xl" />
+            </div>
+          </div>
+          
           {/* Hero and Quick Tasks - Centered in middle */}
-          <div className="flex-1 flex flex-col items-center justify-center px-6">
+          <div className="relative flex-1 flex flex-col items-center justify-center px-6 z-10">
             <div className="space-y-6">
               <Hero />
               <QuickStartTasks />
