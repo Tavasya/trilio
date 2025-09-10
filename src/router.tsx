@@ -5,7 +5,9 @@ import Landing from "@/pages/landing/Landing";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import AppLayout from "./layouts/AppLayout";
 import Research from '@/pages/research/Research'
+import Scheduler from '@/pages/scheduler/Scheduler'
 import Posts from '@/pages/posts/Posts'
+import CreatePost from '@/pages/create-post/CreatePost'
 import Onboarding from '@/pages/onboarding/Onboarding'
 import Generate from '@/pages/generate/Generate'
 import ProtectedRoute from '@/components/ProtectedRoute'
@@ -34,7 +36,10 @@ export default function AppRoutes() {
                 } >
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/research" element={<Research />} />
+                    <Route path="/scheduler" element={<Scheduler />} />
                     <Route path="/posts" element={<Posts />} />
+
+                    <Route path="/create-post" element={<CreatePost />} />
                     <Route path="/generate" element={<Generate />} />
                 </Route>
             </Routes>

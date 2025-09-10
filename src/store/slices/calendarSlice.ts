@@ -4,6 +4,7 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 interface CalendarState {
   selectedMonth: number;
   selectedYear: number;
+
   selectedDate: string | null;
   selectedWeek: string;
 }
@@ -33,6 +34,7 @@ const calendarSlice = createSlice({
       state.selectedYear = action.payload;
     },
     setSelectedDate: (state, action: PayloadAction<Date | null>) => {
+
       if (action.payload) {
         state.selectedDate = action.payload.toISOString();
         state.selectedWeek = getStartOfWeek(action.payload).toISOString();

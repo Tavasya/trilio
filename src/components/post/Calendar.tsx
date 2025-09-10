@@ -73,6 +73,7 @@ const Calendar: React.FC = () => {
         selectedMonth === new Date().getMonth() &&
         selectedYear === new Date().getFullYear();
       
+
       const selectedDateObj = selectedDate ? new Date(selectedDate) : null;
       const isSelected = selectedDateObj && 
         day === selectedDateObj.getDate() &&

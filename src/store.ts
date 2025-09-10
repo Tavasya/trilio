@@ -3,11 +3,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import type { TypedUseSelectorHook } from 'react-redux';
 import onboardingReducer from "./features/onboarding/onboardingSlice";
 import calendarReducer from "./store/slices/calendarSlice";
+import postReducer from "./features/post/postSlice";
 
 const store = configureStore({
     reducer: {
         onboarding: onboardingReducer,
         calendar: calendarReducer,
+        post: postReducer,
     },
 });
 

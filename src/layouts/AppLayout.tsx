@@ -8,7 +8,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton
 } from '@/components/ui/sidebar'
-import { Book, FileText, Home, PlusCircle } from 'lucide-react'
+import { Book, FileText, Home, PlusCircle, Calendar } from 'lucide-react'
 import { UserButton } from '@clerk/react-router'
 import trilioLogo from '@/lib/logo/trilio-logo.png'
 
@@ -30,10 +30,10 @@ export default function AppLayout() {
             </SidebarHeader>
 
             <div className="p-4">
-              <button className='w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md'>
+              <Link to="/create-post" className='w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md'>
                   <PlusCircle className='h-4 w-4' />
                   <span>Create Post</span>
-              </button>
+              </Link>
             </div>
 
             <SidebarContent>
@@ -67,13 +67,26 @@ export default function AppLayout() {
                 <SidebarMenuItem>
                   <SidebarMenuButton 
                       asChild
+                      isActive={location.pathname === '/scheduler'}
+                      className="hover:bg-accent/50 data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
+                  >
+                    <Link to="/scheduler">
+                      <Calendar className='h-4 w-4' />
+                      <span>Scheduler</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+
+                <SidebarMenuItem>
+                  <SidebarMenuButton 
+                      asChild
                       isActive={location.pathname === '/posts'}
                       className="hover:bg-accent/50 data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
                   >
                     <Link to="/posts">
                       <FileText className='h-4 w-4' />
                       <span>My Posts</span>
-                    </ Link>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               </SidebarMenu>
@@ -89,7 +102,9 @@ export default function AppLayout() {
                 <h1 className="text-lg font-semibold">
                   {location.pathname === '/dashboard' && 'Dashboard'}
                   {location.pathname === '/research' && 'Research'}
+                  {location.pathname === '/scheduler' && 'Scheduler'}
                   {location.pathname === '/posts' && 'My Posts'}
+                  {location.pathname === '/create-post' && 'Create Post'}
                 </h1>
               </div>
               
