@@ -4,8 +4,9 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 interface CalendarState {
   selectedMonth: number;
   selectedYear: number;
-  selectedDate: string | null; // ISO string format
-  selectedWeek: string; // ISO string format
+
+  selectedDate: string | null;
+  selectedWeek: string;
 }
 
 const getStartOfWeek = (date: Date): Date => {
@@ -33,11 +34,14 @@ const calendarSlice = createSlice({
       state.selectedYear = action.payload;
     },
     setSelectedDate: (state, action: PayloadAction<Date | null>) => {
-      state.selectedDate = action.payload ? action.payload.toISOString() : null;
+
       if (action.payload) {
+        state.selectedDate = action.payload.toISOString();
         state.selectedWeek = getStartOfWeek(action.payload).toISOString();
         state.selectedMonth = action.payload.getMonth();
         state.selectedYear = action.payload.getFullYear();
+      } else {
+        state.selectedDate = null;
       }
     },
     setSelectedWeek: (state, action: PayloadAction<Date>) => {

@@ -1,22 +1,40 @@
-// src/pages/dashboard/Dashboard.tsx
+import IdentitySection from '../../components/dashboard/IdentitySection';
+import TopicsSection from '../../components/dashboard/TopicsSection';
+import ViralPostsSection from '../../components/dashboard/ViralPostsSection';
+import WritingStylesSection from '../../components/dashboard/WritingStylesSection';
+import { Button } from '../../components/ui/button';
+import { useNavigate } from 'react-router-dom';
+
 const Dashboard = () => {
-    return (
-      <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-        </div>
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-          <div className="rounded-lg border bg-card p-6">
-            <h3 className="text-sm font-medium text-muted-foreground">Total Posts</h3>
-            <p className="text-2xl font-bold mt-2">12</p>
-          </div>
-          <div className="rounded-lg border bg-card p-6">
-            <h3 className="text-sm font-medium text-muted-foreground">Research Items</h3>
-            <p className="text-2xl font-bold mt-2">5</p>
-          </div>
+  const navigate = useNavigate();
+  
+  const handleGeneratePost = () => {
+    navigate('/generate');
+  };
+
+  return (
+    <div className="space-y-6">
+      <div className="bg-white rounded-lg p-6 shadow-sm">
+        <h2 className="text-xl font-semibold text-gray-900 mb-6">
+          Section Breakdown
+        </h2>
+        
+        <IdentitySection />
+        <TopicsSection />
+        <ViralPostsSection />
+        <WritingStylesSection />
+        
+        <div className="flex justify-center mt-8">
+          <Button
+            onClick={handleGeneratePost}
+            className="px-8 py-3 text-lg font-medium"
+          >
+            Generate your first post
+          </Button>
         </div>
       </div>
-    )
-  }
-  
-  export default Dashboard
+    </div>
+  );
+};
+
+export default Dashboard;
