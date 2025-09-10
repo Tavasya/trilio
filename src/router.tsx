@@ -7,6 +7,7 @@ import AppLayout from "./layouts/AppLayout";
 import Research from '@/pages/research/Research'
 import Posts from '@/pages/posts/Posts'
 import Onboarding from '@/pages/onboarding/Onboarding'
+import Generate from '@/pages/generate/Generate'
 import ProtectedRoute from '@/components/ProtectedRoute'
 
 const LoadingSpinner = () => (
@@ -34,6 +35,7 @@ export default function AppRoutes() {
                     <Route path="/dashboard" element={<Dashboard />} />
                     <Route path="/research" element={<Research />} />
                     <Route path="/posts" element={<Posts />} />
+                    <Route path="/generate" element={<Generate />} />
                 </Route>
             </Routes>
         </Suspense>
