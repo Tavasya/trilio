@@ -73,10 +73,11 @@ const Calendar: React.FC = () => {
         selectedMonth === new Date().getMonth() &&
         selectedYear === new Date().getFullYear();
       
-      const isSelected = selectedDate && 
-        day === selectedDate.getDate() &&
-        selectedMonth === selectedDate.getMonth() &&
-        selectedYear === selectedDate.getFullYear();
+      const selectedDateObj = selectedDate ? new Date(selectedDate) : null;
+      const isSelected = selectedDateObj && 
+        day === selectedDateObj.getDate() &&
+        selectedMonth === selectedDateObj.getMonth() &&
+        selectedYear === selectedDateObj.getFullYear();
 
       days.push(
         <div
@@ -132,7 +133,7 @@ const Calendar: React.FC = () => {
     }
   };
 
-  const timeSlots = [];
+  const timeSlots: string[] = [];
   for (let hour = 0; hour < 24; hour++) {
     timeSlots.push(
       `${hour === 0 ? '12' : hour > 12 ? hour - 12 : hour}:00 ${hour < 12 ? 'AM' : 'PM'}`
