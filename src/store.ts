@@ -4,12 +4,14 @@ import type { TypedUseSelectorHook } from 'react-redux';
 import onboardingReducer from "./features/onboarding/onboardingSlice";
 import calendarReducer from "./store/slices/calendarSlice";
 import postReducer from "./features/post/postSlice";
+import chatReducer from "./features/chat/chatSlice";
 
 const store = configureStore({
     reducer: {
         onboarding: onboardingReducer,
         calendar: calendarReducer,
         post: postReducer,
+        chat: chatReducer,
     },
 });
 

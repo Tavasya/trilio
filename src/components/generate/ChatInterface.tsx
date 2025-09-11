@@ -1,49 +1,58 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Send, Plus, FileText, Link, Hash, Image } from 'lucide-react';
 import { Button } from '../ui/button';
-
-interface Message {
-  id: string;
-  role: 'user' | 'assistant';
-  content: string;
-  timestamp: Date;
-}
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { sendMessage, startNewConversation } from '@/features/chat/chatSlice';
+import { useAuth } from '@clerk/react-router';
+import { toast } from 'sonner';
 
 export default function ChatInterface() {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: '1',
-      role: 'assistant',
-      content: "I'll help you generate an engaging LinkedIn post. What topic would you like to write about?",
-      timestamp: new Date(),
-    },
-  ]);
+  const dispatch = useAppDispatch();
+  const { getToken } = useAuth();
   const [inputValue, setInputValue] = useState('');
   const [showTooltip, setShowTooltip] = useState(false);
 
-  const handleSend = () => {
+  const { 
+    conversations, 
+    activeConversationId, 
+    currentStreamingMessage, 
+    isStreaming 
+  } = useAppSelector((state) => state.chat);
+
+  const currentConversation = activeConversationId 
+    ? conversations[activeConversationId] 
+    : null;
+  
+  const messages = currentConversation?.messages || [];
+
+  useEffect(() => {
+    // Initialize with a welcome message if no conversation exists
+    if (!activeConversationId && messages.length === 0) {
+      dispatch(startNewConversation());
+    }
+  }, []);
+
+  const handleSend = async () => {
     if (!inputValue.trim()) return;
+    if (isStreaming) {
+      toast.error('Please wait for the current response to complete', { position: 'top-right' });
+      return;
+    }
 
-    const newMessage: Message = {
-      id: Date.now().toString(),
-      role: 'user',
-      content: inputValue,
-      timestamp: new Date(),
-    };
+    try {
+      const token = await getToken();
+      if (!token) {
+        toast.error('Authentication required', { position: 'top-right' });
+        return;
+      }
 
-    setMessages([...messages, newMessage]);
-    setInputValue('');
-    
-    // Placeholder for AI response
-    setTimeout(() => {
-      const aiResponse: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: 'I understand. Let me help you craft a compelling post about that topic...',
-        timestamp: new Date(),
-      };
-      setMessages(prev => [...prev, aiResponse]);
-    }, 1000);
+      const messageText = inputValue;
+      setInputValue('');
+      
+      await dispatch(sendMessage({ message: messageText, token })).unwrap();
+    } catch (error) {
+      console.error('Failed to send message:', error);
+    }
   };
 
   const handleKeyPress = (e: React.KeyboardEvent) => {
@@ -63,6 +72,14 @@ export default function ChatInterface() {
 
       {/* Messages Area */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {messages.length === 0 && (
+          <div className="flex justify-start">
+            <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900">
+              <p className="text-sm">I'll help you generate an engaging LinkedIn post. What topic would you like to write about?</p>
+            </div>
+          </div>
+        )}
+        
         {messages.map((message) => (
           <div
             key={message.id}
@@ -79,11 +96,38 @@ export default function ChatInterface() {
               <p className={`text-xs mt-1 ${
                 message.role === 'user' ? 'text-white/70' : 'text-gray-500'
               }`}>
-                {message.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </p>
             </div>
           </div>
         ))}
+        
+        {/* Streaming Message */}
+        {isStreaming && currentStreamingMessage && (
+          <div className="flex justify-start">
+            <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900">
+              <p className="text-sm">{currentStreamingMessage}</p>
+              <div className="flex items-center gap-1 mt-2">
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </div>
+          </div>
+        )}
+        
+        {/* Typing Indicator */}
+        {isStreaming && !currentStreamingMessage && (
+          <div className="flex justify-start">
+            <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900">
+              <div className="flex items-center gap-1">
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Input Area */}
@@ -131,8 +175,8 @@ export default function ChatInterface() {
           />
           <Button
             onClick={handleSend}
-            className="self-end"
-            disabled={!inputValue.trim()}
+            className={`self-end ${(!inputValue.trim() || isStreaming) ? 'opacity-50' : ''}`}
+            disabled={false}
           >
             <Send className="w-4 h-4" />
           </Button>

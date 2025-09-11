@@ -1,0 +1,209 @@
+import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import type { PayloadAction } from '@reduxjs/toolkit';
+import { chatService } from './chatService';
+import type { ChatState, Message, SSEEvent } from './chatTypes';
+import { toast } from 'sonner';
+
+const initialState: ChatState = {
+  conversations: {},
+  activeConversationId: null,
+  currentStreamingMessage: '',
+  isStreaming: false,
+  error: null,
+};
+
+// Async thunk for sending a message and handling the stream
+export const sendMessage = createAsyncThunk(
+  'chat/sendMessage',
+  async (
+    { message, token }: { message: string; token: string },
+    { dispatch, getState }
+  ) => {
+    const state = getState() as { chat: ChatState };
+    const conversationId = state.chat.activeConversationId;
+
+    // Add user message immediately
+    const userMessage: Message = {
+      id: Date.now().toString(),
+      role: 'user',
+      content: message,
+      timestamp: new Date().toISOString(),
+    };
+    dispatch(addUserMessage(userMessage));
+
+    // Start streaming
+    dispatch(startStreaming());
+
+    return new Promise<void>((resolve, reject) => {
+      chatService.streamChat(
+        {
+          message,
+          conversation_id: conversationId || undefined,
+        },
+        token,
+        (event: SSEEvent) => {
+          switch (event.type) {
+            case 'conversation':
+              dispatch(setConversationId(event.data.conversation_id));
+              break;
+            case 'message':
+              dispatch(appendStreamingContent(event.data.content));
+              break;
+            case 'done':
+              dispatch(completeStreaming(event.data.conversation_id));
+              resolve();
+              break;
+            case 'error':
+              dispatch(streamingError(event.data.error));
+              reject(new Error(event.data.error));
+              break;
+          }
+        },
+        (error: Error) => {
+          dispatch(streamingError(error.message));
+          reject(error);
+        }
+      );
+    });
+  }
+);
+
+const chatSlice = createSlice({
+  name: 'chat',
+  initialState,
+  reducers: {
+    addUserMessage: (state, action: PayloadAction<Message>) => {
+      // Use the active conversation ID if it exists, otherwise use 'temp'
+      const conversationId = state.activeConversationId || 'temp';
+      
+      if (!state.conversations[conversationId]) {
+        state.conversations[conversationId] = {
+          conversation_id: conversationId,
+          messages: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        };
+      }
+      
+      state.conversations[conversationId].messages.push(action.payload);
+      state.conversations[conversationId].updatedAt = new Date().toISOString();
+      
+      // Set as active if no conversation is active
+      if (!state.activeConversationId) {
+        state.activeConversationId = conversationId;
+      }
+    },
+    
+    setConversationId: (state, action: PayloadAction<string>) => {
+      const newId = action.payload;
+      
+      // If we had a temp conversation, move it to the new ID
+      if (state.activeConversationId === 'temp' && state.conversations.temp) {
+        state.conversations[newId] = {
+          ...state.conversations.temp,
+          conversation_id: newId,
+        };
+        delete state.conversations.temp;
+      } else if (!state.conversations[newId] && state.activeConversationId && state.conversations[state.activeConversationId]) {
+        // If switching to a new conversation ID but we already have an active one, keep it
+        state.conversations[newId] = {
+          ...state.conversations[state.activeConversationId],
+          conversation_id: newId,
+        };
+        if (state.activeConversationId !== newId) {
+          delete state.conversations[state.activeConversationId];
+        }
+      }
+      
+      state.activeConversationId = newId;
+    },
+    
+    startStreaming: (state) => {
+      state.isStreaming = true;
+      state.currentStreamingMessage = '';
+      state.error = null;
+    },
+    
+    appendStreamingContent: (state, action: PayloadAction<string>) => {
+      state.currentStreamingMessage += action.payload;
+    },
+    
+    completeStreaming: (state, action: PayloadAction<string>) => {
+      const conversationId = action.payload;
+      
+      // First ensure we have the right conversation
+      if (!state.conversations[conversationId] && state.activeConversationId) {
+        // The conversation might still be under temp or activeConversationId
+        const sourceId = state.activeConversationId;
+        if (state.conversations[sourceId]) {
+          state.conversations[conversationId] = {
+            ...state.conversations[sourceId],
+            conversation_id: conversationId,
+          };
+          if (sourceId !== conversationId) {
+            delete state.conversations[sourceId];
+          }
+        }
+      }
+      
+      // Now add the message to the correct conversation
+      if (state.currentStreamingMessage) {
+        const targetConversation = state.conversations[conversationId];
+        if (targetConversation) {
+          const assistantMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: state.currentStreamingMessage,
+            timestamp: new Date().toISOString(),
+          };
+          
+          targetConversation.messages.push(assistantMessage);
+          targetConversation.updatedAt = new Date().toISOString();
+        }
+      }
+      
+      // Update the active conversation ID
+      state.activeConversationId = conversationId;
+      state.isStreaming = false;
+      state.currentStreamingMessage = '';
+    },
+    
+    streamingError: (state, action: PayloadAction<string>) => {
+      state.isStreaming = false;
+      state.error = action.payload;
+      toast.error(action.payload, { position: 'top-right' });
+    },
+    
+    clearError: (state) => {
+      state.error = null;
+    },
+    
+    startNewConversation: (state) => {
+      state.activeConversationId = null;
+      state.currentStreamingMessage = '';
+      state.isStreaming = false;
+      state.error = null;
+    },
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(sendMessage.rejected, (state, action) => {
+        state.isStreaming = false;
+        state.error = action.error.message || 'Failed to send message';
+        toast.error(state.error, { position: 'top-right' });
+      });
+  },
+});
+
+export const {
+  addUserMessage,
+  setConversationId,
+  startStreaming,
+  appendStreamingContent,
+  completeStreaming,
+  streamingError,
+  clearError,
+  startNewConversation,
+} = chatSlice.actions;
+
+export default chatSlice.reducer;
