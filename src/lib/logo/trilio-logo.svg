@@ -1,0 +1,24 @@
+<svg width="120" height="40" viewBox="0 0 120 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background circle -->
+  <circle cx="20" cy="20" r="18" fill="oklch(0.55 0.25 300)" stroke="oklch(0.55 0.25 300)" stroke-width="2"/>
+  
+  <!-- Letter T -->
+  <path d="M8 12h24v4h-8v16h-8V16h-8v-4z" fill="white"/>
+  
+  <!-- Letter r -->
+  <path d="M36 12h4v20h-4v-8h-4v-4h4v-8z" fill="oklch(0.55 0.25 300)"/>
+  
+  <!-- Letter i -->
+  <path d="M48 12h4v20h-4z" fill="oklch(0.55 0.25 300)"/>
+  <circle cx="50" cy="8" r="2" fill="oklch(0.55 0.25 300)"/>
+  
+  <!-- Letter l -->
+  <path d="M56 12h4v20h-4z" fill="oklch(0.55 0.25 300)"/>
+  
+  <!-- Letter i -->
+  <path d="M64 12h4v20h-4z" fill="oklch(0.55 0.25 300)"/>
+  <circle cx="66" cy="8" r="2" fill="oklch(0.55 0.25 300)"/>
+  
+  <!-- Letter o -->
+  <ellipse cx="78" cy="22" rx="6" ry="10" fill="none" stroke="oklch(0.55 0.25 300)" stroke-width="4"/>
+</svg>
