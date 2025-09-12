@@ -26,6 +26,8 @@ export interface GeneratedPost {
   isEdited: boolean;  // Track if manually edited
 }
 
+export type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'error';
+
 export interface ChatState {
   conversations: Record<string, Conversation>;
   activeConversationId: string | null;
@@ -34,6 +36,7 @@ export interface ChatState {
   currentToolStatus: ToolStatus | null;
   error: string | null;
   generatedPost: GeneratedPost | null;
+  saveStatus: SaveStatus;
 }
 
 // API Request Types

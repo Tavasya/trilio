@@ -12,7 +12,6 @@ export default function Generate() {
   const [searchParams] = useSearchParams();
   const { getToken } = useAuth();
   const dispatch = useAppDispatch();
-  const generatedPost = useAppSelector(state => state.chat.generatedPost);
   const postId = searchParams.get('postId');
 
   useEffect(() => {

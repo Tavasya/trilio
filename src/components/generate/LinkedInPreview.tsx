@@ -1,15 +1,19 @@
 import { useState } from 'react';
-import { Heart, MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Lightbulb, Calendar, Image, X } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Lightbulb, Calendar, Image, X, Check, Loader2, AlertCircle } from 'lucide-react';
 import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { updateGeneratedPostContent } from '@/features/chat/chatSlice';
+import { updateGeneratedPostContent, saveDraftToDatabase } from '@/features/chat/chatSlice';
+import { useAuth } from '@clerk/react-router';
+import { toast } from 'sonner';
 
 type ViewSize = 'desktop' | 'mobile';
 
 export default function LinkedInPreview() {
   const dispatch = useAppDispatch();
+  const { getToken } = useAuth();
   const generatedPost = useAppSelector(state => state.chat.generatedPost);
+  const saveStatus = useAppSelector(state => state.chat.saveStatus);
   const userName = "John Doe";
   const userTitle = "Product Manager | Tech Enthusiast";
   const userAvatar = "";
@@ -69,6 +73,29 @@ export default function LinkedInPreview() {
     dispatch(updateGeneratedPostContent(newContent));
   };
   
+  const handleContentBlur = async () => {
+    setIsEditingContent(false);
+    
+    // Only save if we have a post ID and the content has been edited
+    if (postId && generatedPost?.isEdited && saveStatus === 'unsaved') {
+      try {
+        const token = await getToken();
+        if (!token) {
+          toast.error('Authentication required', { position: 'top-right' });
+          return;
+        }
+        
+        await dispatch(saveDraftToDatabase({
+          postId,
+          content: postContent,
+          token
+        })).unwrap();
+      } catch (error) {
+        console.error('Failed to save draft:', error);
+      }
+    }
+  };
+  
   const { text: displayContent, truncated } = getTruncatedContent();
   
   // Fixed engagement numbers
@@ -86,6 +113,35 @@ export default function LinkedInPreview() {
               <h2 className="text-lg font-semibold">LinkedIn Preview</h2>
               <p className="text-sm text-gray-500">See how your post will look</p>
             </div>
+            {/* Save Status Indicator */}
+            {postId && (
+              <div className="flex items-center gap-2 text-sm">
+                {saveStatus === 'saving' && (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
+                    <span className="text-gray-500">Saving...</span>
+                  </>
+                )}
+                {saveStatus === 'saved' && (
+                  <>
+                    <Check className="w-4 h-4 text-green-600" />
+                    <span className="text-green-600">Saved</span>
+                  </>
+                )}
+                {saveStatus === 'unsaved' && (
+                  <>
+                    <AlertCircle className="w-4 h-4 text-yellow-600" />
+                    <span className="text-yellow-600">Unsaved changes</span>
+                  </>
+                )}
+                {saveStatus === 'error' && (
+                  <>
+                    <AlertCircle className="w-4 h-4 text-red-600" />
+                    <span className="text-red-600">Save failed</span>
+                  </>
+                )}
+              </div>
+            )}
           </div>
         </div>
         
@@ -159,7 +215,7 @@ export default function LinkedInPreview() {
                 <textarea
                   value={postContent}
                   onChange={(e) => handleContentChange(e.target.value)}
-                  onBlur={() => setIsEditingContent(false)}
+                  onBlur={handleContentBlur}
                   className="w-full min-h-[100px] p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900"
                   autoFocus
                 />

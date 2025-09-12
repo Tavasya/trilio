@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { chatService } from './chatService';
-import type { ChatState, Message, SSEEvent, ToolStatus, MessageContext, GeneratedPost } from './chatTypes';
+import type { ChatState, Message, SSEEvent, ToolStatus, MessageContext, GeneratedPost, SaveStatus } from './chatTypes';
 import { toast } from 'sonner';
+import { postService } from '../post/postService';
 
 const initialState: ChatState = {
   conversations: {},
@@ -12,7 +13,21 @@ const initialState: ChatState = {
   currentToolStatus: null,
   error: null,
   generatedPost: null,
+  saveStatus: 'saved',
 };
+
+// Async thunk for saving draft to database
+export const saveDraftToDatabase = createAsyncThunk(
+  'chat/saveDraft',
+  async ({ postId, content, token }: { postId: string; content: string; token: string }) => {
+    const response = await postService.updateDraft(
+      postId,
+      { content },
+      token
+    );
+    return response;
+  }
+);
 
 // Async thunk for sending a message and handling the stream
 export const sendMessage = createAsyncThunk(
@@ -215,6 +230,7 @@ const chatSlice = createSlice({
       if (state.generatedPost) {
         state.generatedPost.content = action.payload;
         state.generatedPost.isEdited = true;
+        state.saveStatus = 'unsaved';
       }
     },
     
@@ -238,6 +254,10 @@ const chatSlice = createSlice({
     clearGeneratedPost: (state) => {
       state.generatedPost = null;
     },
+    
+    setSaveStatus: (state, action: PayloadAction<SaveStatus>) => {
+      state.saveStatus = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -245,6 +265,16 @@ const chatSlice = createSlice({
         state.isStreaming = false;
         state.error = action.error.message || 'Failed to send message';
         toast.error(state.error, { position: 'top-right' });
+      })
+      .addCase(saveDraftToDatabase.pending, (state) => {
+        state.saveStatus = 'saving';
+      })
+      .addCase(saveDraftToDatabase.fulfilled, (state) => {
+        state.saveStatus = 'saved';
+      })
+      .addCase(saveDraftToDatabase.rejected, (state) => {
+        state.saveStatus = 'error';
+        toast.error('Failed to save draft', { position: 'top-right' });
       });
   },
 });
@@ -263,6 +293,7 @@ export const {
   updateGeneratedPostContent,
   replaceGeneratedPostContent,
   clearGeneratedPost,
+  setSaveStatus,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
