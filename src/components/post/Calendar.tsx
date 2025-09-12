@@ -12,6 +12,37 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const Calendar: React.FC = () => {
   const dispatch = useAppDispatch();
   const { selectedMonth, selectedYear, selectedDate, selectedWeek } = useAppSelector((state) => state.calendar);
+  const { posts } = useAppSelector((state) => state.post);
+
+  // Simulated post dates for demonstration
+  const simulatedPostDates = [
+    new Date(2025, 0, 10), // Jan 10
+    new Date(2025, 0, 12), // Jan 12
+    new Date(2025, 0, 15), // Jan 15
+    new Date(2025, 0, 18), // Jan 18
+    new Date(2025, 0, 22), // Jan 22
+    new Date(2025, 0, 25), // Jan 25
+    new Date(2025, 0, 28), // Jan 28
+  ];
+
+  const hasPostOnDate = (date: Date) => {
+    // Check simulated posts
+    const hasSimulated = simulatedPostDates.some(postDate => 
+      postDate.getDate() === date.getDate() &&
+      postDate.getMonth() === date.getMonth() &&
+      postDate.getFullYear() === date.getFullYear()
+    );
+
+    // Check actual posts from Redux
+    const hasActual = posts.some(post => {
+      const postDate = new Date(post.created_at);
+      return postDate.getDate() === date.getDate() &&
+        postDate.getMonth() === date.getMonth() &&
+        postDate.getFullYear() === date.getFullYear();
+    });
+
+    return hasSimulated || hasActual;
+  };
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -80,11 +111,13 @@ const Calendar: React.FC = () => {
         selectedMonth === selectedDateObj.getMonth() &&
         selectedYear === selectedDateObj.getFullYear();
 
+      const hasPost = hasPostOnDate(currentDate);
+
       days.push(
         <div
           key={day}
           onClick={() => dispatch(setSelectedDate(currentDate))}
-          className={`h-8 flex items-center justify-center text-sm cursor-pointer rounded-lg transition-all
+          className={`h-8 flex items-center justify-center text-sm cursor-pointer rounded-lg transition-all relative
             ${isToday && !isSelected
               ? 'bg-primary/10 text-primary font-medium' 
               : ''
@@ -95,6 +128,11 @@ const Calendar: React.FC = () => {
             }`}
         >
           {day}
+          {hasPost && (
+            <div className={`absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full ${
+              isSelected ? 'bg-white' : 'bg-[#0077b5]'
+            }`} />
+          )}
         </div>
       );
     }
@@ -135,7 +173,7 @@ const Calendar: React.FC = () => {
   };
 
   const timeSlots: string[] = [];
-  for (let hour = 0; hour < 24; hour++) {
+  for (let hour = 0; hour < 24; hour += 2) {
     timeSlots.push(
       `${hour === 0 ? '12' : hour > 12 ? hour - 12 : hour}:00 ${hour < 12 ? 'AM' : 'PM'}`
     );
@@ -221,7 +259,7 @@ const Calendar: React.FC = () => {
               {timeSlots.map((time) => (
                 <div
                   key={time}
-                  className="h-20 text-xs text-gray-400 pr-4 pt-2 text-right border-r border-gray-100"
+                  className="h-32 text-xs text-gray-400 pr-4 pt-2 text-right border-r border-gray-100"
                 >
                   {time}
                 </div>
@@ -232,10 +270,11 @@ const Calendar: React.FC = () => {
               {weekDates.map((date, index) => {
                 const isToday = 
                   date.toDateString() === new Date().toDateString();
+                const hasPost = hasPostOnDate(date);
                 
                 return (
                   <div key={index} className="border-r border-gray-100 last:border-r-0">
-                    <div className={`h-16 border-b border-gray-100 flex flex-col items-center justify-center ${
+                    <div className={`h-16 border-b border-gray-100 flex flex-col items-center justify-center relative ${
                       isToday ? 'bg-primary/5' : 'bg-gray-50/50'
                     }`}>
                       <div className="text-xs text-gray-500 mb-1">
@@ -246,17 +285,40 @@ const Calendar: React.FC = () => {
                       }`}>
                         {date.getDate()}
                       </div>
+                      {hasPost && (
+                        <div className="absolute top-2 right-2">
+                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#0077b5">
+                            <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                          </svg>
+                        </div>
+                      )}
                     </div>
                     
-                    {timeSlots.map((_, timeIndex) => (
-                      <div
-                        key={timeIndex}
-                        className={`h-20 border-b border-gray-50 ${
-                          isToday ? 'bg-primary/[0.02]' : 'hover:bg-gray-50/50'
-                        } transition-colors cursor-pointer`}
-                      >
-                      </div>
-                    ))}
+                    {timeSlots.map((_, timeIndex) => {
+                      // Show LinkedIn post indicator at 10 AM slot (which is now index 5 for 2-hour intervals)
+                      const showPostIndicator = hasPost && timeIndex === 5;
+                      
+                      return (
+                        <div
+                          key={timeIndex}
+                          className={`h-32 border-b border-gray-50 ${
+                            isToday ? 'bg-primary/[0.02]' : 'hover:bg-gray-50/50'
+                          } transition-colors cursor-pointer relative`}
+                        >
+                          {showPostIndicator && (
+                            <div className="absolute inset-x-2 top-3 bg-[#0077b5]/10 border border-[#0077b5]/20 rounded-lg p-3">
+                              <div className="flex flex-col items-center gap-2">
+                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#0077b5">
+                                  <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                                </svg>
+                                <span className="text-xs text-[#0077b5] font-semibold">LinkedIn</span>
+                                <span className="text-[10px] text-[#0077b5]/80">10:00 AM</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })}
