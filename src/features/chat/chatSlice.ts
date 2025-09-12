@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { chatService } from './chatService';
-import type { ChatState, Message, SSEEvent } from './chatTypes';
+import type { ChatState, Message, SSEEvent, ToolStatus } from './chatTypes';
 import { toast } from 'sonner';
 
 const initialState: ChatState = {
@@ -9,6 +9,7 @@ const initialState: ChatState = {
   activeConversationId: null,
   currentStreamingMessage: '',
   isStreaming: false,
+  currentToolStatus: null,
   error: null,
 };
 
@@ -16,7 +17,7 @@ const initialState: ChatState = {
 export const sendMessage = createAsyncThunk(
   'chat/sendMessage',
   async (
-    { message, token }: { message: string; token: string },
+    { message, token, tools }: { message: string; token: string; tools?: string[] },
     { dispatch, getState }
   ) => {
     const state = getState() as { chat: ChatState };
@@ -39,6 +40,7 @@ export const sendMessage = createAsyncThunk(
         {
           message,
           conversation_id: conversationId || undefined,
+          tools,
         },
         token,
         (event: SSEEvent) => {
@@ -48,6 +50,9 @@ export const sendMessage = createAsyncThunk(
               break;
             case 'message':
               dispatch(appendStreamingContent(event.data.content));
+              break;
+            case 'tool_status':
+              dispatch(setToolStatus(event.data));
               break;
             case 'done':
               dispatch(completeStreaming(event.data.conversation_id));
@@ -121,7 +126,12 @@ const chatSlice = createSlice({
     startStreaming: (state) => {
       state.isStreaming = true;
       state.currentStreamingMessage = '';
+      state.currentToolStatus = null;
       state.error = null;
+    },
+    
+    setToolStatus: (state, action: PayloadAction<ToolStatus>) => {
+      state.currentToolStatus = action.payload;
     },
     
     appendStreamingContent: (state, action: PayloadAction<string>) => {
@@ -166,6 +176,7 @@ const chatSlice = createSlice({
       state.activeConversationId = conversationId;
       state.isStreaming = false;
       state.currentStreamingMessage = '';
+      state.currentToolStatus = null;
     },
     
     streamingError: (state, action: PayloadAction<string>) => {
@@ -199,6 +210,7 @@ export const {
   addUserMessage,
   setConversationId,
   startStreaming,
+  setToolStatus,
   appendStreamingContent,
   completeStreaming,
   streamingError,

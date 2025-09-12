@@ -17,7 +17,8 @@ export class ChatService {
       // Create the request body
       const body = JSON.stringify({
         message: request.message,
-        ...(request.conversation_id && { conversation_id: request.conversation_id })
+        ...(request.conversation_id && { conversation_id: request.conversation_id }),
+        ...(request.tools && request.tools.length > 0 && { tools: request.tools })
       });
 
       // Make the initial request to get the SSE stream
@@ -86,6 +87,9 @@ export class ChatService {
                   break;
                 case 'message':
                   onEvent({ type: 'message', data });
+                  break;
+                case 'tool_status':
+                  onEvent({ type: 'tool_status', data });
                   break;
                 case 'done':
                   onEvent({ type: 'done', data });

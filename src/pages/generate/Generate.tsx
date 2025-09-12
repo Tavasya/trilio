@@ -20,14 +20,14 @@ export default function Generate() {
   ]);
 
   return (
-    <div className="h-full bg-gray-50 flex">
+    <div className="h-full bg-gray-50 flex overflow-hidden">
       {/* Chat Interface - 3/5 width */}
-      <div className="w-3/5 p-4 h-full">
+      <div className="w-3/5 p-4 h-full overflow-hidden">
         <ChatInterface />
       </div>
 
       {/* LinkedIn Preview - 2/5 width */}
-      <div className="w-2/5 p-4 h-full">
+      <div className="w-2/5 p-4 h-full overflow-auto">
         <LinkedInPreview posts={generatedPosts} />
       </div>
     </div>

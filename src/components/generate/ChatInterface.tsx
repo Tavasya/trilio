@@ -1,22 +1,32 @@
 import { useState, useEffect } from 'react';
-import { Send, Plus, FileText, Link, Hash, Image } from 'lucide-react';
+import { Send, Search, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { sendMessage, startNewConversation } from '@/features/chat/chatSlice';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
 
+// Define available tools with their metadata
+const AVAILABLE_TOOLS = [
+  { id: 'linkedin_research', name: 'LinkedIn Research', icon: Search, description: 'Search LinkedIn data' },
+  // Easy to add more tools here:
+  // { id: 'ai_enhance', name: 'AI Enhance', icon: Brain, description: 'Enhance with AI' },
+  // { id: 'trending', name: 'Trending Topics', icon: TrendingUp, description: 'Find trending topics' },
+  // { id: 'audience', name: 'Audience Analysis', icon: Users, description: 'Analyze target audience' },
+];
+
 export default function ChatInterface() {
   const dispatch = useAppDispatch();
   const { getToken } = useAuth();
   const [inputValue, setInputValue] = useState('');
-  const [showTooltip, setShowTooltip] = useState(false);
+  const [selectedTools, setSelectedTools] = useState<string[]>([]);
 
   const { 
     conversations, 
     activeConversationId, 
     currentStreamingMessage, 
-    isStreaming 
+    isStreaming,
+    currentToolStatus 
   } = useAppSelector((state) => state.chat);
 
   const currentConversation = activeConversationId 
@@ -49,29 +59,43 @@ export default function ChatInterface() {
       const messageText = inputValue;
       setInputValue('');
       
-      await dispatch(sendMessage({ message: messageText, token })).unwrap();
+      await dispatch(sendMessage({ 
+        message: messageText, 
+        token,
+        tools: selectedTools.length > 0 ? selectedTools : undefined
+      })).unwrap();
+      
+      setSelectedTools([]); // Reset selected tools after sending
     } catch (error) {
       console.error('Failed to send message:', error);
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
+  const handleKeyDown = (e: React.KeyboardEvent) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       handleSend();
     }
   };
 
+  const toggleTool = (toolId: string) => {
+    setSelectedTools(prev => 
+      prev.includes(toolId) 
+        ? prev.filter(id => id !== toolId)
+        : [...prev, toolId]
+    );
+  };
+
   return (
     <div className="h-full flex flex-col bg-white rounded-lg shadow-sm overflow-hidden">
       {/* Chat Header */}
-      <div className="border-b p-4">
+      <div className="border-b p-4 flex-shrink-0">
         <h2 className="text-lg font-semibold">AI Post Generator</h2>
         <p className="text-sm text-gray-500">Chat with AI to create your LinkedIn post</p>
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
         {messages.length === 0 && (
           <div className="flex justify-start">
             <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900">
@@ -116,60 +140,56 @@ export default function ChatInterface() {
           </div>
         )}
         
-        {/* Typing Indicator */}
+        {/* Tool Status or Typing Indicator */}
         {isStreaming && !currentStreamingMessage && (
           <div className="flex justify-start">
             <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900">
-              <div className="flex items-center gap-1">
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
-                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
-              </div>
+              {currentToolStatus ? (
+                <div className="flex items-center gap-2">
+                  <Loader2 className="w-4 h-4 animate-spin text-gray-600" />
+                  <span className="text-sm text-gray-600">
+                    {currentToolStatus.message}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1">
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+                  <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+                </div>
+              )}
             </div>
           </div>
         )}
       </div>
 
       {/* Input Area */}
-      <div className="border-t p-4">
+      <div className="border-t p-4 flex-shrink-0">
         <div className="flex gap-2">
-          {/* Toolbar Button */}
-          <div className="relative">
-            <Button
-              onClick={() => setShowTooltip(!showTooltip)}
-              variant="outline"
-              className="self-end"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
-            
-            {/* Tooltip Menu */}
-            {showTooltip && (
-              <div className="absolute bottom-full mb-2 left-0 bg-white rounded-lg shadow-lg border border-gray-200 p-2 min-w-[200px]">
-                <button className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded text-sm text-gray-700">
-                  <FileText className="w-4 h-4" />
-                  <span>Add draft</span>
-                </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded text-sm text-gray-700">
-                  <Link className="w-4 h-4" />
-                  <span>Add link</span>
-                </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded text-sm text-gray-700">
-                  <Hash className="w-4 h-4" />
-                  <span>Add hashtags</span>
-                </button>
-                <button className="w-full flex items-center gap-3 px-3 py-2 hover:bg-gray-100 rounded text-sm text-gray-700">
-                  <Image className="w-4 h-4" />
-                  <span>Add image idea</span>
-                </button>
-              </div>
-            )}
+          {/* Tool Selector Buttons */}
+          <div className="flex flex-col gap-2">
+            {AVAILABLE_TOOLS.map(tool => {
+              const Icon = tool.icon;
+              const isSelected = selectedTools.includes(tool.id);
+              return (
+                <Button
+                  key={tool.id}
+                  onClick={() => toggleTool(tool.id)}
+                  variant={isSelected ? "default" : "outline"}
+                  size="sm"
+                  title={tool.description}
+                  className="h-8 w-8 p-0"
+                >
+                  <Icon className="w-4 h-4" />
+                </Button>
+              );
+            })}
           </div>
 
           <textarea
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
-            onKeyPress={handleKeyPress}
+            onKeyDown={handleKeyDown}
             placeholder="Type your message here..."
             className="flex-1 min-h-[80px] max-h-[200px] p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
           />

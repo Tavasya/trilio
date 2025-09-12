@@ -93,9 +93,9 @@ export default function AppLayout() {
             </SidebarContent>
         </Sidebar>
         
-        <main className="flex-1 flex flex-col"> 
+        <main className="flex-1 flex flex-col h-screen overflow-hidden"> 
           {/* Top Navigation Bar */}
-          <header className="border-b border-border bg-background">
+          <header className="border-b border-border bg-background flex-shrink-0">
             <div className="flex items-center justify-between px-6 py-3">
               <div className="flex items-center gap-4">
                 {/* Page title or breadcrumbs can go here */}
@@ -105,6 +105,7 @@ export default function AppLayout() {
                   {location.pathname === '/scheduler' && 'Scheduler'}
                   {location.pathname === '/posts' && 'My Posts'}
                   {location.pathname === '/create-post' && 'Create Post'}
+                  {location.pathname === '/generate' && 'Generate Post'}
                 </h1>
               </div>
               
@@ -120,7 +121,7 @@ export default function AppLayout() {
           </header>
           
           {/* Page Content */}
-          <div className="flex-1">
+          <div className="flex-1 overflow-hidden">
             <Outlet />
           </div>
         </main>

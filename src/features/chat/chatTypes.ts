@@ -14,11 +14,18 @@ export interface Conversation {
   updatedAt: string; // ISO string for serialization
 }
 
+export interface ToolStatus {
+  status: 'started' | 'completed';
+  tool: string;
+  message: string;
+}
+
 export interface ChatState {
   conversations: Record<string, Conversation>;
   activeConversationId: string | null;
   currentStreamingMessage: string;
   isStreaming: boolean;
+  currentToolStatus: ToolStatus | null;
   error: string | null;
 }
 
@@ -26,6 +33,7 @@ export interface ChatState {
 export interface SendMessageRequest {
   message: string;
   conversation_id?: string;
+  tools?: string[]; // Array of tool names to use
 }
 
 // SSE Event Types
@@ -46,8 +54,15 @@ export interface ErrorEvent {
   error: string;
 }
 
+export interface ToolStatusEvent {
+  status: 'started' | 'completed';
+  tool: string;
+  message: string;
+}
+
 export type SSEEvent = 
   | { type: 'conversation'; data: ConversationEvent }
   | { type: 'message'; data: MessageEvent }
   | { type: 'done'; data: DoneEvent }
-  | { type: 'error'; data: ErrorEvent };
+  | { type: 'error'; data: ErrorEvent }
+  | { type: 'tool_status'; data: ToolStatusEvent };
