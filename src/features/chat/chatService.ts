@@ -92,6 +92,9 @@ export class ChatService {
                 case 'tool_status':
                   onEvent({ type: 'tool_status', data });
                   break;
+                case 'tool_call':
+                  onEvent({ type: 'tool_call', data });
+                  break;
                 case 'done':
                   onEvent({ type: 'done', data });
                   break;

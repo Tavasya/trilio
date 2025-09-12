@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { chatService } from './chatService';
-import type { ChatState, Message, SSEEvent, ToolStatus, MessageContext } from './chatTypes';
+import type { ChatState, Message, SSEEvent, ToolStatus, MessageContext, GeneratedPost } from './chatTypes';
 import { toast } from 'sonner';
 
 const initialState: ChatState = {
@@ -11,6 +11,7 @@ const initialState: ChatState = {
   isStreaming: false,
   currentToolStatus: null,
   error: null,
+  generatedPost: null,
 };
 
 // Async thunk for sending a message and handling the stream
@@ -54,6 +55,15 @@ export const sendMessage = createAsyncThunk(
               break;
             case 'tool_status':
               dispatch(setToolStatus(event.data));
+              break;
+            case 'tool_call':
+              // Handle edit_content tool responses
+              if (event.data.tool === 'edit_content' && event.data.result.success && event.data.result.content) {
+                dispatch(replaceGeneratedPostContent({
+                  content: event.data.result.content,
+                  id: event.data.result.content_id
+                }));
+              }
               break;
             case 'done':
               dispatch(completeStreaming(event.data.conversation_id));
@@ -196,6 +206,38 @@ const chatSlice = createSlice({
       state.isStreaming = false;
       state.error = null;
     },
+    
+    setGeneratedPost: (state, action: PayloadAction<GeneratedPost>) => {
+      state.generatedPost = action.payload;
+    },
+    
+    updateGeneratedPostContent: (state, action: PayloadAction<string>) => {
+      if (state.generatedPost) {
+        state.generatedPost.content = action.payload;
+        state.generatedPost.isEdited = true;
+      }
+    },
+    
+    replaceGeneratedPostContent: (state, action: PayloadAction<{ content: string; id?: string }>) => {
+      if (state.generatedPost) {
+        state.generatedPost.content = action.payload.content;
+        if (action.payload.id) {
+          state.generatedPost.id = action.payload.id;
+        }
+        state.generatedPost.isEdited = false;
+      } else {
+        // Create new post if doesn't exist
+        state.generatedPost = {
+          content: action.payload.content,
+          id: action.payload.id,
+          isEdited: false
+        };
+      }
+    },
+    
+    clearGeneratedPost: (state) => {
+      state.generatedPost = null;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -217,6 +259,10 @@ export const {
   streamingError,
   clearError,
   startNewConversation,
+  setGeneratedPost,
+  updateGeneratedPostContent,
+  replaceGeneratedPostContent,
+  clearGeneratedPost,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

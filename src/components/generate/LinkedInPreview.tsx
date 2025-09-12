@@ -1,51 +1,26 @@
 import { useState } from 'react';
-import { Heart, MessageCircle, Share2, Send, MoreHorizontal, ChevronLeft, ChevronRight, Monitor, Smartphone, ThumbsUp, Lightbulb, Calendar, Image, X } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Lightbulb, Calendar, Image, X } from 'lucide-react';
 import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
-
-interface Post {
-  id: string;
-  content: string;
-  image?: string;
-}
-
-interface LinkedInPreviewProps {
-  posts?: Post[];
-  userName?: string;
-  userTitle?: string;
-  userAvatar?: string;
-}
-
-const defaultPosts: Post[] = [
-  { id: '1', content: "Your LinkedIn post content will appear here as you generate it..." }
-];
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { updateGeneratedPostContent } from '@/features/chat/chatSlice';
 
 type ViewSize = 'desktop' | 'mobile';
 
-export default function LinkedInPreview({
-  posts = defaultPosts,
-  userName = "John Doe",
-  userTitle = "Product Manager | Tech Enthusiast",
-  userAvatar = "",
-}: LinkedInPreviewProps) {
-  const [currentPostIndex, setCurrentPostIndex] = useState(0);
+export default function LinkedInPreview() {
+  const dispatch = useAppDispatch();
+  const generatedPost = useAppSelector(state => state.chat.generatedPost);
+  const userName = "John Doe";
+  const userTitle = "Product Manager | Tech Enthusiast";
+  const userAvatar = "";
   const [viewSize, setViewSize] = useState<ViewSize>('desktop');
   const [showFullContent, setShowFullContent] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [postImages, setPostImages] = useState<{ [key: string]: string }>({});
+  const [postImage, setPostImage] = useState<string | null>(null);
+  const [isEditingContent, setIsEditingContent] = useState(false);
   
-  const currentPost = posts[currentPostIndex];
-  const hasMultiplePosts = posts.length > 1;
-  
-  const goToPreviousPost = () => {
-    setCurrentPostIndex((prev) => (prev > 0 ? prev - 1 : posts.length - 1));
-    setShowFullContent(false);
-  };
-  
-  const goToNextPost = () => {
-    setCurrentPostIndex((prev) => (prev < posts.length - 1 ? prev + 1 : 0));
-    setShowFullContent(false);
-  };
+  const postContent = generatedPost?.content || "Your LinkedIn post content will appear here as you generate it...";
+  const postId = generatedPost?.id;
   
   const handleSchedule = (date: Date, time: string) => {
     console.log('Post scheduled for:', date, 'at', time);
@@ -62,10 +37,7 @@ export default function LinkedInPreview({
         const reader = new FileReader();
         reader.onload = (event) => {
           const imageUrl = event.target?.result as string;
-          setPostImages(prev => ({
-            ...prev,
-            [currentPost.id]: imageUrl
-          }));
+          setPostImage(imageUrl);
         };
         reader.readAsDataURL(file);
       }
@@ -78,7 +50,7 @@ export default function LinkedInPreview({
   };
   
   const getTruncatedContent = () => {
-    const lines = currentPost.content.split('\n');
+    const lines = postContent.split('\n');
     const maxLines = viewSize === 'mobile' ? 2 : 4;
     
     if (!showFullContent && lines.length > maxLines) {
@@ -88,9 +60,13 @@ export default function LinkedInPreview({
       };
     }
     return {
-      text: currentPost.content,
+      text: postContent,
       truncated: false
     };
+  };
+  
+  const handleContentChange = (newContent: string) => {
+    dispatch(updateGeneratedPostContent(newContent));
   };
   
   const { text: displayContent, truncated } = getTruncatedContent();
@@ -110,12 +86,6 @@ export default function LinkedInPreview({
               <h2 className="text-lg font-semibold">LinkedIn Preview</h2>
               <p className="text-sm text-gray-500">See how your post will look</p>
             </div>
-            {/* Post Counter */}
-            {hasMultiplePosts && (
-              <span className="text-sm text-gray-600 px-2">
-                {currentPostIndex + 1} / {posts.length}
-              </span>
-            )}
           </div>
         </div>
         
@@ -151,28 +121,6 @@ export default function LinkedInPreview({
       {/* LinkedIn Post Preview */}
       <div className="flex-1 overflow-y-auto bg-gray-100 relative">
         <div className="p-4 flex justify-center items-center relative">
-          {/* Left Arrow */}
-          {hasMultiplePosts && (
-            <button
-              onClick={goToPreviousPost}
-              className="absolute left-4 p-2 bg-white rounded-full shadow-lg hover:shadow-xl transition-all z-10"
-              aria-label="Previous post"
-            >
-              <ChevronLeft className="w-6 h-6 text-gray-600" />
-            </button>
-          )}
-          
-          {/* Right Arrow */}
-          {hasMultiplePosts && (
-            <button
-              onClick={goToNextPost}
-              className="absolute right-4 p-2 bg-white rounded-full shadow-lg hover:shadow-xl transition-all z-10"
-              aria-label="Next post"
-            >
-              <ChevronRight className="w-6 h-6 text-gray-600" />
-            </button>
-          )}
-          
           {/* Post Card with responsive width */}
           <div className={`bg-white border border-gray-200 rounded-lg ${getPreviewWidth()} transition-all duration-300`}>
             {/* Post Header */}
@@ -207,35 +155,48 @@ export default function LinkedInPreview({
 
             {/* Post Content */}
             <div className="px-4 pb-3">
-              <p className="text-gray-900 whitespace-pre-wrap">
-                {displayContent}
-                {truncated && (
-                  <>
-                    {'... '}
-                    <button 
-                      onClick={() => setShowFullContent(true)}
-                      className="text-gray-600 hover:underline font-medium"
-                    >
-                      see more
-                    </button>
-                  </>
-                )}
-              </p>
+              {isEditingContent ? (
+                <textarea
+                  value={postContent}
+                  onChange={(e) => handleContentChange(e.target.value)}
+                  onBlur={() => setIsEditingContent(false)}
+                  className="w-full min-h-[100px] p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900"
+                  autoFocus
+                />
+              ) : (
+                <p 
+                  className="text-gray-900 whitespace-pre-wrap cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
+                  onClick={() => setIsEditingContent(true)}
+                  title="Click to edit"
+                >
+                  {displayContent}
+                  {truncated && (
+                    <>
+                      {'... '}
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowFullContent(true);
+                        }}
+                        className="text-gray-600 hover:underline font-medium"
+                      >
+                        see more
+                      </button>
+                    </>
+                  )}
+                </p>
+              )}
               
               {/* Image Upload Area */}
-              {postImages[currentPost.id] ? (
+              {postImage ? (
                 <div className="mt-3 relative group">
                   <img 
-                    src={postImages[currentPost.id]} 
+                    src={postImage} 
                     alt="Post attachment" 
                     className="w-full rounded-lg object-cover"
                   />
                   <button
-                    onClick={() => setPostImages(prev => {
-                      const newImages = { ...prev };
-                      delete newImages[currentPost.id];
-                      return newImages;
-                    })}
+                    onClick={() => setPostImage(null)}
                     className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
                   >
                     <X className="w-4 h-4" />
