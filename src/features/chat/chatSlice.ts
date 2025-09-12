@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { chatService } from './chatService';
-import type { ChatState, Message, SSEEvent, ToolStatus } from './chatTypes';
+import type { ChatState, Message, SSEEvent, ToolStatus, MessageContext } from './chatTypes';
 import { toast } from 'sonner';
 
 const initialState: ChatState = {
@@ -17,7 +17,7 @@ const initialState: ChatState = {
 export const sendMessage = createAsyncThunk(
   'chat/sendMessage',
   async (
-    { message, token, tools }: { message: string; token: string; tools?: string[] },
+    { message, token, tools, context }: { message: string; token: string; tools?: string[]; context?: MessageContext },
     { dispatch, getState }
   ) => {
     const state = getState() as { chat: ChatState };
@@ -41,6 +41,7 @@ export const sendMessage = createAsyncThunk(
           message,
           conversation_id: conversationId || undefined,
           tools,
+          context,
         },
         token,
         (event: SSEEvent) => {

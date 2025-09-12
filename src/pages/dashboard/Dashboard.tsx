@@ -1,15 +1,51 @@
+import { useState } from 'react';
 import IdentitySection from '../../components/dashboard/IdentitySection';
 import TopicsSection from '../../components/dashboard/TopicsSection';
 import ViralPostsSection from '../../components/dashboard/ViralPostsSection';
 import WritingStylesSection from '../../components/dashboard/WritingStylesSection';
 import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
+import { postService } from '../../features/post/postService';
+import { useAuth } from '@clerk/react-router';
+import { toast } from 'sonner';
 
 const Dashboard = () => {
   const navigate = useNavigate();
+  const { getToken } = useAuth();
+  const [topics, setTopics] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
   
-  const handleGeneratePost = () => {
-    navigate('/generate');
+  const handleGeneratePost = async () => {
+    if (!topics.trim()) {
+      toast.error('Please enter a topic first', { position: 'top-right' });
+      return;
+    }
+
+    setIsLoading(true);
+    try {
+      const token = await getToken();
+      if (!token) {
+        toast.error('Authentication required', { position: 'top-right' });
+        return;
+      }
+
+      // Save as draft and get post ID
+      const response = await postService.saveDraft(
+        { 
+          content: topics,
+          visibility: 'PUBLIC'
+        },
+        token
+      );
+
+      // Navigate to generate page with post ID
+      navigate(`/generate?postId=${response.post_id}`);
+    } catch (error) {
+      console.error('Failed to save draft:', error);
+      toast.error('Failed to save draft', { position: 'top-right' });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -20,7 +56,7 @@ const Dashboard = () => {
         </h2>
         
         <IdentitySection />
-        <TopicsSection />
+        <TopicsSection topics={topics} setTopics={setTopics} />
         <ViralPostsSection />
         <WritingStylesSection />
         
@@ -28,8 +64,9 @@ const Dashboard = () => {
           <Button
             onClick={handleGeneratePost}
             className="px-8 py-3 text-lg font-medium"
+            disabled={isLoading}
           >
-            Generate your first post
+            {isLoading ? 'Saving draft...' : 'Generate your first post'}
           </Button>
         </div>
       </div>

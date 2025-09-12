@@ -18,7 +18,8 @@ export class ChatService {
       const body = JSON.stringify({
         message: request.message,
         ...(request.conversation_id && { conversation_id: request.conversation_id }),
-        ...(request.tools && request.tools.length > 0 && { tools: request.tools })
+        ...(request.tools && request.tools.length > 0 && { tools: request.tools }),
+        ...(request.context && { context: request.context })
       });
 
       // Make the initial request to get the SSE stream

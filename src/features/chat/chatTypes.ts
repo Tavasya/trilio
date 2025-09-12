@@ -30,10 +30,15 @@ export interface ChatState {
 }
 
 // API Request Types
+export interface MessageContext {
+  activeContentId?: string; // Post ID to link conversation to
+}
+
 export interface SendMessageRequest {
   message: string;
   conversation_id?: string;
   tools?: string[]; // Array of tool names to use
+  context?: MessageContext;
 }
 
 // SSE Event Types

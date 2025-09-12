@@ -15,7 +15,11 @@ const AVAILABLE_TOOLS = [
   // { id: 'audience', name: 'Audience Analysis', icon: Users, description: 'Analyze target audience' },
 ];
 
-export default function ChatInterface() {
+interface ChatInterfaceProps {
+  postId?: string | null;
+}
+
+export default function ChatInterface({ postId }: ChatInterfaceProps) {
   const dispatch = useAppDispatch();
   const { getToken } = useAuth();
   const [inputValue, setInputValue] = useState('');
@@ -62,7 +66,8 @@ export default function ChatInterface() {
       await dispatch(sendMessage({ 
         message: messageText, 
         token,
-        tools: selectedTools.length > 0 ? selectedTools : undefined
+        tools: selectedTools.length > 0 ? selectedTools : undefined,
+        context: postId ? { activeContentId: postId } : undefined
       })).unwrap();
       
       setSelectedTools([]); // Reset selected tools after sending

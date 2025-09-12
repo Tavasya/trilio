@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
+interface TopicsSectionProps {
+  topics: string;
+  setTopics: (topics: string) => void;
+}
 
-export default function TopicsSection() {
-  const [topics, setTopics] = useState('');
-
+export default function TopicsSection({ topics, setTopics }: TopicsSectionProps) {
   return (
     <div className="mb-8">
       <h2 className="text-lg font-semibold text-gray-900 mb-4">

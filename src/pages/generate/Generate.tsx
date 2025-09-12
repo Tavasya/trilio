@@ -1,34 +1,67 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ChatInterface from '../../components/generate/ChatInterface';
 import LinkedInPreview from '../../components/generate/LinkedInPreview';
+import { postService } from '../../features/post/postService';
+import { useAuth } from '@clerk/react-router';
+import { toast } from 'sonner';
 
 export default function Generate() {
-  // Sample posts for demonstration - in real app, these would come from AI generation
-  const [generatedPosts] = useState([
-    { 
-      id: '1', 
-      content: "🚀 Excited to share that our team just launched a new feature that will revolutionize how we approach project management!\n\nAfter months of user research and development, we've created something truly special. Here are the key highlights:\n\n✅ Real-time collaboration\n✅ AI-powered insights\n✅ Seamless integration\n\nWhat challenges are you facing in project management? Let's discuss in the comments!\n\n#ProjectManagement #Innovation #TechLeadership" 
-    },
-    { 
-      id: '2', 
-      content: "💡 3 lessons I learned from leading a cross-functional team:\n\n1. Communication is everything - Over-communicate rather than under-communicate\n\n2. Trust your team - Micromanagement kills creativity\n\n3. Celebrate small wins - Recognition fuels motivation\n\nWhat's the most valuable leadership lesson you've learned?\n\n#Leadership #TeamWork #Management" 
-    },
-    { 
-      id: '3', 
-      content: "🎯 Just completed an amazing workshop on AI in product development!\n\nKey takeaways:\n• AI is not replacing humans, it's augmenting our capabilities\n• The future belongs to those who can effectively collaborate with AI\n• Continuous learning is no longer optional\n\nInvesting in yourself is the best ROI you can get.\n\n#AI #ProductDevelopment #ContinuousLearning #TechTrends" 
-    }
-  ]);
+  const [searchParams] = useSearchParams();
+  const { getToken } = useAuth();
+  const [generatedPosts, setGeneratedPosts] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const postId = searchParams.get('postId');
+
+  useEffect(() => {
+    const fetchPost = async () => {
+      if (!postId) return;
+
+      setIsLoading(true);
+      try {
+        const token = await getToken();
+        if (!token) {
+          toast.error('Authentication required', { position: 'top-right' });
+          return;
+        }
+
+        const response = await postService.fetchPostById(postId, token);
+        if (response.success && response.post) {
+          setGeneratedPosts([{
+            id: response.post.id,
+            content: response.post.content
+          }]);
+        }
+      } catch (error) {
+        console.error('Failed to fetch post:', error);
+        toast.error('Failed to load post', { position: 'top-right' });
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchPost();
+  }, [postId, getToken]);
 
   return (
     <div className="h-full bg-gray-50 flex overflow-hidden">
       {/* Chat Interface - 3/5 width */}
       <div className="w-3/5 p-4 h-full overflow-hidden">
-        <ChatInterface />
+        <ChatInterface postId={postId} />
       </div>
 
       {/* LinkedIn Preview - 2/5 width */}
       <div className="w-2/5 p-4 h-full overflow-auto">
-        <LinkedInPreview posts={generatedPosts} />
+        {isLoading ? (
+          <div className="h-full flex items-center justify-center">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+              <p className="text-gray-600">Loading post...</p>
+            </div>
+          </div>
+        ) : (
+          <LinkedInPreview posts={generatedPosts.length > 0 ? generatedPosts : undefined} />
+        )}
       </div>
     </div>
   );

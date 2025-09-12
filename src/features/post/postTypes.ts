@@ -29,6 +29,24 @@ export interface FetchPostsResponse {
   error?: string;
 }
 
+export interface DraftPostRequest {
+  content: string;
+  media_url?: string;
+  visibility?: 'PUBLIC' | 'CONNECTIONS';
+}
+
+export interface DraftPostResponse {
+  success: boolean;
+  post_id: string;
+  post: Post;
+}
+
+export interface GetPostResponse {
+  success: boolean;
+  post: Post;
+  error?: string;
+}
+
 export interface PostState {
   currentPost: LinkedInPost | null;
   posts: Post[];
