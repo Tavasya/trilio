@@ -62,7 +62,7 @@ const Calendar: React.FC = () => {
 
     for (let i = 0; i < firstDay; i++) {
       days.push(
-        <div key={`empty-${i}`} className="h-6"></div>
+        <div key={`empty-${i}`} className="h-8"></div>
       );
     }
 
@@ -84,14 +84,14 @@ const Calendar: React.FC = () => {
         <div
           key={day}
           onClick={() => dispatch(setSelectedDate(currentDate))}
-          className={`h-6 flex items-center justify-center text-xs cursor-pointer rounded transition-colors
+          className={`h-8 flex items-center justify-center text-sm cursor-pointer rounded-lg transition-all
             ${isToday && !isSelected
-              ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-semibold' 
+              ? 'bg-primary/10 text-primary font-medium' 
               : ''
             }
             ${isSelected 
-              ? 'bg-blue-500 text-white font-semibold' 
-              : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+              ? 'bg-primary text-white font-medium shadow-sm' 
+              : 'hover:bg-gray-100 text-gray-700'
             }`}
         >
           {day}
@@ -142,86 +142,86 @@ const Calendar: React.FC = () => {
   }
 
   return (
-    <div className="flex h-screen">
-      <div className="w-[20%] bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4">
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold">
+    <div className="flex h-full bg-white">
+      <div className="w-72 bg-gray-50/50 border-r border-gray-100 p-6">
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-base font-medium text-gray-900">
               {monthNames[selectedMonth]} {selectedYear}
             </h3>
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               <button
                 onClick={handlePreviousMonth}
-                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                 aria-label="Previous month"
               >
-                <ChevronLeft className="w-3 h-3" />
+                <ChevronLeft className="w-4 h-4 text-gray-600" />
               </button>
               <button
                 onClick={handleNextMonth}
-                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                 aria-label="Next month"
               >
-                <ChevronRight className="w-3 h-3" />
+                <ChevronRight className="w-4 h-4 text-gray-600" />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 mb-1">
+          <div className="grid grid-cols-7 gap-2 mb-3">
             {shortDaysOfWeek.map((day) => (
               <div
                 key={day}
-                className="text-center text-[10px] font-medium text-gray-500 dark:text-gray-400 py-1"
+                className="text-center text-[11px] font-medium text-gray-400 py-1"
               >
                 {day}
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-2">
             {renderMiniCalendar()}
           </div>
         </div>
       </div>
       
-      <div className="w-[80%] flex flex-col">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-semibold">
+      <div className="flex-1 flex flex-col">
+        <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100">
+          <h2 className="text-xl font-medium text-gray-900">
             {formatWeekRange()}
           </h2>
           
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
             <button
               onClick={handlePreviousWeek}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
               aria-label="Previous week"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5 text-gray-600" />
             </button>
             <button
               onClick={() => dispatch(setSelectedDate(new Date()))}
-              className="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Today
             </button>
             <button
               onClick={handleNextWeek}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
               aria-label="Next week"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5 text-gray-600" />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto bg-white">
           <div className="flex">
-            <div className="w-20 flex-shrink-0">
-              <div className="h-12"></div>
+            <div className="w-24 flex-shrink-0">
+              <div className="h-16"></div>
               {timeSlots.map((time) => (
                 <div
                   key={time}
-                  className="h-16 text-xs text-gray-500 dark:text-gray-400 pr-2 text-right border-r border-gray-200 dark:border-gray-700"
+                  className="h-20 text-xs text-gray-400 pr-4 pt-2 text-right border-r border-gray-100"
                 >
                   {time}
                 </div>
@@ -234,15 +234,15 @@ const Calendar: React.FC = () => {
                   date.toDateString() === new Date().toDateString();
                 
                 return (
-                  <div key={index} className="border-r border-gray-200 dark:border-gray-700 last:border-r-0">
-                    <div className={`h-12 border-b border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center ${
-                      isToday ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                  <div key={index} className="border-r border-gray-100 last:border-r-0">
+                    <div className={`h-16 border-b border-gray-100 flex flex-col items-center justify-center ${
+                      isToday ? 'bg-primary/5' : 'bg-gray-50/50'
                     }`}>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                      <div className="text-xs text-gray-500 mb-1">
                         {daysOfWeek[date.getDay()]}
                       </div>
                       <div className={`text-sm font-medium ${
-                        isToday ? 'text-blue-600 dark:text-blue-400' : ''
+                        isToday ? 'text-primary' : 'text-gray-700'
                       }`}>
                         {date.getDate()}
                       </div>
@@ -251,9 +251,9 @@ const Calendar: React.FC = () => {
                     {timeSlots.map((_, timeIndex) => (
                       <div
                         key={timeIndex}
-                        className={`h-16 border-b border-gray-100 dark:border-gray-800 ${
-                          isToday ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''
-                        }`}
+                        className={`h-20 border-b border-gray-50 ${
+                          isToday ? 'bg-primary/[0.02]' : 'hover:bg-gray-50/50'
+                        } transition-colors cursor-pointer`}
                       >
                       </div>
                     ))}
