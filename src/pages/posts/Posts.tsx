@@ -2,11 +2,13 @@ import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchUserPosts, selectShouldFetchPosts } from '@/features/post/postSlice';
 import { useAuth } from '@clerk/react-router';
-import { Link } from 'react-router';
-import { Clock, Globe, Users, ExternalLink, PlusCircle } from 'lucide-react';
+import { Link, useNavigate } from 'react-router';
+import { Clock, Globe, Users, ExternalLink, PlusCircle, Edit } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 export default function Posts() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { getToken } = useAuth();
   const { posts, isLoading } = useAppSelector(state => state.post);
   const shouldFetch = useAppSelector(selectShouldFetchPosts);
@@ -37,6 +39,10 @@ export default function Posts() {
   const truncateContent = (content: string, maxLength: number = 280) => {
     if (content.length <= maxLength) return content;
     return content.substring(0, maxLength) + '...';
+  };
+
+  const handleEditPost = (postId: string) => {
+    navigate(`/generate?postId=${postId}`);
   };
 
   if (isLoading && posts.length === 0) {
@@ -86,7 +92,7 @@ export default function Posts() {
                     <Clock className="w-4 h-4" />
                     <span>{formatDate(post.created_at)}</span>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     {post.visibility === 'PUBLIC' ? (
                       <div className="flex items-center gap-1 text-sm text-blue-600 dark:text-blue-400">
                         <Globe className="w-4 h-4" />
@@ -98,6 +104,15 @@ export default function Posts() {
                         <span>Connections</span>
                       </div>
                     )}
+                    <Button
+                      onClick={() => handleEditPost(post.id)}
+                      size="sm"
+                      variant="outline"
+                      className="flex items-center gap-1"
+                    >
+                      <Edit className="w-4 h-4" />
+                      Edit
+                    </Button>
                   </div>
                 </div>
 

@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { chatService } from './chatService';
-import type { ChatState, Message, SSEEvent, ToolStatus, MessageContext, GeneratedPost, SaveStatus } from './chatTypes';
+import type { ChatState, Message, SSEEvent, ToolStatus, MessageContext, GeneratedPost, SaveStatus, ConversationHistoryResponse } from './chatTypes';
 import { toast } from 'sonner';
 import { postService } from '../post/postService';
 
@@ -25,6 +25,15 @@ export const saveDraftToDatabase = createAsyncThunk(
       { content },
       token
     );
+    return response;
+  }
+);
+
+// Async thunk for loading conversation history for a post
+export const loadConversationHistory = createAsyncThunk(
+  'chat/loadConversationHistory',
+  async ({ postId, token }: { postId: string; token: string }) => {
+    const response = await chatService.fetchConversationByPost(postId, token);
     return response;
   }
 );
@@ -258,6 +267,30 @@ const chatSlice = createSlice({
     setSaveStatus: (state, action: PayloadAction<SaveStatus>) => {
       state.saveStatus = action.payload;
     },
+    
+    loadConversation: (state, action: PayloadAction<ConversationHistoryResponse | null>) => {
+      if (!action.payload) return;
+      
+      const { conversation, messages } = action.payload;
+      
+      // Set the conversation with loaded messages
+      if (conversation && messages) {
+        const conversationId = conversation.id;
+        state.conversations[conversationId] = {
+          conversation_id: conversationId,
+          messages: messages.map(msg => ({
+            id: msg.id,
+            role: msg.role as 'user' | 'assistant',
+            content: msg.content,
+            timestamp: msg.created_at,
+          })),
+          title: conversation.title,
+          createdAt: conversation.created_at,
+          updatedAt: conversation.updated_at,
+        };
+        state.activeConversationId = conversationId;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -275,6 +308,28 @@ const chatSlice = createSlice({
       .addCase(saveDraftToDatabase.rejected, (state) => {
         state.saveStatus = 'error';
         toast.error('Failed to save draft', { position: 'top-right' });
+      })
+      .addCase(loadConversationHistory.fulfilled, (state, action) => {
+        if (action.payload) {
+          const { conversation, messages } = action.payload;
+          
+          if (conversation && messages) {
+            const conversationId = conversation.id;
+            state.conversations[conversationId] = {
+              conversation_id: conversationId,
+              messages: messages.map((msg) => ({
+                id: msg.id,
+                role: msg.role as 'user' | 'assistant',
+                content: msg.content,
+                timestamp: msg.created_at,
+              })),
+              title: conversation.title,
+              createdAt: conversation.created_at,
+              updatedAt: conversation.updated_at,
+            };
+            state.activeConversationId = conversationId;
+          }
+        }
       });
   },
 });
@@ -294,6 +349,7 @@ export const {
   replaceGeneratedPostContent,
   clearGeneratedPost,
   setSaveStatus,
+  loadConversation,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

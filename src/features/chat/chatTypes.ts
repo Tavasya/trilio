@@ -92,3 +92,22 @@ export type SSEEvent =
   | { type: 'error'; data: ErrorEvent }
   | { type: 'tool_status'; data: ToolStatusEvent }
   | { type: 'tool_call'; data: ToolCallEvent };
+
+// Conversation history response types
+export interface ConversationHistoryResponse {
+  conversation: {
+    id: string;
+    user_id: string;
+    title?: string;
+    post_id: string;
+    created_at: string;
+    updated_at: string;
+  };
+  messages: Array<{
+    id: string;
+    conversation_id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    created_at: string;
+  }>;
+}

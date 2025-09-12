@@ -1,5 +1,5 @@
 import { API_CONFIG } from '@/shared/config/api';
-import type { SendMessageRequest, SSEEvent } from './chatTypes';
+import type { SendMessageRequest, SSEEvent, ConversationHistoryResponse } from './chatTypes';
 
 export class ChatService {
   private eventSource: EventSource | null = null;
@@ -118,6 +118,31 @@ export class ChatService {
     if (this.eventSource) {
       this.eventSource.close();
       this.eventSource = null;
+    }
+  }
+
+  async fetchConversationByPost(postId: string, token: string): Promise<ConversationHistoryResponse | null> {
+    try {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/chat/conversations/by-post/${postId}/messages`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        if (response.status === 404) {
+          // No conversation history for this post
+          return null;
+        }
+        throw new Error(`Failed to fetch conversation history: ${response.status}`);
+      }
+
+      return await response.json();
+    } catch (error) {
+      console.error('Error fetching conversation history:', error);
+      return null;
     }
   }
 }

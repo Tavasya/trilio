@@ -5,8 +5,8 @@ import LinkedInPreview from '../../components/generate/LinkedInPreview';
 import { postService } from '../../features/post/postService';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
-import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { setGeneratedPost } from '@/features/chat/chatSlice';
+import { useAppDispatch } from '@/store/hooks';
+import { setGeneratedPost, loadConversationHistory } from '@/features/chat/chatSlice';
 
 export default function Generate() {
   const [searchParams] = useSearchParams();
@@ -15,7 +15,7 @@ export default function Generate() {
   const postId = searchParams.get('postId');
 
   useEffect(() => {
-    const fetchPost = async () => {
+    const fetchPostAndConversation = async () => {
       if (!postId) return;
 
       try {
@@ -25,6 +25,7 @@ export default function Generate() {
           return;
         }
 
+        // Fetch post data
         const response = await postService.fetchPostById(postId, token);
         if (response.success && response.post) {
           dispatch(setGeneratedPost({
@@ -33,13 +34,19 @@ export default function Generate() {
             isEdited: false
           }));
         }
+
+        // Fetch conversation history for this post
+        await dispatch(loadConversationHistory({ postId, token })).unwrap();
       } catch (error) {
-        console.error('Failed to fetch post:', error);
-        toast.error('Failed to load post', { position: 'top-right' });
+        console.error('Failed to fetch post or conversation:', error);
+        // Only show error for post fetch failure, conversation might not exist
+        if (error instanceof Error && !error.message.includes('conversation')) {
+          toast.error('Failed to load post', { position: 'top-right' });
+        }
       }
     };
 
-    fetchPost();
+    fetchPostAndConversation();
   }, [postId, getToken, dispatch]);
 
   return (
