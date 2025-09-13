@@ -1,8 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { chatService } from './chatService';
-import type { ChatState, Message, SSEEvent, ToolStatus } from './chatTypes';
+import type { ChatState, Message, SSEEvent, ToolStatus, MessageContext, GeneratedPost, SaveStatus, ConversationHistoryResponse } from './chatTypes';
 import { toast } from 'sonner';
+import { postService } from '../post/postService';
 
 const initialState: ChatState = {
   conversations: {},
@@ -11,13 +12,37 @@ const initialState: ChatState = {
   isStreaming: false,
   currentToolStatus: null,
   error: null,
+  generatedPost: null,
+  saveStatus: 'saved',
 };
+
+// Async thunk for saving draft to database
+export const saveDraftToDatabase = createAsyncThunk(
+  'chat/saveDraft',
+  async ({ postId, content, token }: { postId: string; content: string; token: string }) => {
+    const response = await postService.updateDraft(
+      postId,
+      { content },
+      token
+    );
+    return response;
+  }
+);
+
+// Async thunk for loading conversation history for a post
+export const loadConversationHistory = createAsyncThunk(
+  'chat/loadConversationHistory',
+  async ({ postId, token }: { postId: string; token: string }) => {
+    const response = await chatService.fetchConversationByPost(postId, token);
+    return response;
+  }
+);
 
 // Async thunk for sending a message and handling the stream
 export const sendMessage = createAsyncThunk(
   'chat/sendMessage',
   async (
-    { message, token, tools }: { message: string; token: string; tools?: string[] },
+    { message, token, tools, context }: { message: string; token: string; tools?: string[]; context?: MessageContext },
     { dispatch, getState }
   ) => {
     const state = getState() as { chat: ChatState };
@@ -41,6 +66,7 @@ export const sendMessage = createAsyncThunk(
           message,
           conversation_id: conversationId || undefined,
           tools,
+          context,
         },
         token,
         (event: SSEEvent) => {
@@ -53,6 +79,15 @@ export const sendMessage = createAsyncThunk(
               break;
             case 'tool_status':
               dispatch(setToolStatus(event.data));
+              break;
+            case 'tool_call':
+              // Handle edit_content tool responses
+              if (event.data.tool === 'edit_content' && event.data.result.success && event.data.result.content) {
+                dispatch(replaceGeneratedPostContent({
+                  content: event.data.result.content,
+                  id: event.data.result.content_id
+                }));
+              }
               break;
             case 'done':
               dispatch(completeStreaming(event.data.conversation_id));
@@ -195,6 +230,67 @@ const chatSlice = createSlice({
       state.isStreaming = false;
       state.error = null;
     },
+    
+    setGeneratedPost: (state, action: PayloadAction<GeneratedPost>) => {
+      state.generatedPost = action.payload;
+    },
+    
+    updateGeneratedPostContent: (state, action: PayloadAction<string>) => {
+      if (state.generatedPost) {
+        state.generatedPost.content = action.payload;
+        state.generatedPost.isEdited = true;
+        state.saveStatus = 'unsaved';
+      }
+    },
+    
+    replaceGeneratedPostContent: (state, action: PayloadAction<{ content: string; id?: string }>) => {
+      if (state.generatedPost) {
+        state.generatedPost.content = action.payload.content;
+        if (action.payload.id) {
+          state.generatedPost.id = action.payload.id;
+        }
+        state.generatedPost.isEdited = false;
+      } else {
+        // Create new post if doesn't exist
+        state.generatedPost = {
+          content: action.payload.content,
+          id: action.payload.id,
+          isEdited: false
+        };
+      }
+    },
+    
+    clearGeneratedPost: (state) => {
+      state.generatedPost = null;
+    },
+    
+    setSaveStatus: (state, action: PayloadAction<SaveStatus>) => {
+      state.saveStatus = action.payload;
+    },
+    
+    loadConversation: (state, action: PayloadAction<ConversationHistoryResponse | null>) => {
+      if (!action.payload) return;
+      
+      const { conversation, messages } = action.payload;
+      
+      // Set the conversation with loaded messages
+      if (conversation && messages) {
+        const conversationId = conversation.id;
+        state.conversations[conversationId] = {
+          conversation_id: conversationId,
+          messages: messages.map(msg => ({
+            id: msg.id,
+            role: msg.role as 'user' | 'assistant',
+            content: msg.content,
+            timestamp: msg.created_at,
+          })),
+          title: conversation.title,
+          createdAt: conversation.created_at,
+          updatedAt: conversation.updated_at,
+        };
+        state.activeConversationId = conversationId;
+      }
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -202,6 +298,38 @@ const chatSlice = createSlice({
         state.isStreaming = false;
         state.error = action.error.message || 'Failed to send message';
         toast.error(state.error, { position: 'top-right' });
+      })
+      .addCase(saveDraftToDatabase.pending, (state) => {
+        state.saveStatus = 'saving';
+      })
+      .addCase(saveDraftToDatabase.fulfilled, (state) => {
+        state.saveStatus = 'saved';
+      })
+      .addCase(saveDraftToDatabase.rejected, (state) => {
+        state.saveStatus = 'error';
+        toast.error('Failed to save draft', { position: 'top-right' });
+      })
+      .addCase(loadConversationHistory.fulfilled, (state, action) => {
+        if (action.payload) {
+          const { conversation, messages } = action.payload;
+          
+          if (conversation && messages) {
+            const conversationId = conversation.id;
+            state.conversations[conversationId] = {
+              conversation_id: conversationId,
+              messages: messages.map((msg) => ({
+                id: msg.id,
+                role: msg.role as 'user' | 'assistant',
+                content: msg.content,
+                timestamp: msg.created_at,
+              })),
+              title: conversation.title,
+              createdAt: conversation.created_at,
+              updatedAt: conversation.updated_at,
+            };
+            state.activeConversationId = conversationId;
+          }
+        }
       });
   },
 });
@@ -216,6 +344,12 @@ export const {
   streamingError,
   clearError,
   startNewConversation,
+  setGeneratedPost,
+  updateGeneratedPostContent,
+  replaceGeneratedPostContent,
+  clearGeneratedPost,
+  setSaveStatus,
+  loadConversation,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

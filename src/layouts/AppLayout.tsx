@@ -29,10 +29,10 @@ export default function AppLayout() {
               </Link>
             </SidebarHeader>
 
-            <div className="p-4">
-              <Link to="/create-post" className='w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2 rounded-md'>
+            <div className="px-6 pb-4">
+              <Link to="/create-post" className='w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2.5 rounded-lg transition-colors'>
                   <PlusCircle className='h-4 w-4' />
-                  <span>Create Post</span>
+                  <span className="font-medium">Create Post</span>
               </Link>
             </div>
 
@@ -42,12 +42,11 @@ export default function AppLayout() {
                   <SidebarMenuButton 
                       asChild
                       isActive={location.pathname === '/dashboard' || location.pathname === '/'}
-                      
                   >
                     <Link to="/dashboard">
                       <Home className="h-4 w-4" />
                       <span>Home</span>
-                    </ Link>
+                    </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
 
@@ -55,7 +54,6 @@ export default function AppLayout() {
                   <SidebarMenuButton 
                       asChild
                       isActive={location.pathname === '/research'}
-                      className="hover:bg-accent/50 data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
                   >
                     <Link to="/research">
                       <Book className='h-4 w-4' />
@@ -68,7 +66,6 @@ export default function AppLayout() {
                   <SidebarMenuButton 
                       asChild
                       isActive={location.pathname === '/scheduler'}
-                      className="hover:bg-accent/50 data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
                   >
                     <Link to="/scheduler">
                       <Calendar className='h-4 w-4' />
@@ -81,7 +78,6 @@ export default function AppLayout() {
                   <SidebarMenuButton 
                       asChild
                       isActive={location.pathname === '/posts'}
-                      className="hover:bg-accent/50 data-[active=true]:bg-accent data-[active=true]:text-accent-foreground"
                   >
                     <Link to="/posts">
                       <FileText className='h-4 w-4' />
@@ -96,19 +92,7 @@ export default function AppLayout() {
         <main className="flex-1 flex flex-col h-screen overflow-hidden"> 
           {/* Top Navigation Bar */}
           <header className="border-b border-border bg-background flex-shrink-0">
-            <div className="flex items-center justify-between px-6 py-3">
-              <div className="flex items-center gap-4">
-                {/* Page title or breadcrumbs can go here */}
-                <h1 className="text-lg font-semibold">
-                  {location.pathname === '/dashboard' && 'Dashboard'}
-                  {location.pathname === '/research' && 'Research'}
-                  {location.pathname === '/scheduler' && 'Scheduler'}
-                  {location.pathname === '/posts' && 'My Posts'}
-                  {location.pathname === '/create-post' && 'Create Post'}
-                  {location.pathname === '/generate' && 'Generate Post'}
-                </h1>
-              </div>
-              
+            <div className="flex items-center justify-end px-6 py-3">
               {/* User Profile */}
               <UserButton 
                 appearance={{

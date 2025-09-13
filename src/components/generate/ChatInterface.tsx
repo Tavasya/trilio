@@ -15,7 +15,11 @@ const AVAILABLE_TOOLS = [
   // { id: 'audience', name: 'Audience Analysis', icon: Users, description: 'Analyze target audience' },
 ];
 
-export default function ChatInterface() {
+interface ChatInterfaceProps {
+  postId?: string | null;
+}
+
+export default function ChatInterface({ postId }: ChatInterfaceProps) {
   const dispatch = useAppDispatch();
   const { getToken } = useAuth();
   const [inputValue, setInputValue] = useState('');
@@ -26,7 +30,8 @@ export default function ChatInterface() {
     activeConversationId, 
     currentStreamingMessage, 
     isStreaming,
-    currentToolStatus 
+    currentToolStatus,
+    generatedPost 
   } = useAppSelector((state) => state.chat);
 
   const currentConversation = activeConversationId 
@@ -59,10 +64,25 @@ export default function ChatInterface() {
       const messageText = inputValue;
       setInputValue('');
       
+      // Build context with live content
+      const context: { post_id?: string; content?: string } = {};
+      if (generatedPost) {
+        // Always include the live content if we have a post
+        context.content = generatedPost.content;
+        // Include post_id if it's a saved post
+        if (generatedPost.id) {
+          context.post_id = generatedPost.id;
+        }
+      } else if (postId) {
+        // Fallback to just post_id if no generated post yet (will fetch from DB)
+        context.post_id = postId;
+      }
+      
       await dispatch(sendMessage({ 
         message: messageText, 
         token,
-        tools: selectedTools.length > 0 ? selectedTools : undefined
+        tools: selectedTools.length > 0 ? selectedTools : undefined,
+        context: Object.keys(context).length > 0 ? context : undefined
       })).unwrap();
       
       setSelectedTools([]); // Reset selected tools after sending

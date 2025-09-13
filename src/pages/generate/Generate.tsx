@@ -1,34 +1,64 @@
-import { useState } from 'react';
+import { useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import ChatInterface from '../../components/generate/ChatInterface';
 import LinkedInPreview from '../../components/generate/LinkedInPreview';
+import { postService } from '../../features/post/postService';
+import { useAuth } from '@clerk/react-router';
+import { toast } from 'sonner';
+import { useAppDispatch } from '@/store/hooks';
+import { setGeneratedPost, loadConversationHistory } from '@/features/chat/chatSlice';
 
 export default function Generate() {
-  // Sample posts for demonstration - in real app, these would come from AI generation
-  const [generatedPosts] = useState([
-    { 
-      id: '1', 
-      content: "🚀 Excited to share that our team just launched a new feature that will revolutionize how we approach project management!\n\nAfter months of user research and development, we've created something truly special. Here are the key highlights:\n\n✅ Real-time collaboration\n✅ AI-powered insights\n✅ Seamless integration\n\nWhat challenges are you facing in project management? Let's discuss in the comments!\n\n#ProjectManagement #Innovation #TechLeadership" 
-    },
-    { 
-      id: '2', 
-      content: "💡 3 lessons I learned from leading a cross-functional team:\n\n1. Communication is everything - Over-communicate rather than under-communicate\n\n2. Trust your team - Micromanagement kills creativity\n\n3. Celebrate small wins - Recognition fuels motivation\n\nWhat's the most valuable leadership lesson you've learned?\n\n#Leadership #TeamWork #Management" 
-    },
-    { 
-      id: '3', 
-      content: "🎯 Just completed an amazing workshop on AI in product development!\n\nKey takeaways:\n• AI is not replacing humans, it's augmenting our capabilities\n• The future belongs to those who can effectively collaborate with AI\n• Continuous learning is no longer optional\n\nInvesting in yourself is the best ROI you can get.\n\n#AI #ProductDevelopment #ContinuousLearning #TechTrends" 
-    }
-  ]);
+  const [searchParams] = useSearchParams();
+  const { getToken } = useAuth();
+  const dispatch = useAppDispatch();
+  const postId = searchParams.get('postId');
+
+  useEffect(() => {
+    const fetchPostAndConversation = async () => {
+      if (!postId) return;
+
+      try {
+        const token = await getToken();
+        if (!token) {
+          toast.error('Authentication required', { position: 'top-right' });
+          return;
+        }
+
+        // Fetch post data
+        const response = await postService.fetchPostById(postId, token);
+        if (response.success && response.post) {
+          dispatch(setGeneratedPost({
+            id: response.post.id,
+            content: response.post.content,
+            isEdited: false
+          }));
+        }
+
+        // Fetch conversation history for this post
+        await dispatch(loadConversationHistory({ postId, token })).unwrap();
+      } catch (error) {
+        console.error('Failed to fetch post or conversation:', error);
+        // Only show error for post fetch failure, conversation might not exist
+        if (error instanceof Error && !error.message.includes('conversation')) {
+          toast.error('Failed to load post', { position: 'top-right' });
+        }
+      }
+    };
+
+    fetchPostAndConversation();
+  }, [postId, getToken, dispatch]);
 
   return (
     <div className="h-full bg-gray-50 flex overflow-hidden">
       {/* Chat Interface - 3/5 width */}
       <div className="w-3/5 p-4 h-full overflow-hidden">
-        <ChatInterface />
+        <ChatInterface postId={postId} />
       </div>
 
       {/* LinkedIn Preview - 2/5 width */}
       <div className="w-2/5 p-4 h-full overflow-auto">
-        <LinkedInPreview posts={generatedPosts} />
+        <LinkedInPreview />
       </div>
     </div>
   );
