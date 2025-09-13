@@ -47,23 +47,22 @@ const mockPosts = [
 
 export default function ViralPostsSection({ posts = mockPosts }: ViralPostsSectionProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <div className="flex items-center justify-between mb-6">
+    <div className="p-4">
+      <div className="flex items-center justify-between mb-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">
+          <h2 className="text-lg font-bold text-gray-900">
             Trending in Your Topics
           </h2>
-          <p className="text-sm text-gray-500 mt-1">Get inspired by top-performing content</p>
         </div>
         <button className="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-50 rounded-lg transition-colors">
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {posts.map((post: any) => (
           <div
             key={post.id}
-            className="group relative bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-4 hover:shadow-lg hover:border-primary/20 transition-all duration-200 cursor-pointer"
+            className="group relative bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-3 hover:shadow-lg hover:border-primary/20 transition-all duration-200 cursor-pointer"
           >
             <div className="absolute top-2 right-2">
               <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
@@ -71,10 +70,10 @@ export default function ViralPostsSection({ posts = mockPosts }: ViralPostsSecti
               </span>
             </div>
             
-            <h3 className="font-semibold text-gray-900 mb-2 pr-12 line-clamp-2">
+            <h3 className="font-semibold text-sm text-gray-900 mb-1.5 pr-12 line-clamp-2">
               {post.title}
             </h3>
-            <p className="text-sm text-gray-600 line-clamp-2 mb-4">
+            <p className="text-xs text-gray-600 line-clamp-2 mb-3">
               {post.content}
             </p>
             

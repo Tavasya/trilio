@@ -11,6 +11,7 @@ import CreatePost from '@/pages/create-post/CreatePost'
 import Onboarding from '@/pages/onboarding/Onboarding'
 import Generate from '@/pages/generate/Generate'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import IdentityTest from '@/pages/test/IdentityTest'
 
 const LoadingSpinner = () => (
     <div className="min-h-screen flex items-center justify-center">
@@ -41,6 +42,7 @@ export default function AppRoutes() {
 
                     <Route path="/create-post" element={<CreatePost />} />
                     <Route path="/generate" element={<Generate />} />
+                    <Route path="/test/identity" element={<IdentityTest />} />
                 </Route>
             </Routes>
         </Suspense>
