@@ -3,6 +3,7 @@ import IdentitySection from '../../components/dashboard/IdentitySection';
 import TopicsSection from '../../components/dashboard/TopicsSection';
 import ViralPostsSection from '../../components/dashboard/ViralPostsSection';
 import WritingStylesSection from '../../components/dashboard/WritingStylesSection';
+import CharacterCountSection from '../../components/dashboard/CharacterCountSection';
 import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { postService } from '../../features/post/postService';
@@ -53,19 +54,20 @@ const Dashboard = () => {
     <div className="h-full overflow-y-auto bg-gradient-to-br from-gray-50 via-white to-gray-50 p-6">
       <div className="max-w-3xl mx-auto">
         {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-gray-900 mb-1">
             Content Creation Studio
           </h1>
-          <p className="text-gray-600">Build your LinkedIn presence with AI-powered content</p>
+          <p className="text-sm text-gray-600">Build your LinkedIn presence with AI-powered content</p>
         </div>
         
-        <div className="space-y-6">
+        <div className="space-y-4">
           <IdentitySection />
           <TopicsSection topics={topics} setTopics={setTopics} />
-          <ViralPostsSection />
+          <ViralPostsSection topics={topics} />
           <WritingStylesSection />
-          
+          <CharacterCountSection />
+
           <div className="flex justify-end">
             <Button
               onClick={handleGeneratePost}

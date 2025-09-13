@@ -8,7 +8,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton
 } from '@/components/ui/sidebar'
-import { Book, FileText, Home, PlusCircle, Calendar } from 'lucide-react'
+import { Book, FileText, PlusCircle, Calendar } from 'lucide-react'
 import { UserButton } from '@clerk/react-router'
 import trilioLogo from '@/lib/logo/trilio-logo.png'
 
@@ -24,13 +24,13 @@ export default function AppLayout() {
                 <img 
                   src={trilioLogo} 
                   alt="Trilio" 
-                  className="w-10 h-10 cursor-pointer hover:opacity-80 transition-opacity"
+                  className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
                 />
               </Link>
             </SidebarHeader>
 
             <div className="px-6 pb-4">
-              <Link to="/create-post" className='w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2.5 rounded-lg transition-colors'>
+              <Link to="/dashboard" className='w-full flex items-center justify-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 py-2.5 rounded-lg transition-colors'>
                   <PlusCircle className='h-4 w-4' />
                   <span className="font-medium">Create Post</span>
               </Link>
@@ -39,19 +39,19 @@ export default function AppLayout() {
             <SidebarContent>
               <SidebarMenu>
                 <SidebarMenuItem>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                       asChild
-                      isActive={location.pathname === '/dashboard' || location.pathname === '/'}
+                      isActive={location.pathname === '/posts'}
                   >
-                    <Link to="/dashboard">
-                      <Home className="h-4 w-4" />
-                      <span>Home</span>
+                    <Link to="/posts">
+                      <FileText className='h-4 w-4' />
+                      <span>My Posts</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
 
                 <SidebarMenuItem>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                       asChild
                       isActive={location.pathname === '/research'}
                   >
@@ -63,25 +63,13 @@ export default function AppLayout() {
                 </SidebarMenuItem>
 
                 <SidebarMenuItem>
-                  <SidebarMenuButton 
+                  <SidebarMenuButton
                       asChild
                       isActive={location.pathname === '/scheduler'}
                   >
                     <Link to="/scheduler">
                       <Calendar className='h-4 w-4' />
                       <span>Scheduler</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-
-                <SidebarMenuItem>
-                  <SidebarMenuButton 
-                      asChild
-                      isActive={location.pathname === '/posts'}
-                  >
-                    <Link to="/posts">
-                      <FileText className='h-4 w-4' />
-                      <span>My Posts</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

@@ -13,13 +13,12 @@ const topicSuggestions = [
 
 export default function TopicsSection({ topics, setTopics }: TopicsSectionProps) {
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-      <div className="flex items-start justify-between mb-4">
+    <div className="p-4">
+      <div className="flex items-start justify-between mb-3">
         <div>
-          <h2 className="text-xl font-bold text-gray-900">
+          <h2 className="text-lg font-bold text-gray-900">
             Content Topics
           </h2>
-          <p className="text-sm text-gray-500 mt-1">What subjects would you like to explore?</p>
         </div>
       </div>
       
@@ -27,7 +26,7 @@ export default function TopicsSection({ topics, setTopics }: TopicsSectionProps)
         value={topics}
         onChange={(e) => setTopics(e.target.value)}
         placeholder="E.g., AI in healthcare, sustainable business practices, remote team management..."
-        className="w-full min-h-[140px] p-4 border-2 border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 placeholder:text-gray-400"
+        className="w-full min-h-[100px] p-3 border-2 border-gray-200 rounded-xl resize-none focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all duration-200 placeholder:text-gray-400 text-sm"
       />
     </div>
   );

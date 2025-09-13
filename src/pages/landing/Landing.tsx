@@ -50,7 +50,7 @@ export default function Landing() {
           <div className={`flex items-center justify-between transition-[padding] duration-300 ${
             scrolledPastPurple ? 'px-8 py-3' : 'px-6 py-4'
           }`}>
-            <img src={trilioLogo} alt="Trilio" className="w-10 h-10" />
+            <img src={trilioLogo} alt="Trilio" className="h-8 w-auto" />
             
             <div className={`flex items-center gap-3 ${!loaded ? 'invisible' : 'visible'}`}>
               <SignedOut>
