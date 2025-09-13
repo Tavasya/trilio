@@ -24,7 +24,7 @@ export default function AppLayout() {
                 <img 
                   src={trilioLogo} 
                   alt="Trilio" 
-                  className="w-10 h-10 cursor-pointer hover:opacity-80 transition-opacity"
+                  className="h-8 w-auto cursor-pointer hover:opacity-80 transition-opacity"
                 />
               </Link>
             </SidebarHeader>

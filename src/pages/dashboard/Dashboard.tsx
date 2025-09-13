@@ -64,7 +64,7 @@ const Dashboard = () => {
         <div className="space-y-4">
           <IdentitySection />
           <TopicsSection topics={topics} setTopics={setTopics} />
-          <ViralPostsSection />
+          <ViralPostsSection topics={topics} />
           <WritingStylesSection />
           <CharacterCountSection />
 
