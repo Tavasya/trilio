@@ -31,7 +31,6 @@ const lengthOptions: LengthOption[] = [
 
 export default function CharacterCountSection() {
   const [selectedLength, setSelectedLength] = useState<PostLength>('medium');
-  const [isDragging, setIsDragging] = useState(false);
   const sliderRef = useRef<HTMLDivElement>(null);
 
   const getSliderPosition = () => {
@@ -86,7 +85,6 @@ export default function CharacterCountSection() {
             }}
             onMouseDown={(e) => {
               e.stopPropagation();
-              setIsDragging(true);
 
               const handleMouseMove = (e: MouseEvent) => {
                 if (!sliderRef.current) return;
@@ -104,7 +102,6 @@ export default function CharacterCountSection() {
               };
 
               const handleMouseUp = () => {
-                setIsDragging(false);
                 document.removeEventListener('mousemove', handleMouseMove);
                 document.removeEventListener('mouseup', handleMouseUp);
               };

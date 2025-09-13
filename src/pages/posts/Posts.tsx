@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchUserPosts, selectShouldFetchPosts, setCurrentPost } from '@/features/post/postSlice';
 import { useAuth } from '@clerk/react-router';
 import { Link, useNavigate } from 'react-router';
-import { MoreHorizontal, ThumbsUp, MessageSquare, Repeat2, Send, Globe, Users, PenLine, Heart, Lightbulb, Clock, Edit } from 'lucide-react';
+import { MoreHorizontal, ThumbsUp, MessageSquare, Repeat2, Send, PenLine, Heart, Lightbulb, Edit } from 'lucide-react';
 import { useUser } from '@clerk/react-router';
 import { Button } from '@/components/ui/button';
 

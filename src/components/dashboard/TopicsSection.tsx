@@ -1,15 +1,7 @@
-import { PenTool, Hash, TrendingUp, Lightbulb } from 'lucide-react';
-
 interface TopicsSectionProps {
   topics: string;
   setTopics: (topics: string) => void;
 }
-
-const topicSuggestions = [
-  { icon: TrendingUp, label: 'Industry Trends', color: 'text-blue-500' },
-  { icon: Lightbulb, label: 'Innovation', color: 'text-yellow-500' },
-  { icon: Hash, label: 'Tech', color: 'text-purple-500' },
-];
 
 export default function TopicsSection({ topics, setTopics }: TopicsSectionProps) {
   return (

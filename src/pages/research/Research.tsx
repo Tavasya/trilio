@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Search, Filter, TrendingUp, Calendar, Heart, MessageCircle, Loader2, ChevronDown } from 'lucide-react';
+import { Search, Filter, Heart, MessageCircle, Loader2, ChevronDown } from 'lucide-react';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
 import { debounce } from 'lodash';
