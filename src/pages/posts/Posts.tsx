@@ -3,8 +3,9 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchUserPosts, selectShouldFetchPosts, setCurrentPost } from '@/features/post/postSlice';
 import { useAuth } from '@clerk/react-router';
 import { Link, useNavigate } from 'react-router';
-import { MoreHorizontal, ThumbsUp, MessageSquare, Repeat2, Send, Globe, Users, PenLine, Heart, Lightbulb } from 'lucide-react';
+import { MoreHorizontal, ThumbsUp, MessageSquare, Repeat2, Send, Globe, Users, PenLine, Heart, Lightbulb, Clock, Edit } from 'lucide-react';
 import { useUser } from '@clerk/react-router';
+import { Button } from '@/components/ui/button';
 
 export default function Posts() {
   const dispatch = useAppDispatch();
@@ -52,6 +53,10 @@ export default function Posts() {
       visibility: post.visibility
     }));
     navigate('/generate');
+  };
+
+  const handleEditPost = (postId: string) => {
+    navigate(`/generate?postId=${postId}`);
   };
 
   if (isLoading && posts.length === 0) {
@@ -118,14 +123,14 @@ export default function Posts() {
                     DRAFT
                   </span>
                 </div>
-                
+
                 {/* Post Header */}
                 <div className="p-4 pb-3">
                   <div className="flex items-start justify-between">
                     <div className="flex gap-3">
                       {user?.imageUrl ? (
-                        <img 
-                          src={user.imageUrl} 
+                        <img
+                          src={user.imageUrl}
                           alt={`${user.firstName} ${user.lastName}`}
                           className="w-12 h-12 rounded-full object-cover flex-shrink-0"
                         />
@@ -144,9 +149,20 @@ export default function Posts() {
                         </p>
                       </div>
                     </div>
-                    <button className="p-1 hover:bg-gray-100 rounded">
-                      <MoreHorizontal className="w-5 h-5 text-gray-600" />
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={() => handleEditPost(post.id)}
+                        size="sm"
+                        variant="outline"
+                        className="flex items-center gap-1"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Edit
+                      </Button>
+                      <button className="p-1 hover:bg-gray-100 rounded">
+                        <MoreHorizontal className="w-5 h-5 text-gray-600" />
+                      </button>
+                    </div>
                   </div>
                 </div>
 

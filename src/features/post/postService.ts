@@ -1,5 +1,5 @@
 import { API_CONFIG } from '@/shared/config/api';
-import type { FetchPostsResponse, LinkedInPost, LinkedInPostResponse, DraftPostRequest, DraftPostResponse, GetPostResponse } from './postTypes';
+import type { FetchPostsResponse, LinkedInPost, LinkedInPostResponse, DraftPostRequest, DraftPostResponse, GetPostResponse, UpdateDraftRequest, UpdateDraftResponse } from './postTypes';
 
 export class PostService {
   async fetchUserPosts(token: string): Promise<FetchPostsResponse> {
@@ -70,6 +70,25 @@ export class PostService {
 
     if (!response.ok || !data.success) {
       throw new Error(data.error || 'Failed to fetch post');
+    }
+
+    return data;
+  }
+
+  async updateDraft(postId: string, draft: UpdateDraftRequest, token: string): Promise<UpdateDraftResponse> {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/posting/draft/${postId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(draft),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || 'Failed to update draft');
     }
 
     return data;
