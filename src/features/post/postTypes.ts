@@ -47,6 +47,18 @@ export interface GetPostResponse {
   error?: string;
 }
 
+export interface UpdateDraftRequest {
+  content: string;
+  media_url?: string;
+  visibility?: 'PUBLIC' | 'CONNECTIONS';
+}
+
+export interface UpdateDraftResponse {
+  success: boolean;
+  post: Post;
+  error?: string;
+}
+
 export interface PostState {
   currentPost: LinkedInPost | null;
   posts: Post[];

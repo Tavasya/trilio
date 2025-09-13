@@ -20,6 +20,14 @@ export interface ToolStatus {
   message: string;
 }
 
+export interface GeneratedPost {
+  id?: string;        // Real DB ID if saved
+  content: string;    // Current live content
+  isEdited: boolean;  // Track if manually edited
+}
+
+export type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'error';
+
 export interface ChatState {
   conversations: Record<string, Conversation>;
   activeConversationId: string | null;
@@ -27,11 +35,14 @@ export interface ChatState {
   isStreaming: boolean;
   currentToolStatus: ToolStatus | null;
   error: string | null;
+  generatedPost: GeneratedPost | null;
+  saveStatus: SaveStatus;
 }
 
 // API Request Types
 export interface MessageContext {
-  activeContentId?: string; // Post ID to link conversation to
+  post_id?: string;   // Post ID to fetch from database
+  content?: string;   // Current live content from frontend
 }
 
 export interface SendMessageRequest {
@@ -65,9 +76,38 @@ export interface ToolStatusEvent {
   message: string;
 }
 
+export interface ToolCallEvent {
+  tool: string;
+  result: {
+    success: boolean;
+    content_id?: string;  // The post_id if provided
+    content?: string;     // The edited content
+  };
+}
+
 export type SSEEvent = 
   | { type: 'conversation'; data: ConversationEvent }
   | { type: 'message'; data: MessageEvent }
   | { type: 'done'; data: DoneEvent }
   | { type: 'error'; data: ErrorEvent }
-  | { type: 'tool_status'; data: ToolStatusEvent };
+  | { type: 'tool_status'; data: ToolStatusEvent }
+  | { type: 'tool_call'; data: ToolCallEvent };
+
+// Conversation history response types
+export interface ConversationHistoryResponse {
+  conversation: {
+    id: string;
+    user_id: string;
+    title?: string;
+    post_id: string;
+    created_at: string;
+    updated_at: string;
+  };
+  messages: Array<{
+    id: string;
+    conversation_id: string;
+    role: 'user' | 'assistant';
+    content: string;
+    created_at: string;
+  }>;
+}

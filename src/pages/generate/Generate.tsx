@@ -1,23 +1,23 @@
-import { useState, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ChatInterface from '../../components/generate/ChatInterface';
 import LinkedInPreview from '../../components/generate/LinkedInPreview';
 import { postService } from '../../features/post/postService';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
+import { useAppDispatch } from '@/store/hooks';
+import { setGeneratedPost, loadConversationHistory } from '@/features/chat/chatSlice';
 
 export default function Generate() {
   const [searchParams] = useSearchParams();
   const { getToken } = useAuth();
-  const [generatedPosts, setGeneratedPosts] = useState([]);
-  const [isLoading, setIsLoading] = useState(false);
+  const dispatch = useAppDispatch();
   const postId = searchParams.get('postId');
 
   useEffect(() => {
-    const fetchPost = async () => {
+    const fetchPostAndConversation = async () => {
       if (!postId) return;
 
-      setIsLoading(true);
       try {
         const token = await getToken();
         if (!token) {
@@ -25,23 +25,29 @@ export default function Generate() {
           return;
         }
 
+        // Fetch post data
         const response = await postService.fetchPostById(postId, token);
         if (response.success && response.post) {
-          setGeneratedPosts([{
+          dispatch(setGeneratedPost({
             id: response.post.id,
-            content: response.post.content
-          }]);
+            content: response.post.content,
+            isEdited: false
+          }));
         }
+
+        // Fetch conversation history for this post
+        await dispatch(loadConversationHistory({ postId, token })).unwrap();
       } catch (error) {
-        console.error('Failed to fetch post:', error);
-        toast.error('Failed to load post', { position: 'top-right' });
-      } finally {
-        setIsLoading(false);
+        console.error('Failed to fetch post or conversation:', error);
+        // Only show error for post fetch failure, conversation might not exist
+        if (error instanceof Error && !error.message.includes('conversation')) {
+          toast.error('Failed to load post', { position: 'top-right' });
+        }
       }
     };
 
-    fetchPost();
-  }, [postId, getToken]);
+    fetchPostAndConversation();
+  }, [postId, getToken, dispatch]);
 
   return (
     <div className="h-full bg-gray-50 flex overflow-hidden">
@@ -52,16 +58,7 @@ export default function Generate() {
 
       {/* LinkedIn Preview - 2/5 width */}
       <div className="w-2/5 p-4 h-full overflow-auto">
-        {isLoading ? (
-          <div className="h-full flex items-center justify-center">
-            <div className="text-center">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-              <p className="text-gray-600">Loading post...</p>
-            </div>
-          </div>
-        ) : (
-          <LinkedInPreview posts={generatedPosts.length > 0 ? generatedPosts : undefined} />
-        )}
+        <LinkedInPreview />
       </div>
     </div>
   );
