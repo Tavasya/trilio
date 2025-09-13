@@ -12,6 +12,37 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 const Calendar: React.FC = () => {
   const dispatch = useAppDispatch();
   const { selectedMonth, selectedYear, selectedDate, selectedWeek } = useAppSelector((state) => state.calendar);
+  const { posts } = useAppSelector((state) => state.post);
+
+  // Simulated post dates for demonstration
+  const simulatedPostDates = [
+    new Date(2025, 0, 10), // Jan 10
+    new Date(2025, 0, 12), // Jan 12
+    new Date(2025, 0, 15), // Jan 15
+    new Date(2025, 0, 18), // Jan 18
+    new Date(2025, 0, 22), // Jan 22
+    new Date(2025, 0, 25), // Jan 25
+    new Date(2025, 0, 28), // Jan 28
+  ];
+
+  const hasPostOnDate = (date: Date) => {
+    // Check simulated posts
+    const hasSimulated = simulatedPostDates.some(postDate => 
+      postDate.getDate() === date.getDate() &&
+      postDate.getMonth() === date.getMonth() &&
+      postDate.getFullYear() === date.getFullYear()
+    );
+
+    // Check actual posts from Redux
+    const hasActual = posts.some(post => {
+      const postDate = new Date(post.created_at);
+      return postDate.getDate() === date.getDate() &&
+        postDate.getMonth() === date.getMonth() &&
+        postDate.getFullYear() === date.getFullYear();
+    });
+
+    return hasSimulated || hasActual;
+  };
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -62,7 +93,7 @@ const Calendar: React.FC = () => {
 
     for (let i = 0; i < firstDay; i++) {
       days.push(
-        <div key={`empty-${i}`} className="h-6"></div>
+        <div key={`empty-${i}`} className="h-8"></div>
       );
     }
 
@@ -80,21 +111,28 @@ const Calendar: React.FC = () => {
         selectedMonth === selectedDateObj.getMonth() &&
         selectedYear === selectedDateObj.getFullYear();
 
+      const hasPost = hasPostOnDate(currentDate);
+
       days.push(
         <div
           key={day}
           onClick={() => dispatch(setSelectedDate(currentDate))}
-          className={`h-6 flex items-center justify-center text-xs cursor-pointer rounded transition-colors
+          className={`h-8 flex items-center justify-center text-sm cursor-pointer rounded-lg transition-all relative
             ${isToday && !isSelected
-              ? 'bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 font-semibold' 
+              ? 'bg-primary/10 text-primary font-medium' 
               : ''
             }
             ${isSelected 
-              ? 'bg-blue-500 text-white font-semibold' 
-              : 'hover:bg-gray-100 dark:hover:bg-gray-700'
+              ? 'bg-primary text-white font-medium shadow-sm' 
+              : 'hover:bg-gray-100 text-gray-700'
             }`}
         >
           {day}
+          {hasPost && (
+            <div className={`absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full ${
+              isSelected ? 'bg-white' : 'bg-[#0077b5]'
+            }`} />
+          )}
         </div>
       );
     }
@@ -135,93 +173,93 @@ const Calendar: React.FC = () => {
   };
 
   const timeSlots: string[] = [];
-  for (let hour = 0; hour < 24; hour++) {
+  for (let hour = 0; hour < 24; hour += 2) {
     timeSlots.push(
       `${hour === 0 ? '12' : hour > 12 ? hour - 12 : hour}:00 ${hour < 12 ? 'AM' : 'PM'}`
     );
   }
 
   return (
-    <div className="flex h-screen">
-      <div className="w-[20%] bg-gray-50 dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 p-4">
-        <div className="mb-4">
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-semibold">
+    <div className="flex h-full bg-white">
+      <div className="w-72 bg-gray-50/50 border-r border-gray-100 p-6">
+        <div className="mb-6">
+          <div className="flex items-center justify-between mb-6">
+            <h3 className="text-base font-medium text-gray-900">
               {monthNames[selectedMonth]} {selectedYear}
             </h3>
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               <button
                 onClick={handlePreviousMonth}
-                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                 aria-label="Previous month"
               >
-                <ChevronLeft className="w-3 h-3" />
+                <ChevronLeft className="w-4 h-4 text-gray-600" />
               </button>
               <button
                 onClick={handleNextMonth}
-                className="p-1 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
                 aria-label="Next month"
               >
-                <ChevronRight className="w-3 h-3" />
+                <ChevronRight className="w-4 h-4 text-gray-600" />
               </button>
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-1 mb-1">
+          <div className="grid grid-cols-7 gap-2 mb-3">
             {shortDaysOfWeek.map((day) => (
               <div
                 key={day}
-                className="text-center text-[10px] font-medium text-gray-500 dark:text-gray-400 py-1"
+                className="text-center text-[11px] font-medium text-gray-400 py-1"
               >
                 {day}
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-1">
+          <div className="grid grid-cols-7 gap-2">
             {renderMiniCalendar()}
           </div>
         </div>
       </div>
       
-      <div className="w-[80%] flex flex-col">
-        <div className="flex items-center justify-between p-6 border-b border-gray-200 dark:border-gray-700">
-          <h2 className="text-2xl font-semibold">
+      <div className="flex-1 flex flex-col">
+        <div className="flex items-center justify-between px-8 py-6 border-b border-gray-100">
+          <h2 className="text-xl font-medium text-gray-900">
             {formatWeekRange()}
           </h2>
           
-          <div className="flex gap-3">
+          <div className="flex items-center gap-3">
             <button
               onClick={handlePreviousWeek}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
               aria-label="Previous week"
             >
-              <ChevronLeft className="w-6 h-6" />
+              <ChevronLeft className="w-5 h-5 text-gray-600" />
             </button>
             <button
               onClick={() => dispatch(setSelectedDate(new Date()))}
-              className="px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
             >
               Today
             </button>
             <button
               onClick={handleNextWeek}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+              className="p-2 rounded-lg hover:bg-gray-50 transition-colors"
               aria-label="Next week"
             >
-              <ChevronRight className="w-6 h-6" />
+              <ChevronRight className="w-5 h-5 text-gray-600" />
             </button>
           </div>
         </div>
 
-        <div className="flex-1 overflow-auto">
+        <div className="flex-1 overflow-auto bg-white">
           <div className="flex">
-            <div className="w-20 flex-shrink-0">
-              <div className="h-12"></div>
+            <div className="w-24 flex-shrink-0">
+              <div className="h-16"></div>
               {timeSlots.map((time) => (
                 <div
                   key={time}
-                  className="h-16 text-xs text-gray-500 dark:text-gray-400 pr-2 text-right border-r border-gray-200 dark:border-gray-700"
+                  className="h-32 text-xs text-gray-400 pr-4 pt-2 text-right border-r border-gray-100"
                 >
                   {time}
                 </div>
@@ -232,31 +270,55 @@ const Calendar: React.FC = () => {
               {weekDates.map((date, index) => {
                 const isToday = 
                   date.toDateString() === new Date().toDateString();
+                const hasPost = hasPostOnDate(date);
                 
                 return (
-                  <div key={index} className="border-r border-gray-200 dark:border-gray-700 last:border-r-0">
-                    <div className={`h-12 border-b border-gray-200 dark:border-gray-700 flex flex-col items-center justify-center ${
-                      isToday ? 'bg-blue-50 dark:bg-blue-900/20' : ''
+                  <div key={index} className="border-r border-gray-100 last:border-r-0">
+                    <div className={`h-16 border-b border-gray-100 flex flex-col items-center justify-center relative ${
+                      isToday ? 'bg-primary/5' : 'bg-gray-50/50'
                     }`}>
-                      <div className="text-xs text-gray-500 dark:text-gray-400">
+                      <div className="text-xs text-gray-500 mb-1">
                         {daysOfWeek[date.getDay()]}
                       </div>
                       <div className={`text-sm font-medium ${
-                        isToday ? 'text-blue-600 dark:text-blue-400' : ''
+                        isToday ? 'text-primary' : 'text-gray-700'
                       }`}>
                         {date.getDate()}
                       </div>
+                      {hasPost && (
+                        <div className="absolute top-2 right-2">
+                          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="#0077b5">
+                            <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                          </svg>
+                        </div>
+                      )}
                     </div>
                     
-                    {timeSlots.map((_, timeIndex) => (
-                      <div
-                        key={timeIndex}
-                        className={`h-16 border-b border-gray-100 dark:border-gray-800 ${
-                          isToday ? 'bg-blue-50/50 dark:bg-blue-900/10' : ''
-                        }`}
-                      >
-                      </div>
-                    ))}
+                    {timeSlots.map((_, timeIndex) => {
+                      // Show LinkedIn post indicator at 10 AM slot (which is now index 5 for 2-hour intervals)
+                      const showPostIndicator = hasPost && timeIndex === 5;
+                      
+                      return (
+                        <div
+                          key={timeIndex}
+                          className={`h-32 border-b border-gray-50 ${
+                            isToday ? 'bg-primary/[0.02]' : 'hover:bg-gray-50/50'
+                          } transition-colors cursor-pointer relative`}
+                        >
+                          {showPostIndicator && (
+                            <div className="absolute inset-x-2 top-3 bg-[#0077b5]/10 border border-[#0077b5]/20 rounded-lg p-3">
+                              <div className="flex flex-col items-center gap-2">
+                                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="#0077b5">
+                                  <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                                </svg>
+                                <span className="text-xs text-[#0077b5] font-semibold">LinkedIn</span>
+                                <span className="text-[10px] text-[#0077b5]/80">10:00 AM</span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 );
               })}
