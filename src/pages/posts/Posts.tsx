@@ -3,7 +3,9 @@ import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchUserPosts, selectShouldFetchPosts, setCurrentPost } from '@/features/post/postSlice';
 import { useAuth } from '@clerk/react-router';
 import { Link, useNavigate } from 'react-router';
-import { MoreHorizontal, ThumbsUp, MessageSquare, Repeat2, Send, PenLine, Heart, Lightbulb, Edit } from 'lucide-react';
+
+import { MoreHorizontal, ThumbsUp, MessageSquare, Repeat2, Send, Globe, Users, PenLine, Heart, Lightbulb, Clock, Edit, Calendar, CheckCircle2 } from 'lucide-react';
+
 import { useUser } from '@clerk/react-router';
 import { Button } from '@/components/ui/button';
 
@@ -31,7 +33,7 @@ export default function Posts() {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
+
     if (diffInHours < 1) {
       const diffInMinutes = Math.floor((now.getTime() - date.getTime()) / (1000 * 60));
       return `${diffInMinutes}m`;
@@ -44,6 +46,70 @@ export default function Posts() {
     } else {
       return `${Math.floor(diffInHours / 168)}w`;
     }
+  };
+
+  const formatScheduledDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMs = date.getTime() - now.getTime();
+    const diffInHours = Math.floor(diffInMs / (1000 * 60 * 60));
+    const diffInDays = Math.floor(diffInHours / 24);
+
+    if (diffInMs < 0) {
+      return 'Past due';
+    }
+
+    if (diffInHours < 1) {
+      const diffInMinutes = Math.floor(diffInMs / (1000 * 60));
+      return `in ${diffInMinutes}m`;
+    } else if (diffInHours < 24) {
+      return `in ${diffInHours}h`;
+    } else if (diffInDays === 1) {
+      return 'Tomorrow';
+    } else if (diffInDays < 7) {
+      return `in ${diffInDays} days`;
+    } else {
+      return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: date.getFullYear() !== now.getFullYear() ? 'numeric' : undefined });
+    }
+  };
+
+  const getPostStatus = (post: any) => {
+    if (post.linkedin_post_id && post.linkedin_post_url) {
+      return 'published';
+    }
+    if (post.scheduled_for) {
+      return 'scheduled';
+    }
+    return 'draft';
+  };
+
+  const getStatusBadge = (post: any) => {
+    const status = getPostStatus(post);
+
+    if (status === 'published') {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+          <CheckCircle2 className="w-3 h-3" />
+          Published
+        </span>
+      );
+    }
+
+    if (status === 'scheduled') {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+          <Calendar className="w-3 h-3" />
+          Scheduled
+        </span>
+      );
+    }
+
+    return (
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+        <Clock className="w-3 h-3" />
+        Draft
+      </span>
+    );
   };
 
   const handleResumeWriting = (post: any) => {
@@ -117,11 +183,9 @@ export default function Posts() {
                 key={post.id}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden relative"
               >
-                {/* Draft Badge */}
+                {/* Status Badge */}
                 <div className="absolute top-3 right-3 z-10">
-                  <span className="inline-flex items-center px-2.5 py-1 rounded-md text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
-                    DRAFT
-                  </span>
+                  {getStatusBadge(post)}
                 </div>
 
                 {/* Post Header */}
@@ -145,7 +209,19 @@ export default function Posts() {
                         </h3>
                         <p className="text-sm text-gray-600">Product Manager | Tech Enthusiast</p>
                         <p className="text-xs text-gray-500">
-                          <span className="text-amber-600 font-medium">Draft</span> • {formatDate(post.created_at)} • {post.visibility === 'PUBLIC' ? '🌐' : '👥'}
+                          {getPostStatus(post) === 'scheduled' ? (
+                            <>
+                              <span className="text-blue-600 font-medium">Scheduled</span> • {formatScheduledDate(post.scheduled_for!)} • {post.timezone}
+                            </>
+                          ) : getPostStatus(post) === 'published' ? (
+                            <>
+                              <span className="text-green-600 font-medium">Published</span> • {formatDate(post.created_at)} • {post.visibility === 'PUBLIC' ? '🌐' : '👥'}
+                            </>
+                          ) : (
+                            <>
+                              <span className="text-amber-600 font-medium">Draft</span> • {formatDate(post.created_at)} • {post.visibility === 'PUBLIC' ? '🌐' : '👥'}
+                            </>
+                          )}
                         </p>
                       </div>
                     </div>

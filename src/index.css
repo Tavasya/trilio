@@ -208,7 +208,7 @@
   }
   body {
     @apply bg-background text-foreground;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     line-height: 1.6;
     letter-spacing: 0.02em;
   }
@@ -222,5 +222,10 @@
   /* Better spacing for paragraphs */
   p {
     line-height: 1.9;
+  }
+
+  /* Perspective for 3D transforms */
+  .perspective-1000 {
+    perspective: 1000px;
   }
 }

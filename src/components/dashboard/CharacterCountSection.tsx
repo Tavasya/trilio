@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 type PostLength = 'short' | 'medium' | 'long';
 
 interface LengthOption {
@@ -29,9 +29,20 @@ const lengthOptions: LengthOption[] = [
   }
 ];
 
-export default function CharacterCountSection() {
-  const [selectedLength, setSelectedLength] = useState<PostLength>('medium');
+
+interface CharacterCountSectionProps {
+  value?: PostLength;
+  onChange?: (length: PostLength) => void;
+}
+
+export default function CharacterCountSection({ value = 'medium', onChange }: CharacterCountSectionProps) {
+  const [selectedLength, setSelectedLength] = useState<PostLength>(value);
   const sliderRef = useRef<HTMLDivElement>(null);
+
+  // Update local state when prop changes
+  useEffect(() => {
+    setSelectedLength(value);
+  }, [value]);
 
   const getSliderPosition = () => {
     switch (selectedLength) {
@@ -60,13 +71,9 @@ export default function CharacterCountSection() {
             const x = e.clientX - rect.left;
             const percentage = (x / rect.width) * 100;
 
-            if (percentage <= 33) {
-              setSelectedLength('short');
-            } else if (percentage >= 67) {
-              setSelectedLength('long');
-            } else {
-              setSelectedLength('medium');
-            }
+            const newLength = percentage <= 33 ? 'short' : percentage >= 67 ? 'long' : 'medium';
+            setSelectedLength(newLength);
+            onChange?.(newLength);
           }}
         >
           {/* Active Track */}
@@ -92,13 +99,9 @@ export default function CharacterCountSection() {
                 const x = Math.max(0, Math.min(e.clientX - rect.left, rect.width));
                 const percentage = (x / rect.width) * 100;
 
-                if (percentage <= 33) {
-                  setSelectedLength('short');
-                } else if (percentage >= 67) {
-                  setSelectedLength('long');
-                } else {
-                  setSelectedLength('medium');
-                }
+                const newLength = percentage <= 33 ? 'short' : percentage >= 67 ? 'long' : 'medium';
+                setSelectedLength(newLength);
+                onChange?.(newLength);
               };
 
               const handleMouseUp = () => {
@@ -132,7 +135,10 @@ export default function CharacterCountSection() {
           {lengthOptions.map((option) => (
             <button
               key={option.value}
-              onClick={() => setSelectedLength(option.value)}
+              onClick={() => {
+                setSelectedLength(option.value);
+                onChange?.(option.value);
+              }}
               className="text-center transition-all duration-200"
             >
               <div className={`font-medium text-xs ${

@@ -9,7 +9,7 @@ export default function TopicsSection({ topics, setTopics }: TopicsSectionProps)
       <div className="flex items-start justify-between mb-3">
         <div>
           <h2 className="text-lg font-bold text-gray-900">
-            Content Topics
+            Content Topics <span className="text-red-500">*</span>
           </h2>
         </div>
       </div>
