@@ -1,5 +1,5 @@
 import { API_CONFIG } from '@/shared/config/api';
-import type { FetchPostsResponse, LinkedInPost, LinkedInPostResponse, DraftPostRequest, DraftPostResponse, GetPostResponse, UpdateDraftRequest, UpdateDraftResponse } from './postTypes';
+import type { FetchPostsResponse, LinkedInPost, LinkedInPostResponse, DraftPostRequest, DraftPostResponse, GetPostResponse, UpdateDraftRequest, UpdateDraftResponse, SchedulePostRequest, SchedulePostResponse } from './postTypes';
 
 export class PostService {
   async fetchUserPosts(token: string): Promise<FetchPostsResponse> {
@@ -89,6 +89,36 @@ export class PostService {
 
     if (!response.ok || !data.success) {
       throw new Error(data.error || 'Failed to update draft');
+    }
+
+    return data;
+  }
+
+  async schedulePost(scheduleData: SchedulePostRequest, token: string): Promise<SchedulePostResponse> {
+    console.log('Scheduling post with data:', scheduleData);
+
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/posts/schedule`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(scheduleData),
+    });
+
+    let data;
+    try {
+      data = await response.json();
+    } catch (e) {
+      console.error('Failed to parse response:', e);
+      throw new Error('Invalid response from server');
+    }
+
+    console.log('Schedule response:', response.status, data);
+
+    if (!response.ok || !data.success) {
+      console.error('Schedule failed:', data);
+      throw new Error(data.error || data.detail || 'Failed to schedule post');
     }
 
     return data;

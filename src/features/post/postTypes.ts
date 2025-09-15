@@ -12,6 +12,9 @@ export interface Post {
   visibility: 'PUBLIC' | 'CONNECTIONS';
   linkedin_post_id: string | null;
   linkedin_post_url: string | null;
+  scheduled_for: string | null;
+  timezone: string | null;
+  status: 'draft' | 'scheduled' | 'published';
   created_at: string;
 }
 
@@ -54,6 +57,20 @@ export interface UpdateDraftRequest {
 }
 
 export interface UpdateDraftResponse {
+  success: boolean;
+  post: Post;
+  error?: string;
+}
+
+export interface SchedulePostRequest {
+  content: string;
+  scheduled_for: string;
+  timezone: string;
+  media_url?: string;
+  visibility?: 'PUBLIC' | 'CONNECTIONS';
+}
+
+export interface SchedulePostResponse {
   success: boolean;
   post: Post;
   error?: string;
