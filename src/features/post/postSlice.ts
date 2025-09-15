@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { toast } from 'sonner';
+
 import type { LinkedInPost, LinkedInPostResponse, PostState, FetchPostsResponse, Post, SchedulePostRequest, SchedulePostResponse } from './postTypes';
+
 import { postService } from './postService';
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
