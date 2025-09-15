@@ -4,11 +4,10 @@ import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateGeneratedPostContent, saveDraftToDatabase } from '@/features/chat/chatSlice';
-
 import { schedulePost } from '@/features/post/postSlice';
-import { useAuth } from '@clerk/react-router';
+import { useAuth, useUser } from '@clerk/react-router';
 import { useNavigate } from 'react-router';
-
+import { toast } from 'sonner';
 
 type ViewSize = 'desktop' | 'mobile';
 
@@ -34,7 +33,7 @@ export default function LinkedInPreview() {
   const postContent = generatedPost?.content || "Your LinkedIn post content will appear here as you generate it...";
   const postId = generatedPost?.id;
 
-  const handleSchedule = async (date: Date, time: string) => {
+  const handleSchedule = async (date: Date, _time: string) => {
     try {
       const token = await getToken();
       if (!token) {
@@ -227,7 +226,7 @@ export default function LinkedInPreview() {
                       <img src={userAvatar} alt={userName} className="w-full h-full rounded-full object-cover" />
                     ) : (
                       <span className="text-gray-600 font-semibold text-lg">
-                        {userName.split(' ').map(n => n[0]).join('')}
+                        {userName.split(' ').map((n: string) => n[0]).join('')}
                       </span>
                     )}
                   </div>

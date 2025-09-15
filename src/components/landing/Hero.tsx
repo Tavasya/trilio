@@ -4,13 +4,14 @@ import { IoIosCheckmarkCircle } from "react-icons/io";
 import { SignUpButton } from '@clerk/react-router';
 
 export default function Hero() {
-  const profiles = [
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Profile1",
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Profile2",
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Profile3",
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Profile4",
-    "https://api.dicebear.com/7.x/avataaars/svg?seed=Profile5"
-  ];
+  // Profile avatars for future use
+  // const profiles = [
+  //   "https://api.dicebear.com/7.x/avataaars/svg?seed=Profile1",
+  //   "https://api.dicebear.com/7.x/avataaars/svg?seed=Profile2",
+  //   "https://api.dicebear.com/7.x/avataaars/svg?seed=Profile3",
+  //   "https://api.dicebear.com/7.x/avataaars/svg?seed=Profile4",
+  //   "https://api.dicebear.com/7.x/avataaars/svg?seed=Profile5"
+  // ];
 
   const screenshotRef = useRef<HTMLDivElement | null>(null);
   const [tiltAmount, setTiltAmount] = useState(5);
