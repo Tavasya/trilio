@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import IdentityModal from '../identity/IdentityModal';
 
@@ -11,23 +11,32 @@ const previewRoles = [
   { id: 'leader', label: 'Leader' },
 ];
 
-export default function IdentitySection() {
-  const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+interface IdentitySectionProps {
+  value?: string;
+  onChange?: (selected: string) => void;
+}
+
+export default function IdentitySection({ value = '', onChange }: IdentitySectionProps) {
+  const [selectedRole, setSelectedRole] = useState<string>(value);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Update local state when prop changes
+  useEffect(() => {
+    setSelectedRole(value);
+  }, [value]);
+
   const handlePreviewRoleClick = (roleId: string) => {
-    // Toggle selection directly from preview
-    setSelectedRoles(prev =>
-      prev.includes(roleId)
-        ? prev.filter(id => id !== roleId)
-        : [...prev, roleId]
-    );
+    // Single selection - deselect if clicking the same role, otherwise select new role
+    const newSelection = selectedRole === roleId ? '' : roleId;
+    setSelectedRole(newSelection);
+    onChange?.(newSelection);
   };
 
   const handleSaveIdentity = (roles: string[]) => {
-    setSelectedRoles(roles);
-    // TODO: Save to backend/localStorage
-    console.log('Selected roles:', roles);
+    // For modal, we still receive array but only use first selection
+    const firstRole = roles[0] || '';
+    setSelectedRole(firstRole);
+    onChange?.(firstRole);
   };
 
   return (
@@ -36,7 +45,7 @@ export default function IdentitySection() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="text-lg font-bold text-gray-900">
-              Define Your Identity
+              Define Your Identity <span className="text-red-500">*</span>
             </h2>
           </div>
           <button
@@ -47,10 +56,10 @@ export default function IdentitySection() {
           </button>
         </div>
 
-        {/* Clickable Role Preview Badges - Direct Selection */}
+        {/* Clickable Role Preview Badges - Single Selection */}
         <div className="flex flex-wrap gap-2">
           {previewRoles.map((role) => {
-            const isSelected = selectedRoles.includes(role.id);
+            const isSelected = selectedRole === role.id;
             return (
               <button
                 key={role.id}
@@ -67,11 +76,11 @@ export default function IdentitySection() {
           })}
         </div>
 
-        {/* Show selected count if any */}
-        {selectedRoles.length > 0 && (
+        {/* Show selected role if any */}
+        {selectedRole && (
           <div className="mt-3 pt-3 border-t">
             <p className="text-xs text-gray-600">
-              {selectedRoles.length} role{selectedRoles.length !== 1 ? 's' : ''} selected
+              Selected: {previewRoles.find(r => r.id === selectedRole)?.label}
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="ml-2 text-primary hover:text-primary/80 font-medium"
@@ -88,7 +97,7 @@ export default function IdentitySection() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveIdentity}
-        initialSelections={selectedRoles}
+        initialSelections={selectedRole ? [selectedRole] : []}
       />
     </>
   );

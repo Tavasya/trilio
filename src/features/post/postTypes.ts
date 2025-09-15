@@ -33,6 +33,11 @@ export interface DraftPostRequest {
   content: string;
   media_url?: string;
   visibility?: 'PUBLIC' | 'CONNECTIONS';
+  identity?: string;
+  content_topics?: string[];
+  writing_style?: string;
+  post_length?: 'short' | 'medium' | 'long';
+  trending_posts?: any[];
 }
 
 export interface DraftPostResponse {

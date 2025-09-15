@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronRight } from 'lucide-react';
 import WritingStylesModal from '../writing-styles/WritingStylesModal';
 
@@ -11,23 +11,32 @@ const previewStyles = [
   { id: 'inspirational', label: 'Inspirational' },
 ];
 
-export default function WritingStylesSection() {
-  const [selectedStyles, setSelectedStyles] = useState<string[]>([]);
+interface WritingStylesSectionProps {
+  value?: string;
+  onChange?: (selected: string) => void;
+}
+
+export default function WritingStylesSection({ value = '', onChange }: WritingStylesSectionProps) {
+  const [selectedStyle, setSelectedStyle] = useState<string>(value);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
+  // Update local state when prop changes
+  useEffect(() => {
+    setSelectedStyle(value);
+  }, [value]);
+
   const handlePreviewStyleClick = (styleId: string) => {
-    // Toggle selection directly from preview
-    setSelectedStyles(prev =>
-      prev.includes(styleId)
-        ? prev.filter(id => id !== styleId)
-        : [...prev, styleId]
-    );
+    // Single selection - deselect if clicking the same style, otherwise select new style
+    const newSelection = selectedStyle === styleId ? '' : styleId;
+    setSelectedStyle(newSelection);
+    onChange?.(newSelection);
   };
 
   const handleSaveStyles = (styles: string[]) => {
-    setSelectedStyles(styles);
-    // TODO: Save to backend/localStorage
-    console.log('Selected styles:', styles);
+    // For modal, we still receive array but only use first selection
+    const firstStyle = styles[0] || '';
+    setSelectedStyle(firstStyle);
+    onChange?.(firstStyle);
   };
 
   return (
@@ -36,7 +45,7 @@ export default function WritingStylesSection() {
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="text-lg font-bold text-gray-900">
-              Writing Styles
+              Writing Styles <span className="text-red-500">*</span>
             </h2>
           </div>
           <button
@@ -47,10 +56,10 @@ export default function WritingStylesSection() {
           </button>
         </div>
 
-        {/* Clickable Style Preview Badges - Direct Selection */}
+        {/* Clickable Style Preview Badges - Single Selection */}
         <div className="flex flex-wrap gap-2">
           {previewStyles.map((style) => {
-            const isSelected = selectedStyles.includes(style.id);
+            const isSelected = selectedStyle === style.id;
             return (
               <button
                 key={style.id}
@@ -67,11 +76,11 @@ export default function WritingStylesSection() {
           })}
         </div>
 
-        {/* Show selected count if any */}
-        {selectedStyles.length > 0 && (
+        {/* Show selected style if any */}
+        {selectedStyle && (
           <div className="mt-3 pt-3 border-t">
             <p className="text-xs text-gray-600">
-              {selectedStyles.length} style{selectedStyles.length !== 1 ? 's' : ''} selected
+              Selected: {previewStyles.find(s => s.id === selectedStyle)?.label}
               <button
                 onClick={() => setIsModalOpen(true)}
                 className="ml-2 text-primary hover:text-primary/80 font-medium"
@@ -88,7 +97,7 @@ export default function WritingStylesSection() {
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
         onSave={handleSaveStyles}
-        initialSelections={selectedStyles}
+        initialSelections={selectedStyle ? [selectedStyle] : []}
       />
     </>
   );
