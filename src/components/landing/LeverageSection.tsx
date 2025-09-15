@@ -34,7 +34,6 @@ const leveragePoints = [
 
 export default function LeverageSection() {
   const [expandedIndex, setExpandedIndex] = useState<number | null>(null);
-  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
 
   const toggleExpand = (index: number) => {
     setExpandedIndex(expandedIndex === index ? null : index);

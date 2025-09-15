@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { toast } from 'sonner';
 
-import type { LinkedInPost, LinkedInPostResponse, PostState, FetchPostsResponse, Post, SchedulePostRequest, SchedulePostResponse } from './postTypes';
+import type { LinkedInPost, LinkedInPostResponse, PostState, FetchPostsResponse, SchedulePostRequest, SchedulePostResponse } from './postTypes';
 
 import { postService } from './postService';
 
