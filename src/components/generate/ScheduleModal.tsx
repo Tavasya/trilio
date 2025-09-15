@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { X, Calendar, Clock, Sparkles } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { X, Calendar, Clock, Sparkles, AlertCircle } from 'lucide-react';
 import { Button } from '../ui/button';
 
 interface ScheduleModalProps {
@@ -11,9 +11,17 @@ interface ScheduleModalProps {
 export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleModalProps) {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
-  
+  const [validationError, setValidationError] = useState<string>('');
+  const [useManualInput, setUseManualInput] = useState(false);
+
   // Get today's date in YYYY-MM-DD format for min date
   const today = new Date().toISOString().split('T')[0];
+
+  // Get current time for validation
+  const getCurrentTime = () => {
+    const now = new Date();
+    return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  };
   
   // Generate time slots every 30 minutes
   const timeSlots = [];
@@ -29,13 +37,48 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleM
     }
   }
   
+  const validateDateTime = () => {
+    if (!selectedDate || !selectedTime) {
+      setValidationError('Please select both date and time');
+      return false;
+    }
+
+    const scheduledDateTime = new Date(`${selectedDate}T${selectedTime}`);
+    const now = new Date();
+
+    if (scheduledDateTime <= now) {
+      setValidationError('Please select a future date and time');
+      return false;
+    }
+
+    setValidationError('');
+    return true;
+  };
+
   const handleSchedule = () => {
-    if (selectedDate && selectedTime) {
+    if (validateDateTime()) {
       const scheduledDateTime = new Date(`${selectedDate}T${selectedTime}`);
       onSchedule(scheduledDateTime, selectedTime);
       onClose();
     }
   };
+
+  // Clear validation error when date or time changes
+  useEffect(() => {
+    if (selectedDate && selectedTime) {
+      validateDateTime();
+    }
+  }, [selectedDate, selectedTime]);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      setSelectedDate('');
+      setSelectedTime('');
+      setValidationError('');
+      setUseManualInput(false);
+    }
+  }, [isOpen]);
   
   const generateBestTime = () => {
     if (!selectedDate) return;
@@ -108,34 +151,71 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleM
               <Clock className="w-4 h-4 inline mr-2" />
               Select Time
             </label>
-            <Button
-              type="button"
-              onClick={generateBestTime}
-              disabled={!selectedDate}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1"
-            >
-              <Sparkles className="w-3 h-3" />
-              Generate Best Time
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                onClick={() => setUseManualInput(!useManualInput)}
+                variant="outline"
+                size="sm"
+                className="text-xs"
+              >
+                {useManualInput ? 'Use Dropdown' : 'Type Time'}
+              </Button>
+              <Button
+                type="button"
+                onClick={generateBestTime}
+                disabled={!selectedDate}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-1"
+              >
+                <Sparkles className="w-3 h-3" />
+                Best Time
+              </Button>
+            </div>
           </div>
-          <select
-            value={selectedTime}
-            onChange={(e) => setSelectedTime(e.target.value)}
-            className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-          >
-            <option value="">Choose a time</option>
-            {timeSlots.map((slot) => (
-              <option key={slot.value} value={slot.value}>
-                {slot.display}
-              </option>
-            ))}
-          </select>
+          {useManualInput ? (
+            <input
+              type="time"
+              value={selectedTime}
+              onChange={(e) => setSelectedTime(e.target.value)}
+              min={selectedDate === today ? getCurrentTime() : undefined}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            />
+          ) : (
+            <select
+              value={selectedTime}
+              onChange={(e) => setSelectedTime(e.target.value)}
+              className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            >
+              <option value="">Choose a time</option>
+              {timeSlots.map((slot) => {
+                // Filter out past times if today is selected
+                if (selectedDate === today) {
+                  const now = new Date();
+                  const slotDateTime = new Date(`${selectedDate}T${slot.value}`);
+                  if (slotDateTime <= now) return null;
+                }
+                return (
+                  <option key={slot.value} value={slot.value}>
+                    {slot.display}
+                  </option>
+                );
+              })}
+            </select>
+          )}
         </div>
         
+        {/* Validation Error */}
+        {validationError && (
+          <div className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 text-red-600 mt-0.5 flex-shrink-0" />
+            <p className="text-sm text-red-600">{validationError}</p>
+          </div>
+        )}
+
         {/* Selected DateTime Display */}
-        {selectedDate && selectedTime && (
+        {selectedDate && selectedTime && !validationError && (
           <div className="mb-6 p-3 bg-gray-50 rounded-lg">
             <p className="text-sm text-gray-600">Scheduled for:</p>
             <p className="font-medium">
@@ -163,7 +243,7 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleM
           </Button>
           <Button
             onClick={handleSchedule}
-            disabled={!selectedDate || !selectedTime}
+            disabled={!selectedDate || !selectedTime || !!validationError}
             className="flex-1"
           >
             Schedule Post
