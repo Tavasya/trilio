@@ -4,10 +4,11 @@ import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateGeneratedPostContent, saveDraftToDatabase } from '@/features/chat/chatSlice';
+
 import { schedulePost } from '@/features/post/postSlice';
 import { useAuth } from '@clerk/react-router';
 import { useNavigate } from 'react-router';
-import { toast } from 'sonner';
+
 
 type ViewSize = 'desktop' | 'mobile';
 
@@ -15,11 +16,15 @@ export default function LinkedInPreview() {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { getToken } = useAuth();
+  const { user } = useUser();
   const generatedPost = useAppSelector(state => state.chat.generatedPost);
   const saveStatus = useAppSelector(state => state.chat.saveStatus);
-  const userName = "John Doe";
-  const userTitle = "Product Manager | Tech Enthusiast";
-  const userAvatar = "";
+
+  // Use Clerk user data with fallbacks
+  const userName = user?.fullName || user?.firstName || "Your Name";
+  const userTitle = "Product Manager | Tech Enthusiast"; // You might want to make this editable or pull from user metadata
+  const userAvatar = user?.imageUrl || "";
+
   const [viewSize, setViewSize] = useState<ViewSize>('desktop');
   const [showFullContent, setShowFullContent] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
