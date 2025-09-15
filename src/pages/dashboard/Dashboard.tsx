@@ -9,17 +9,48 @@ import { useNavigate } from 'react-router-dom';
 import { postService } from '../../features/post/postService';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
-import { Sparkles } from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import {
+  setContent,
+  setIdentity,
+  setWritingStyle,
+  setPostLength,
+  setTrendingPosts,
+  validateForm,
+  selectDashboardState
+} from '../../features/dashboard/dashboardSlice';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { getToken } = useAuth();
-  const [topics, setTopics] = useState('');
+  const dispatch = useAppDispatch();
+  const dashboardState = useAppSelector(selectDashboardState);
   const [isLoading, setIsLoading] = useState(false);
-  
+
   const handleGeneratePost = async () => {
-    if (!topics.trim()) {
-      toast.error('Please enter a topic first', { position: 'top-right' });
+    // Validate form
+    dispatch(validateForm());
+
+    // Check validation state after dispatching
+    const state = dashboardState;
+    if (!state.identity ||
+        !state.writingStyle ||
+        state.trendingPosts.length === 0 ||
+        !state.content.trim()) {
+
+      // Show validation errors
+      if (!state.content.trim()) {
+        toast.error('Please enter content topics', { position: 'top-right' });
+      }
+      if (!state.identity) {
+        toast.error('Please select an identity', { position: 'top-right' });
+      }
+      if (!state.writingStyle) {
+        toast.error('Please select a writing style', { position: 'top-right' });
+      }
+      if (state.trendingPosts.length === 0) {
+        toast.error('Please select at least one trending post for inspiration', { position: 'top-right' });
+      }
       return;
     }
 
@@ -31,11 +62,16 @@ const Dashboard = () => {
         return;
       }
 
-      // Save as draft and get post ID
+      // Save as draft with all required fields
       const response = await postService.saveDraft(
-        { 
-          content: topics,
-          visibility: 'PUBLIC'
+        {
+          content: dashboardState.content,
+          visibility: 'PUBLIC',
+          identity: dashboardState.identity,
+          content_topics: dashboardState.contentTopics,
+          writing_style: dashboardState.writingStyle,
+          post_length: dashboardState.postLength,
+          trending_posts: dashboardState.trendingPosts
         },
         token
       );
@@ -62,11 +98,26 @@ const Dashboard = () => {
         </div>
         
         <div className="space-y-4">
-          <IdentitySection />
-          <TopicsSection topics={topics} setTopics={setTopics} />
-          <ViralPostsSection topics={topics} />
-          <WritingStylesSection />
-          <CharacterCountSection />
+          <IdentitySection
+            value={dashboardState.identity}
+            onChange={(selected) => dispatch(setIdentity(selected))}
+          />
+          <TopicsSection
+            topics={dashboardState.content}
+            setTopics={(content) => dispatch(setContent(content))}
+          />
+          <ViralPostsSection
+            topics={dashboardState.content}
+            onSelectionChange={(posts) => dispatch(setTrendingPosts(posts))}
+          />
+          <WritingStylesSection
+            value={dashboardState.writingStyle}
+            onChange={(styles) => dispatch(setWritingStyle(styles))}
+          />
+          <CharacterCountSection
+            value={dashboardState.postLength}
+            onChange={(length) => dispatch(setPostLength(length))}
+          />
 
           <div className="flex justify-end">
             <Button

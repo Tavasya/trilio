@@ -21,9 +21,10 @@ interface ViralPost {
 interface ViralPostsSectionProps {
   posts?: ViralPost[];
   topics?: string;
+  onSelectionChange?: (posts: ViralPost[]) => void;
 }
 
-export default function ViralPostsSection({ topics = '' }: ViralPostsSectionProps) {
+export default function ViralPostsSection({ topics = '', onSelectionChange }: ViralPostsSectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedPosts, setSelectedPosts] = useState<any[]>([]);
   const [previewPosts, setPreviewPosts] = useState<ViralPost[]>([]);
@@ -34,6 +35,11 @@ export default function ViralPostsSection({ topics = '' }: ViralPostsSectionProp
   useEffect(() => {
     fetchAIPosts();
   }, []);
+
+  // Notify parent when selection changes
+  useEffect(() => {
+    onSelectionChange?.(selectedPosts);
+  }, [selectedPosts, onSelectionChange]);
 
   const fetchAIPosts = async () => {
     try {
@@ -126,7 +132,7 @@ export default function ViralPostsSection({ topics = '' }: ViralPostsSectionProp
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="text-lg font-bold text-gray-900">
-              Trending in Your Topics
+              Trending in Your Topics <span className="text-red-500">*</span>
             </h2>
             {selectedPosts.length > 0 && (
               <p className="text-xs text-primary mt-0.5">
