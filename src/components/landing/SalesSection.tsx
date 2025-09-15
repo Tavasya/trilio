@@ -1,30 +1,23 @@
 import { useEffect, useRef, useState } from "react";
-import { useNavigate } from "react-router";
-import { SignedIn, SignedOut, SignUpButton, useUser } from '@clerk/react-router';
-import trilioLogo from "@/lib/logo/trilio-logo.png";
 
 export default function SalesSection() {
-  const navigate = useNavigate();
-  const { user } = useUser();
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-  const ctaRef = useRef<HTMLDivElement | null>(null);
-  const [ctaVisible, setCtaVisible] = useState(false);
 
   const features = [
     {
-      title: "Analyze Successful Creators",
-      description: "Study creators who started where you are and achieved your goals. Learn their strategies and growth patterns.",
+      title: "An Authentic Brand Voice",
+      description: "Finally sound authentic online, not robotic, by aligning your content with your identity and goals.",
       color: "bg-purple-100"
     },
     {
-      title: "Write in Your Voice",
-      description: "Generate authentic LinkedIn posts that sound like you, not a robot. Maintain your unique voice and style.",
+      title: "Experiment & Evolve",
+      description: "Post with clarity and intention, guided by insights on what works and how to hit your sweet spot.",
       color: "bg-blue-100"
     },
     {
-      title: "Schedule & Automate",
-      description: "Plan and schedule your posts in advance. Stay consistent with automated posting at optimal times.",
+      title: "Consistent Posting Made Effortless",
+      description: "Skip the grind, automate the busywork so you can focus on creating and enjoying the process.",
       color: "bg-green-100"
     }
   ];
@@ -38,9 +31,6 @@ export default function SalesSection() {
             if (index !== -1 && !visibleItems.includes(index)) {
               setVisibleItems(prev => [...prev, index]);
             }
-            if (entry.target === ctaRef.current) {
-              setCtaVisible(true);
-            }
           }
         });
       },
@@ -52,10 +42,6 @@ export default function SalesSection() {
       itemRefs.current.forEach((ref) => {
         if (ref) observer.observe(ref);
       });
-
-      if (ctaRef.current) {
-        observer.observe(ctaRef.current);
-      }
     }, 100);
 
     return () => observer.disconnect();
@@ -63,7 +49,7 @@ export default function SalesSection() {
 
   return (
     <div className="max-w-6xl mx-auto px-6 py-20">
-      <h2 className="text-3xl font-bold text-center text-gray-900 mb-16">How It Works</h2>
+      <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-16">How It Works</h2>
       
       <div className="space-y-24">
         {features.map((feature, index) => {
@@ -101,10 +87,10 @@ export default function SalesSection() {
                     ? 'opacity-0 translate-x-12' 
                     : 'opacity-0 -translate-x-12'
               }`}>
-                <h3 className="text-2xl font-bold text-gray-900">
+                <h3 className="text-2xl md:text-3xl font-bold text-gray-900">
                   {feature.title}
                 </h3>
-                <p className="text-lg text-gray-600 leading-relaxed">
+                <p className="text-base md:text-lg text-gray-600 leading-relaxed">
                   {feature.description}
                 </p>
               </div>
@@ -113,62 +99,6 @@ export default function SalesSection() {
         })}
       </div>
 
-      {/* CTA Section */}
-      <div className="mt-32">
-        <div 
-          ref={ctaRef}
-          className={`rounded-2xl p-20 text-center space-y-8 transition-all duration-700 ${
-            ctaVisible 
-              ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-12'
-          }`}
-          style={{
-            background: 'radial-gradient(circle at 20% 50%, rgba(139, 92, 246, 0.1) 0%, transparent 50%), radial-gradient(circle at 80% 80%, rgba(139, 92, 246, 0.15) 0%, transparent 50%), white'
-          }}
-        >
-          <img src={trilioLogo} alt="Trilio" className={`w-12 h-12 mx-auto transition-all duration-700 delay-150 ${
-            ctaVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
-          }`} />
-          <p className={`text-lg text-gray-600 max-w-2xl mx-auto transition-all duration-700 delay-300 ${
-            ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}>
-            Still not convinced? Book a call to see how we've helped 500+ creators grow their LinkedIn presence.
-          </p>
-          <div className={`flex justify-center gap-4 transition-all duration-700 delay-500 ${
-            ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
-          }`}>
-            <SignedOut>
-              <SignUpButton mode="modal">
-                <button 
-                  className="px-6 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium h-12 flex items-center"
-                >
-                  Try for Free
-                </button>
-              </SignUpButton>
-              <button className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center">
-                Book a Call
-              </button>
-            </SignedOut>
-            <SignedIn>
-              <button 
-                onClick={() => {
-                  // Check if user has completed onboarding
-                  const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${user?.id}`);
-                  
-                  if (hasCompletedOnboarding) {
-                    navigate("/dashboard");
-                  } else {
-                    navigate("/onboarding/1");
-                  }
-                }}
-                className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center"
-              >
-                Go to App
-              </button>
-            </SignedIn>
-          </div>
-        </div>
-      </div>
     </div>
   );
 }

@@ -3,9 +3,13 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { SignedIn, SignedOut, SignInButton, SignUpButton, useUser, useClerk } from '@clerk/react-router';
 import Hero from "@/components/landing/Hero";
-import QuickStartTasks from "@/components/landing/QuickStartTasks";
-import TestimonialCarousel from "@/components/landing/TestimonialCarousel";
+import ProblemsSection from "@/components/landing/ProblemsSection";
+import LeverageSection from "@/components/landing/LeverageSection";
+import FoundersTestimonials from "@/components/landing/FoundersTestimonials";
 import SalesSection from "@/components/landing/SalesSection";
+import PricingSection from "@/components/landing/PricingSection";
+import FAQSection from "@/components/landing/FAQSection";
+import CTASection from "@/components/landing/CTASection";
 import trilioLogo from "@/lib/logo/trilio-logo.png";
 
 export default function Landing() {
@@ -37,59 +41,45 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-white">
       {/* Fixed Header */}
-      <header className={`fixed top-0 left-0 right-0 z-50 transition-[padding] duration-300 ${
-        scrolledPastPurple 
-          ? 'px-8 pt-4' 
-          : ''
-      }`}>
-        <div className={`transition-[border-radius,background-color,box-shadow] duration-300 ${
-          scrolledPastPurple 
-            ? 'rounded-2xl bg-white/80 backdrop-blur-md shadow-sm border border-gray-200/50' 
-            : ''
-        }`}>
-          <div className={`flex items-center justify-between transition-[padding] duration-300 ${
-            scrolledPastPurple ? 'px-8 py-3' : 'px-6 py-4'
-          }`}>
-            <img src={trilioLogo} alt="Trilio" className="h-8 w-auto" />
-            
-            <div className={`flex items-center gap-3 ${!loaded ? 'invisible' : 'visible'}`}>
-              <SignedOut>
-                <SignInButton mode="modal">
-                  <Button
-                    variant="ghost"
-                    className={`px-4 py-2 transition-colors ${
-                      scrolledPastPurple ? 'text-gray-700 hover:bg-gray-100/50' : 'text-gray-700 hover:bg-white/50'
-                    }`}
-                  >
-                    Login
-                  </Button>
-                </SignInButton>
-                <SignUpButton mode="modal">
-                  <Button
-                    className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
-                  >
-                    Try for Free
-                  </Button>
-                </SignUpButton>
-              </SignedOut>
-              <SignedIn>
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md">
+        <div className="flex items-center justify-between px-6 py-4">
+          <img src={trilioLogo} alt="Trilio" className="h-8 w-auto" />
+
+          <div className={`flex items-center gap-3 ${!loaded ? 'invisible' : 'visible'}`}>
+            <SignedOut>
+              <SignInButton mode="modal">
                 <Button
-                  onClick={() => {
-                    // Check if user has completed onboarding
-                    const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${user?.id}`);
-                    
-                    if (hasCompletedOnboarding) {
-                      navigate("/dashboard");
-                    } else {
-                      navigate("/onboarding/1");
-                    }
-                  }}
+                  variant="ghost"
+                  className="px-4 py-2 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                >
+                  Login
+                </Button>
+              </SignInButton>
+              <SignUpButton mode="modal">
+                <Button
                   className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
                 >
-                  Go to App
+                  Try for Free
                 </Button>
-              </SignedIn>
-            </div>
+              </SignUpButton>
+            </SignedOut>
+            <SignedIn>
+              <Button
+                onClick={() => {
+                  // Check if user has completed onboarding
+                  const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${user?.id}`);
+
+                  if (hasCompletedOnboarding) {
+                    navigate("/dashboard");
+                  } else {
+                    navigate("/onboarding/1");
+                  }
+                }}
+                className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
+              >
+                Go to App
+              </Button>
+            </SignedIn>
           </div>
         </div>
       </header>
@@ -98,28 +88,14 @@ export default function Landing() {
       <div className="pt-1 px-1">
         <div className="relative min-h-[calc(100vh-8px)] flex flex-col rounded-xl">
           {/* Background with fade-in effect */}
-          <div className={`absolute inset-0 bg-gradient-to-b from-primary/15 via-primary/10 to-primary/5 rounded-xl transition-opacity duration-1000 ${
+          <div className={`absolute inset-0 bg-white rounded-xl transition-opacity duration-1000 ${
             backgroundLoaded ? 'opacity-100' : 'opacity-0'
           }`}>
-            {/* Animated gradient spots for visual interest - fade in together with background */}
-            <div className="absolute inset-0 overflow-hidden rounded-xl">
-              <div className="absolute top-20 -left-20 w-96 h-96 bg-gray-400/10 rounded-full blur-3xl animate-[float_20s_ease-in-out_infinite]" />
-              <div className="absolute bottom-20 -right-20 w-96 h-96 bg-gray-300/10 rounded-full blur-3xl animate-[float_25s_ease-in-out_infinite_reverse]" />
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40rem] h-[40rem] bg-primary/10 rounded-full blur-3xl animate-[float_30s_ease-in-out_infinite_2s]" />
-            </div>
           </div>
           
-          {/* Hero and Quick Tasks - Centered in middle */}
+          {/* Hero - Centered in middle */}
           <div className="relative flex-1 flex flex-col items-center justify-center px-6 z-10">
-            <div className="space-y-6">
-              <Hero />
-              <QuickStartTasks />
-            </div>
-          </div>
-
-          {/* Testimonial Carousel - Fixed at bottom */}
-          <div className="pb-8">
-            <TestimonialCarousel />
+            <Hero />
           </div>
 
           {/* Fade to white at bottom */}
@@ -127,24 +103,70 @@ export default function Landing() {
         </div>
       </div>
 
-      {/* Sales Section on white background */}
+      {/* Problems Section, Leverage Section, Sales Section, Testimonials, Pricing and FAQ on white background */}
       <div className="bg-white">
+        <ProblemsSection />
+        <LeverageSection />
         <SalesSection />
+        <FoundersTestimonials />
+        <PricingSection />
+        <FAQSection />
+        <CTASection />
       </div>
 
-      {/* Footer */}
-      <footer className="bg-white py-12 px-6">
-        <div className="max-w-6xl mx-auto">
-          <div className="flex flex-wrap justify-center gap-6 mb-8 text-sm text-gray-600">
-            <a href="#" className="hover:text-gray-900">Terms of Service</a>
-            <a href="#" className="hover:text-gray-900">Privacy Policy</a>
-            <a href="#" className="hover:text-gray-900">Cookie Policy</a>
-            <a href="https://www.linkedin.com/company/trilio-company" target="_blank" rel="noopener noreferrer" className="hover:text-gray-900">LinkedIn</a>
-            <a href="#" className="hover:text-gray-900">Contact</a>
-            <a href="#" className="hover:text-gray-900">Support</a>
+      {/* Footer with Primary Background */}
+      <footer className="bg-primary px-6 pb-6 pt-12">
+        <div className="max-w-6xl mx-auto bg-white rounded-2xl p-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+            {/* Company Info */}
+            <div className="col-span-1 md:col-span-2">
+              <img src={trilioLogo} alt="Trilio" className="h-8 w-auto mb-4" />
+              <p className="text-sm text-gray-600 mb-4">
+                Transform your LinkedIn presence with AI-powered content creation that sounds authentically you.
+              </p>
+              <div className="flex gap-4">
+                <a href="https://www.linkedin.com/company/trilio-company" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+                  </svg>
+                </a>
+                <a href="https://twitter.com/trilio" target="_blank" rel="noopener noreferrer" className="text-gray-400 hover:text-primary">
+                  <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M23.953 4.57a10 10 0 01-2.825.775 4.958 4.958 0 002.163-2.723c-.951.555-2.005.959-3.127 1.184a4.92 4.92 0 00-8.384 4.482C7.69 8.095 4.067 6.13 1.64 3.162a4.822 4.822 0 00-.666 2.475c0 1.71.87 3.213 2.188 4.096a4.904 4.904 0 01-2.228-.616v.06a4.923 4.923 0 003.946 4.827 4.996 4.996 0 01-2.212.085 4.936 4.936 0 004.604 3.417 9.867 9.867 0 01-6.102 2.105c-.39 0-.779-.023-1.17-.067a13.995 13.995 0 007.557 2.209c9.053 0 13.998-7.496 13.998-13.985 0-.21 0-.42-.015-.63A9.935 9.935 0 0024 4.59z"/>
+                  </svg>
+                </a>
+              </div>
+            </div>
+
+            {/* Product */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4">Product</h3>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Features</a></li>
+                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Pricing</a></li>
+                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">API</a></li>
+                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Integrations</a></li>
+              </ul>
+            </div>
+
+            {/* Support */}
+            <div>
+              <h3 className="font-semibold text-gray-900 mb-4">Support</h3>
+              <ul className="space-y-2">
+                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Help Center</a></li>
+                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Contact</a></li>
+                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Status</a></li>
+                <li><a href="#" className="text-sm text-gray-600 hover:text-primary">Terms of Service</a></li>
+              </ul>
+            </div>
           </div>
-          <div className="text-center text-sm text-gray-500">
-            <p>© 2024 Trilio. All rights reserved.</p>
+
+          <div className="border-t border-gray-200 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
+            <p className="text-sm text-gray-500">© 2024 Trilio. All rights reserved.</p>
+            <div className="flex gap-6 mt-4 md:mt-0">
+              <a href="#" className="text-sm text-gray-500 hover:text-primary">Privacy Policy</a>
+              <a href="#" className="text-sm text-gray-500 hover:text-primary">Cookie Policy</a>
+            </div>
           </div>
         </div>
       </footer>
