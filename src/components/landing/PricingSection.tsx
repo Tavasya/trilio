@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
+import { SignUpButton } from '@clerk/react-router';
 
 const plans = [
   {
@@ -35,7 +36,7 @@ const plans = [
     name: "Business",
     price: { monthly: "Let's talk", yearly: "Let's talk" },
     description: "For businesses and agencies to amplify their content creation",
-    cta: "Contact Trilio",
+    cta: "Book a Call",
     postGeneration: "Unlimited posts",
     features: [
       "Everything in Creator, plus:",
@@ -88,18 +89,15 @@ export default function PricingSection() {
   }, []);
 
   return (
-    <div className="py-16 px-6 bg-gray-50">
+    <div id="pricing" className="py-16 px-6 bg-gray-50">
       <div className="max-w-6xl mx-auto">
         <div ref={headerRef} className={`transition-all duration-700 ${
           headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3 text-center">
-            Ready to save time?
+          Choose Your LinkedIn Growth Plan
           </h2>
 
-          <p className="text-xl text-gray-600 text-center mb-8">
-            Choose the offer that fits your LinkedIn activity
-          </p>
         </div>
 
         {/* Billing Toggle */}
@@ -165,15 +163,19 @@ export default function PricingSection() {
                 </div>
                 <p className="text-base text-gray-600 mb-4">{plan.description}</p>
 
-                <Button
-                  className={`w-full ${
-                    plan.cta === "Contact Trilio"
-                      ? "bg-gray-900 hover:bg-gray-800"
-                      : "bg-primary hover:bg-primary/90"
-                  }`}
-                >
-                  {plan.cta}
-                </Button>
+                {plan.cta === "Book a Call" ? (
+                  <a href="https://calendly.com/jessie-nativespeaking/meet-jessie?month=2025-09" target="_blank" rel="noopener noreferrer">
+                    <Button className="w-full bg-gray-900 hover:bg-gray-800">
+                      {plan.cta}
+                    </Button>
+                  </a>
+                ) : (
+                  <SignUpButton mode="modal">
+                    <Button className="w-full bg-primary hover:bg-primary/90">
+                      {plan.cta}
+                    </Button>
+                  </SignUpButton>
+                )}
               </div>
 
               {/* Post Generation */}

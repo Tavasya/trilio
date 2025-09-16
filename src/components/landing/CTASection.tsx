@@ -65,9 +65,11 @@ export default function CTASection() {
                 Try for Free
               </button>
             </SignUpButton>
-            <button className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center">
-              Book a Call
-            </button>
+            <a href="https://calendly.com/jessie-nativespeaking/meet-jessie?month=2025-09" target="_blank" rel="noopener noreferrer">
+              <button className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center">
+                Book a Call
+              </button>
+            </a>
           </SignedOut>
           <SignedIn>
             <button

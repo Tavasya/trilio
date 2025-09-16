@@ -62,7 +62,7 @@ export default function FAQSection() {
   }, []);
 
   return (
-    <div className="py-16 px-6">
+    <div id="faq" className="py-16 px-6">
       <div className="max-w-3xl mx-auto">
         <h2 ref={headerRef} className={`text-4xl md:text-5xl font-bold text-gray-900 mb-10 text-center transition-all duration-700 ${
           headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
