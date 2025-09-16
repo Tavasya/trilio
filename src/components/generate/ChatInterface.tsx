@@ -66,18 +66,17 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       const messageText = inputValue;
       setInputValue('');
       
-      // Build context with live content
+      // Build context with live content and post_id
       const context: { post_id?: string; content?: string } = {};
-      if (generatedPost) {
-        // Always include the live content if we have a post
-        context.content = generatedPost.content;
-        // Include post_id if it's a saved post
-        if (generatedPost.id) {
-          context.post_id = generatedPost.id;
-        }
-      } else if (postId) {
-        // Fallback to just post_id if no generated post yet (will fetch from DB)
+
+      // Always include post_id if we have one (from props)
+      if (postId) {
         context.post_id = postId;
+      }
+
+      // Include live content if we have a generated post
+      if (generatedPost) {
+        context.content = generatedPost.content;
       }
       
       await dispatch(sendMessage({ 

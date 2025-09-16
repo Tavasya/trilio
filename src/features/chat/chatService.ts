@@ -123,7 +123,7 @@ export class ChatService {
 
   async fetchConversationByPost(postId: string, token: string): Promise<ConversationHistoryResponse | null> {
     try {
-      const response = await fetch(`${API_CONFIG.BASE_URL}/api/chat/conversations/by-post/${postId}/messages`, {
+      const response = await fetch(`${API_CONFIG.BASE_URL}/api/ai/conversations/by-post/${postId}/messages`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,

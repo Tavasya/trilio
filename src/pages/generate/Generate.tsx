@@ -6,7 +6,7 @@ import { postService } from '../../features/post/postService';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
 import { useAppDispatch } from '@/store/hooks';
-import { setGeneratedPost, loadConversationHistory } from '@/features/chat/chatSlice';
+import { setGeneratedPost, loadConversationHistory, startNewConversation } from '@/features/chat/chatSlice';
 
 export default function Generate() {
   const [searchParams] = useSearchParams();
@@ -18,6 +18,9 @@ export default function Generate() {
   useEffect(() => {
     const fetchPostAndConversation = async () => {
       if (!postId) return;
+
+      // Clear any existing conversation state when postId changes
+      dispatch(startNewConversation());
 
       try {
         const token = await getToken();
