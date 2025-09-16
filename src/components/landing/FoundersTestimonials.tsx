@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from 'react';
 import { Star } from 'lucide-react';
 import michaelChen from '@/lib/pfps/michael-chen.jpeg';
 import sarahJohnson from '@/lib/pfps/sarah_johnson.jpeg';
@@ -67,10 +68,47 @@ const testimonials = [
 ];
 
 export default function FoundersTestimonials() {
+  const [visibleItems, setVisibleItems] = useState<number[]>([]);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const headerRef = useRef<HTMLHeadingElement | null>(null);
+  const [headerVisible, setHeaderVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === headerRef.current && entry.isIntersecting) {
+            setHeaderVisible(true);
+          } else if (entry.isIntersecting) {
+            const index = itemRefs.current.indexOf(entry.target as HTMLDivElement);
+            if (index !== -1 && !visibleItems.includes(index)) {
+              setTimeout(() => {
+                setVisibleItems(prev => [...prev, index]);
+              }, index * 100);
+            }
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    if (headerRef.current) observer.observe(headerRef.current);
+
+    setTimeout(() => {
+      itemRefs.current.forEach((ref) => {
+        if (ref) observer.observe(ref);
+      });
+    }, 100);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="py-16 px-6">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-10 text-center">
+        <h2 ref={headerRef} className={`text-4xl md:text-5xl font-bold text-gray-900 mb-10 text-center transition-all duration-700 ${
+          headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}>
           2,000+ founders have used Trilio
         </h2>
 
@@ -78,7 +116,12 @@ export default function FoundersTestimonials() {
           {testimonials.map((testimonial, index) => (
             <div
               key={index}
-              className="bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-shadow break-inside-avoid"
+              ref={(el) => {itemRefs.current[index] = el}}
+              className={`bg-white border border-gray-200 rounded-xl p-4 hover:shadow-md transition-all duration-700 break-inside-avoid ${
+                visibleItems.includes(index)
+                  ? 'opacity-100 translate-y-0'
+                  : 'opacity-0 translate-y-8'
+              }`}
             >
               <div className="flex items-start gap-3 mb-3">
                 <img

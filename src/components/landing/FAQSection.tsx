@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 
 const faqs = [
@@ -22,15 +22,51 @@ const faqs = [
 
 export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [visibleItems, setVisibleItems] = useState<number[]>([]);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const headerRef = useRef<HTMLHeadingElement | null>(null);
+  const [headerVisible, setHeaderVisible] = useState(false);
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);
   };
 
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === headerRef.current && entry.isIntersecting) {
+            setHeaderVisible(true);
+          } else if (entry.isIntersecting) {
+            const index = itemRefs.current.indexOf(entry.target as HTMLDivElement);
+            if (index !== -1 && !visibleItems.includes(index)) {
+              setTimeout(() => {
+                setVisibleItems(prev => [...prev, index]);
+              }, index * 100);
+            }
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    if (headerRef.current) observer.observe(headerRef.current);
+
+    setTimeout(() => {
+      itemRefs.current.forEach((ref) => {
+        if (ref) observer.observe(ref);
+      });
+    }, 100);
+
+    return () => observer.disconnect();
+  }, []);
+
   return (
     <div className="py-16 px-6">
       <div className="max-w-3xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-10 text-center">
+        <h2 ref={headerRef} className={`text-4xl md:text-5xl font-bold text-gray-900 mb-10 text-center transition-all duration-700 ${
+          headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}>
           Frequently Asked Questions
         </h2>
 
@@ -38,7 +74,12 @@ export default function FAQSection() {
           {faqs.map((faq, index) => (
             <div
               key={index}
-              className="bg-white border border-gray-200 rounded-xl overflow-hidden"
+              ref={(el) => {itemRefs.current[index] = el}}
+              className={`bg-white border border-gray-200 rounded-xl overflow-hidden transition-all duration-700 ${
+                visibleItems.includes(index)
+                  ? 'opacity-100 translate-y-0'
+                  : 'opacity-0 translate-y-8'
+              }`}
             >
               <button
                 onClick={() => toggleFAQ(index)}
