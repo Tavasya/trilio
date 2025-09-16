@@ -2,15 +2,15 @@ import { X } from 'lucide-react';
 
 const problems = [
   "It feels cringe… what if people judge me?",
-  "Staring at a blank screen, unsure where to start.",
-  "Hours tweaking captions, still sounds robotic",
-  "One post today… silence for weeks.",
-  "You hit publish and get crickets"
+  "I want to post, but I don't even know how to begin",
+  "I spend so long editing captions and picking images, and somehow it still doesn't feel like me",
+  "No one engages. I have no clue what's working or what's not",
+  "It's just so hard to stay consistent… how do people do it?"
 ];
 
 export default function ProblemsSection() {
   return (
-    <div className="py-16 px-6">
+    <div className="py-20 px-6">
       <div className="max-w-4xl mx-auto">
         <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
           Posting on LinkedIn is hard.

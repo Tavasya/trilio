@@ -1,57 +1,66 @@
 import { Star } from 'lucide-react';
+import michaelChen from '@/lib/pfps/michael-chen.jpeg';
+import sarahJohnson from '@/lib/pfps/sarah_johnson.jpeg';
+import anaRodriguez from '@/lib/pfps/ana_rodriguez.jpeg';
+import davidKim from '@/lib/pfps/david_kim.jpeg';
+import rachelThompson from '@/lib/pfps/rachel_thompson.jpeg';
+import robertGarcia from '@/lib/pfps/robert_garcia.jpeg';
+import weiLi from '@/lib/pfps/wei_li.jpeg';
+import alexKumar from '@/lib/pfps/alex_kumar.jpeg';
+import emmaDavis from '@/lib/pfps/emma_davis.jpeg';
 
 const testimonials = [
   {
     name: "Michael Chen",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Michael",
+    avatar: michaelChen,
     rating: 5,
     experience: "I have been trying out ChatGPT, Gemini, Claude, Copy.ai and many others for a very long time. I tried many different prompts to generate content that does not sound like machine. None of these were as successful as Trilio, it is amazing!!!"
   },
   {
     name: "Sarah Johnson",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+    avatar: sarahJohnson,
     rating: 5,
     experience: "Using Trilio to create my content library and it has been great! Looking forward to my engaging stats"
   },
   {
     name: "Ana Rodriguez",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Ana",
+    avatar: anaRodriguez,
     rating: 5,
     experience: "English isn't my first language, so writing was always hard. Trilio helped me break through that mental block, and the support team was super helpful along the way"
   },
   {
     name: "David Kim",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=David",
+    avatar: davidKim,
     rating: 5,
     experience: "Trilio boosted my engagement 287% in the first week. It's true that people just need to start posting ... intentionally"
   },
   {
     name: "Rachel Thompson",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Rachel",
+    avatar: rachelThompson,
     rating: 5,
     experience: "I love how I can experiment and find the brand voice that really fits me. Suddenly, sharing content feels natural, I actually enjoy the process now. Trilio makes it so convenient. Highly recommend."
   },
   {
     name: "Robert Garcia",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Robert",
+    avatar: robertGarcia,
     rating: 5,
     experience: "I spent over $5000 for ghostwriter and other applications before Trilio and I wish I'd found it sooner. It's been such a great return on investment!"
   },
   {
     name: "Li Wei",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Li",
+    avatar: weiLi,
     rating: 5,
     experience: "I'm not good expressing myself in English. Trilio walked me through the process seamlessly and I now like to write in English more than Chinese!!"
   },
   {
     name: "Alex Kumar",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Alex",
+    avatar: alexKumar,
     rating: 5,
     experience: "As an engineer, I struggled with LinkedIn content. Trilio helped me translate my technical knowledge into engaging posts that actually get traction. My network grew by 3x in just 2 months!"
   },
   {
     name: "Emma Davis",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emma",
+    avatar: emmaDavis,
     rating: 5,
     experience: "From 0 to 10K followers in 3 months! Trilio's AI understands my industry perfectly and helps me share insights that resonate with my audience. Best investment for personal branding."
   }

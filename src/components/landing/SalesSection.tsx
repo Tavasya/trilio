@@ -1,4 +1,7 @@
 import { useEffect, useRef, useState } from "react";
+import product1 from '@/lib/product/1.png';
+import product2 from '@/lib/product/2.png';
+import product3 from '@/lib/product/3.png';
 
 export default function SalesSection() {
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
@@ -6,19 +9,19 @@ export default function SalesSection() {
 
   const features = [
     {
-      title: "An Authentic Brand Voice",
-      description: "Finally sound authentic online, not robotic, by aligning your content with your identity and goals.",
-      color: "bg-purple-100"
+      title: "Trends Analyzer",
+      description: "Trilio scans 20,000+ posts to spot viral content in your niche and recommends what clicks your audience.",
+      image: product1
     },
     {
-      title: "Experiment & Evolve",
-      description: "Post with clarity and intention, guided by insights on what works and how to hit your sweet spot.",
-      color: "bg-blue-100"
+      title: "Truly Your Brand Voice",
+      description: "Trilio learns your preferences to help you shape and experiment with your unique brand voice, generating original, authentic posts every time.",
+      image: product2
     },
     {
-      title: "Consistent Posting Made Effortless",
-      description: "Skip the grind, automate the busywork so you can focus on creating and enjoying the process.",
-      color: "bg-green-100"
+      title: "Effortless Content Creating",
+      description: "With Trilio, content planning and creation becomes effortless, fully automated and enjoyable. No more wasting hours on guesswork",
+      image: product3
     }
   ];
 
@@ -70,13 +73,19 @@ export default function SalesSection() {
             >
               {/* Image Placeholder Side */}
               <div className={`flex-1 flex justify-center transition-all duration-700 delay-150 ${
-                isVisible 
-                  ? 'opacity-100 translate-x-0' 
-                  : isEven 
-                    ? 'opacity-0 -translate-x-12' 
+                isVisible
+                  ? 'opacity-100 translate-x-0'
+                  : isEven
+                    ? 'opacity-0 -translate-x-12'
                     : 'opacity-0 translate-x-12'
               }`}>
-                <div className={`w-full max-w-xl h-72 rounded-2xl ${feature.color}`} />
+                <div className="w-full max-w-xl h-72 rounded-2xl overflow-hidden bg-gray-100 flex items-center justify-center">
+                  <img
+                    src={feature.image}
+                    alt={feature.title}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
               
               {/* Content Side */}

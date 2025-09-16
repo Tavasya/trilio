@@ -1,4 +1,8 @@
 import { Heart, MessageCircle, Share2, Send } from "lucide-react";
+import sarahJohnson from '@/lib/pfps/sarah_johnson.jpeg';
+import michaelChen from '@/lib/pfps/michael-chen.jpeg';
+import emmaDavis from '@/lib/pfps/emma_davis.jpeg';
+import davidKim from '@/lib/pfps/david_kim.jpeg';
 
 interface Testimonial {
   id: string;
@@ -20,7 +24,7 @@ const testimonials: Testimonial[] = [
     name: "Sarah Chen",
     title: "VP of Engineering → Founder",
     company: "TechStart Inc.",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah",
+    avatar: sarahJohnson,
     timeAgo: "2h",
     message: "Just hit 100K followers using Trilio's AI strategies! The platform analyzed successful creators in my niche and gave me a personalized content roadmap. My engagement rate went from 2% to 8% in just 3 months. 🚀",
     likes: 1243,
@@ -33,7 +37,7 @@ const testimonials: Testimonial[] = [
     name: "Michael Rodriguez",
     title: "Data Scientist → AI Consultant",
     company: "DataWise Consulting",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Michael",
+    avatar: michaelChen,
     timeAgo: "5h",
     message: "Trilio completely transformed my LinkedIn presence. It identified patterns from 50+ successful data science influencers and created a content strategy that actually works. Went from 5K to 85K followers in 6 months!",
     likes: 892,
@@ -46,7 +50,7 @@ const testimonials: Testimonial[] = [
     name: "Emily Thompson",
     title: "Product Manager → CPO",
     company: "ProductLab",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=Emily",
+    avatar: emmaDavis,
     timeAgo: "1d",
     message: "The AI-powered content suggestions are incredible. Trilio analyzed my target audience and showed me exactly what type of content resonates. My posts now consistently get 10x more engagement than before.",
     likes: 2156,
@@ -59,7 +63,7 @@ const testimonials: Testimonial[] = [
     name: "James Wilson",
     title: "Developer → Tech Lead",
     company: "Microsoft",
-    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=James",
+    avatar: davidKim,
     timeAgo: "3d",
     message: "From 0 to 200K followers in 8 months! Trilio's creator analysis feature helped me understand what made top tech influencers successful. Now I'm getting speaking invitations and job offers weekly.",
     likes: 3421,
