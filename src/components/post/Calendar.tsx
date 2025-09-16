@@ -296,7 +296,7 @@ const Calendar: React.FC = () => {
 
   return (
     <div className="flex h-full bg-white">
-      <div className="w-72 bg-gray-50/50 border-r border-gray-100 p-6">
+      <div className="hidden lg:block w-72 bg-gray-50/50 border-r border-gray-100 p-6">
         <div className="mb-6">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-base font-medium text-gray-900">
@@ -320,7 +320,7 @@ const Calendar: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-7 gap-2 mb-3">
+          <div className="hidden md:grid grid-cols-7 gap-2 mb-3">
             {shortDaysOfWeek.map((day) => (
               <div
                 key={day}
@@ -381,19 +381,29 @@ const Calendar: React.FC = () => {
               ))}
             </div>
 
-            <div className="flex-1 grid grid-cols-7">
+            <div className="flex-1 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-7">
               {weekDates.map((date, index) => {
+                // Hide certain days on smaller screens
+                let hiddenClass = '';
+                if (index === 0 || index === 6) {
+                  // Hide Sunday and Saturday on mobile
+                  hiddenClass = 'hidden sm:block';
+                } else if (index === 1 || index === 5) {
+                  // Hide Monday and Friday on small mobile
+                  hiddenClass = 'hidden md:block';
+                }
                 const isToday = 
                   date.toDateString() === new Date().toDateString();
                 const hasPost = hasPostOnDate(date);
                 
                 return (
-                  <div key={index} className="border-r border-gray-100 last:border-r-0">
+                  <div key={index} className={`border-r border-gray-100 last:border-r-0 ${hiddenClass}`}>
                     <div className={`h-16 border-b border-gray-100 flex flex-col items-center justify-center relative ${
                       isToday ? 'bg-primary/5' : 'bg-gray-50/50'
                     }`}>
                       <div className="text-xs text-gray-500 mb-1">
-                        {daysOfWeek[date.getDay()]}
+                        <span className="hidden md:inline">{daysOfWeek[date.getDay()]}</span>
+                        <span className="md:hidden">{shortDaysOfWeek[date.getDay()]}</span>
                       </div>
                       <div className={`text-sm font-medium ${
                         isToday ? 'text-primary' : 'text-gray-700'

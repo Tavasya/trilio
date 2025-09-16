@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router";
+import { Routes, Route } from "react-router";
 import { Suspense } from "react";
 
 import Landing from "@/pages/landing/Landing";
@@ -8,7 +8,7 @@ import Research from '@/pages/research/Research'
 import Scheduler from '@/pages/scheduler/Scheduler'
 import Posts from '@/pages/posts/Posts'
 import CreatePost from '@/pages/create-post/CreatePost'
-import Onboarding from '@/pages/onboarding/Onboarding'
+// import Onboarding from '@/pages/onboarding/Onboarding'
 import Generate from '@/pages/generate/Generate'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import IdentityTest from '@/pages/test/IdentityTest'
@@ -24,12 +24,12 @@ export default function AppRoutes() {
         <Suspense fallback={<LoadingSpinner />}>
             <Routes>
                 <Route path="/" element={<Landing />} />
-                <Route path="/onboarding" element={<Navigate to="/onboarding/1" replace />} />
+                {/* <Route path="/onboarding" element={<Navigate to="/onboarding/1" replace />} />
                 <Route path="/onboarding/:step" element={
                     <ProtectedRoute>
                         <Onboarding />
                     </ProtectedRoute>
-                } />
+                } /> */}
                 <Route element={
                     <ProtectedRoute>
                         <AppLayout />

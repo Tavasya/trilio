@@ -109,21 +109,21 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleM
   if (!isOpen) return null;
   
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
       {/* Backdrop */}
-      <div 
-        className="absolute inset-0 bg-black/50" 
+      <div
+        className="absolute inset-0 bg-black/50"
         onClick={onClose}
       />
-      
+
       {/* Modal */}
-      <div className="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+      <div className="relative bg-white rounded-t-2xl sm:rounded-lg shadow-xl p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <h2 className="text-xl font-semibold">Schedule Post</h2>
+        <div className="flex items-center justify-between mb-4 sm:mb-6">
+          <h2 className="text-lg sm:text-xl font-semibold">Schedule Post</h2>
           <button
             onClick={onClose}
-            className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+            className="p-1.5 sm:p-1 hover:bg-gray-100 rounded-lg transition-colors"
           >
             <X className="w-5 h-5 text-gray-500" />
           </button>
@@ -146,7 +146,7 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleM
         
         {/* Time Selection */}
         <div className="mb-6">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-2">
             <label className="block text-sm font-medium text-gray-700">
               <Clock className="w-4 h-4 inline mr-2" />
               Select Time
@@ -157,7 +157,7 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleM
                 onClick={() => setUseManualInput(!useManualInput)}
                 variant="outline"
                 size="sm"
-                className="text-xs"
+                className="text-xs px-2 sm:px-3"
               >
                 {useManualInput ? 'Use Dropdown' : 'Type Time'}
               </Button>
@@ -167,10 +167,11 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleM
                 disabled={!selectedDate}
                 variant="outline"
                 size="sm"
-                className="flex items-center gap-1"
+                className="flex items-center gap-1 px-2 sm:px-3"
               >
                 <Sparkles className="w-3 h-3" />
-                Best Time
+                <span className="hidden sm:inline">Best Time</span>
+                <span className="sm:hidden">Best</span>
               </Button>
             </div>
           </div>

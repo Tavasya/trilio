@@ -6,8 +6,6 @@ import productScreenshot from '@/lib/product/3.png';
 export default function Hero() {
   const screenshotRef = useRef<HTMLDivElement | null>(null);
   const [tiltAmount, setTiltAmount] = useState(5);
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const words = ["Prospects", "Clients", "Opportunities"];
 
   useEffect(() => {
     const handleScroll = () => {
@@ -32,13 +30,6 @@ export default function Hero() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentWordIndex((prevIndex) => (prevIndex + 1) % words.length);
-    }, 2000); // Change word every 2 seconds
-
-    return () => clearInterval(interval);
-  }, [words.length]);
 
   return (
     <div className="flex flex-col items-center justify-center flex-1 w-full px-6">
@@ -51,7 +42,7 @@ export default function Hero() {
             ))}
           </div>
           <span className="text-base font-medium text-primary">
-            Trusted by 20K LinkedIn Creators
+            Trusted by 200+ LinkedIn Creators
           </span>
         </div>
 
@@ -60,18 +51,8 @@ export default function Hero() {
           The AI LinkedIn Assistant,
         </h1>
         <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mt-2">
-          Turn Content into
+          Turn Content into <span className="text-primary">Prospects</span>
         </h1>
-        <div className="h-[70px] md:h-[80px] flex items-center justify-center mt-2">
-          <span
-            className="text-5xl md:text-6xl font-bold text-primary transition-all duration-500 ease-in-out"
-            style={{
-              animation: 'fadeInOut 2s infinite',
-            }}
-          >
-            {words[currentWordIndex]}
-          </span>
-        </div>
 
         {/* Description */}
         <p className="text-xl text-gray-600 mt-8">

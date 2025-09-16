@@ -104,12 +104,12 @@ export default function FoundersTestimonials() {
   }, []);
 
   return (
-    <div className="py-16 px-6">
+    <div id="testimonials" className="py-16 px-6">
       <div className="max-w-6xl mx-auto">
         <h2 ref={headerRef} className={`text-4xl md:text-5xl font-bold text-gray-900 mb-10 text-center transition-all duration-700 ${
           headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
-          2,000+ founders have used Trilio
+          200+ founders have used Trilio
         </h2>
 
         <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
@@ -127,7 +127,7 @@ export default function FoundersTestimonials() {
                 <img
                   src={testimonial.avatar}
                   alt={testimonial.name}
-                  className="w-12 h-12 rounded-full bg-gray-100"
+                  className="w-12 h-12 rounded-full bg-gray-100 shadow-lg object-cover"
                 />
                 <div className="flex-1">
                   <h3 className="font-semibold text-gray-900 text-base">

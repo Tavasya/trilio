@@ -2,10 +2,11 @@ import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchUserPosts, selectShouldFetchPosts } from '@/features/post/postSlice';
 import type { Post } from '@/features/post/postTypes';
+
 import { useAuth } from '@clerk/react-router';
 import { Link, useNavigate } from 'react-router';
 
-import { MoreHorizontal, ThumbsUp, MessageSquare, Repeat2, Send, PenLine, Heart, Lightbulb, Clock, Edit, Calendar, CheckCircle2 } from 'lucide-react';
+import { MoreHorizontal, ThumbsUp, MessageSquare, Repeat2, Send, Heart, Lightbulb, Edit } from 'lucide-react';
 
 import { useUser } from '@clerk/react-router';
 import { Button } from '@/components/ui/button';
@@ -84,6 +85,7 @@ export default function Posts() {
     return 'draft';
   };
 
+
   const getStatusBadge = (post: Post) => {
     const status = getPostStatus(post);
 
@@ -118,6 +120,7 @@ export default function Posts() {
     navigate(`/generate?postId=${post.id}`);
   };
 
+
   const handleEditPost = (postId: string) => {
     navigate(`/generate?postId=${postId}`);
   };
@@ -151,7 +154,7 @@ export default function Posts() {
               </div>
             )}
             <Link
-              to="/create-post"
+              to="/dashboard"
               className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors text-left text-gray-500 text-sm font-medium"
             >
               Start a post
@@ -180,10 +183,7 @@ export default function Posts() {
                 key={post.id}
                 className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden relative"
               >
-                {/* Status Badge */}
-                <div className="absolute top-3 right-3 z-10">
-                  {getStatusBadge(post)}
-                </div>
+                {/* Status Badge - Removed */}
 
                 {/* Post Header */}
                 <div className="p-4 pb-3">
@@ -304,16 +304,7 @@ export default function Posts() {
                   </button>
                 </div>
 
-                {/* Resume Writing Button */}
-                <div className="px-4 pb-3 border-t border-gray-100">
-                  <button
-                    onClick={() => handleResumeWriting(post)}
-                    className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-full hover:bg-primary/90 transition-colors"
-                  >
-                    <PenLine className="w-4 h-4" />
-                    <span className="text-sm font-semibold">Edit Draft</span>
-                  </button>
-                </div>
+                {/* Resume Writing Button - Removed */}
               </div>
             ))}
           </div>

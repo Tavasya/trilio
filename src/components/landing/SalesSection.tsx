@@ -51,8 +51,8 @@ export default function SalesSection() {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto px-6 py-20">
-      <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-16">How It Works</h2>
+    <div id="features" className="max-w-6xl mx-auto px-6 py-20">
+      <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-16">Trilio Turns Content Into Prospects</h2>
       
       <div className="space-y-24">
         {features.map((feature, index) => {
@@ -79,7 +79,7 @@ export default function SalesSection() {
                     ? 'opacity-0 -translate-x-12'
                     : 'opacity-0 translate-x-12'
               }`}>
-                <div className="w-full max-w-xl h-72 rounded-2xl overflow-hidden bg-gray-100 flex items-center justify-center">
+                <div className="w-full max-w-xl h-72 rounded-2xl overflow-hidden bg-gray-100 flex items-center justify-center shadow-xl">
                   <img
                     src={feature.image}
                     alt={feature.title}
