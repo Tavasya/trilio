@@ -231,7 +231,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
 
       {/* LinkedIn Post Preview */}
       <div className="flex-1 overflow-y-auto bg-gray-100 relative">
-        <div className="p-4 flex justify-center items-center relative">
+        <div className="p-4 flex justify-center items-center relative pb-24">
           {/* Post Card with responsive width */}
           <div className={`bg-white border border-gray-200 rounded-lg ${getPreviewWidth()} transition-all duration-300`}>
             {/* Post Header */}
@@ -371,17 +371,17 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
           </div>
 
         </div>
-        
-        {/* Schedule Post Button */}
-        <div className="absolute bottom-4 right-4">
-          <Button 
-            onClick={() => setShowScheduleModal(true)}
-            className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-lg"
-          >
-            <Calendar className="w-4 h-4" />
-            <span className="font-medium">Schedule Post</span>
-          </Button>
-        </div>
+      </div>
+
+      {/* Schedule Post Button - Fixed to bottom right of preview container */}
+      <div className="fixed bottom-8 right-8 z-50 lg:absolute lg:bottom-8 lg:right-8 lg:z-10">
+        <Button
+          onClick={() => setShowScheduleModal(true)}
+          className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-6 py-3"
+        >
+          <Calendar className="w-4 h-4" />
+          <span className="font-medium">Schedule Post</span>
+        </Button>
       </div>
       
       {/* Schedule Modal */}

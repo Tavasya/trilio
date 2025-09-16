@@ -1,4 +1,4 @@
-import { Routes, Route, Navigate } from "react-router";
+import { Routes, Route } from "react-router";
 import { Suspense } from "react";
 
 import Landing from "@/pages/landing/Landing";

@@ -19,10 +19,9 @@ interface ChatInterfaceProps {
   postId?: string | null;
   onToggleView?: () => void;
   showToggle?: boolean;
-  currentView?: 'chat' | 'preview';
 }
 
-export default function ChatInterface({ postId, onToggleView, showToggle, currentView }: ChatInterfaceProps) {
+export default function ChatInterface({ postId, onToggleView, showToggle }: ChatInterfaceProps) {
   const dispatch = useAppDispatch();
   const { getToken } = useAuth();
   const [inputValue, setInputValue] = useState('');

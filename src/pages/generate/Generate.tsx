@@ -7,8 +7,6 @@ import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
 import { useAppDispatch } from '@/store/hooks';
 import { setGeneratedPost, loadConversationHistory } from '@/features/chat/chatSlice';
-import { Button } from '@/components/ui/button';
-import { MessageSquare, Eye } from 'lucide-react';
 
 export default function Generate() {
   const [searchParams] = useSearchParams();
@@ -75,7 +73,6 @@ export default function Generate() {
               postId={postId}
               onToggleView={() => setMobileView('preview')}
               showToggle={true}
-              currentView={mobileView}
             />
           </div>
         ) : (
