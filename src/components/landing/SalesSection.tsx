@@ -79,7 +79,7 @@ export default function SalesSection() {
                     ? 'opacity-0 -translate-x-12'
                     : 'opacity-0 translate-x-12'
               }`}>
-                <div className="w-full max-w-xl h-72 rounded-2xl overflow-hidden bg-gray-100 flex items-center justify-center">
+                <div className="w-full max-w-xl h-72 rounded-2xl overflow-hidden bg-gray-100 flex items-center justify-center shadow-xl">
                   <img
                     src={feature.image}
                     alt={feature.title}
