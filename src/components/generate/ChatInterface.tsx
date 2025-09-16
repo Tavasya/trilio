@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Send, Search, Loader2 } from 'lucide-react';
+import { Send, Search, Loader2, Eye } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { sendMessage, startNewConversation } from '@/features/chat/chatSlice';
@@ -17,9 +17,11 @@ const AVAILABLE_TOOLS = [
 
 interface ChatInterfaceProps {
   postId?: string | null;
+  onToggleView?: () => void;
+  showToggle?: boolean;
 }
 
-export default function ChatInterface({ postId }: ChatInterfaceProps) {
+export default function ChatInterface({ postId, onToggleView, showToggle }: ChatInterfaceProps) {
   const dispatch = useAppDispatch();
   const { getToken } = useAuth();
   const [inputValue, setInputValue] = useState('');
@@ -110,8 +112,23 @@ export default function ChatInterface({ postId }: ChatInterfaceProps) {
     <div className="h-full flex flex-col bg-white rounded-lg shadow-sm overflow-hidden">
       {/* Chat Header */}
       <div className="border-b p-4 flex-shrink-0">
-        <h2 className="text-lg font-semibold">AI Post Generator</h2>
-        <p className="text-sm text-gray-500">Chat with AI to create your LinkedIn post</p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h2 className="text-lg font-semibold">AI Post Generator</h2>
+            <p className="text-sm text-gray-500">Chat with AI to create your LinkedIn post</p>
+          </div>
+          {showToggle && (
+            <Button
+              onClick={onToggleView}
+              variant="outline"
+              size="sm"
+              className="lg:hidden"
+            >
+              <Eye className="w-4 h-4 mr-2" />
+              Preview
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Messages Area */}

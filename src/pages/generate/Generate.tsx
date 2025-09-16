@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import ChatInterface from '../../components/generate/ChatInterface';
 import LinkedInPreview from '../../components/generate/LinkedInPreview';
@@ -13,6 +13,7 @@ export default function Generate() {
   const { getToken } = useAuth();
   const dispatch = useAppDispatch();
   const postId = searchParams.get('postId');
+  const [mobileView, setMobileView] = useState<'chat' | 'preview'>('chat');
 
   useEffect(() => {
     const fetchPostAndConversation = async () => {
@@ -50,15 +51,38 @@ export default function Generate() {
   }, [postId, getToken, dispatch]);
 
   return (
-    <div className="h-full bg-gray-50 flex overflow-hidden">
-      {/* Chat Interface - 3/5 width */}
-      <div className="w-3/5 p-4 h-full overflow-hidden">
-        <ChatInterface postId={postId} />
+    <div className="h-full bg-gray-50 flex flex-col">
+      {/* Desktop Layout */}
+      <div className="hidden lg:flex h-full overflow-hidden">
+        {/* Chat Interface - 3/5 width */}
+        <div className="w-3/5 p-4 h-full overflow-hidden">
+          <ChatInterface postId={postId} />
+        </div>
+
+        {/* LinkedIn Preview - 2/5 width */}
+        <div className="w-2/5 p-4 h-full overflow-auto">
+          <LinkedInPreview />
+        </div>
       </div>
 
-      {/* LinkedIn Preview - 2/5 width */}
-      <div className="w-2/5 p-4 h-full overflow-auto">
-        <LinkedInPreview />
+      {/* Mobile Layout */}
+      <div className="lg:hidden h-full overflow-hidden">
+        {mobileView === 'chat' ? (
+          <div className="p-4 h-full overflow-hidden">
+            <ChatInterface
+              postId={postId}
+              onToggleView={() => setMobileView('preview')}
+              showToggle={true}
+            />
+          </div>
+        ) : (
+          <div className="p-4 h-full overflow-auto">
+            <LinkedInPreview
+              onToggleView={() => setMobileView('chat')}
+              showToggle={true}
+            />
+          </div>
+        )}
       </div>
     </div>
   );

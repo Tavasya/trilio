@@ -272,20 +272,20 @@ export default function WritingStylesModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-3xl w-full max-h-[85vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 sm:p-4">
+      <div className="bg-white rounded-t-2xl sm:rounded-xl shadow-xl w-full sm:max-w-3xl max-h-[95vh] sm:max-h-[85vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">Select Writing Styles</h2>
-              <p className="text-sm text-gray-600 mt-1">
+        <div className="p-4 sm:p-6 border-b">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Select Writing Styles</h2>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 Choose the tones that match your content strategy
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors ml-2"
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>
@@ -305,14 +305,14 @@ export default function WritingStylesModal({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {/* Predefined Styles by Category */}
           {Object.entries(groupedStyles).map(([category, styles]) => (
             <div key={category} className="mb-8">
               <h3 className="text-sm font-semibold text-gray-700 mb-4 uppercase tracking-wider">
                 {category}
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
                 {styles.map(style => {
                   const isSelected = selectedStyles.includes(style.id);
 
@@ -320,7 +320,7 @@ export default function WritingStylesModal({
                     <button
                       key={style.id}
                       onClick={() => toggleStyle(style.id)}
-                      className={`p-4 rounded-lg border-2 text-left transition-all duration-200 ${
+                      className={`p-3 sm:p-4 rounded-lg border-2 text-left transition-all duration-200 ${
                         isSelected
                           ? 'border-primary bg-primary/5'
                           : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
@@ -328,12 +328,12 @@ export default function WritingStylesModal({
                     >
                       <div className="flex items-start justify-between">
                         <div>
-                          <h4 className={`font-semibold ${
+                          <h4 className={`text-sm sm:text-base font-semibold ${
                             isSelected ? 'text-primary' : 'text-gray-900'
                           }`}>
                             {style.label}
                           </h4>
-                          <p className="text-xs text-gray-600 mt-1">
+                          <p className="text-xs text-gray-600 mt-0.5 sm:mt-1">
                             {style.description}
                           </p>
                         </div>
@@ -356,9 +356,9 @@ export default function WritingStylesModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+        <div className="p-4 sm:p-6 border-t bg-gray-50">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
               {selectedStyles.length > 0 ? (
                 <span>
                   {selectedStyles.length} style{selectedStyles.length !== 1 ? 's' : ''} selected
@@ -367,14 +367,14 @@ export default function WritingStylesModal({
                 <span>Select at least one writing style</span>
               )}
             </div>
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={onClose}>
+            <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+              <Button variant="outline" onClick={onClose} className="flex-1 sm:flex-none">
                 Cancel
               </Button>
               <Button
                 onClick={handleSave}
                 disabled={selectedStyles.length === 0}
-                className={selectedStyles.length === 0 ? 'opacity-50' : ''}
+                className={`flex-1 sm:flex-none ${selectedStyles.length === 0 ? 'opacity-50' : ''}`}
               >
                 Save Selection
               </Button>

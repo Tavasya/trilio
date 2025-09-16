@@ -6,7 +6,8 @@ import {
   SidebarProvider,
   SidebarMenu,
   SidebarMenuItem,
-  SidebarMenuButton
+  SidebarMenuButton,
+  SidebarTrigger
 } from '@/components/ui/sidebar'
 import { Book, FileText, PlusCircle, Calendar } from 'lucide-react'
 import { UserButton } from '@clerk/react-router'
@@ -77,18 +78,23 @@ export default function AppLayout() {
             </SidebarContent>
         </Sidebar>
         
-        <main className="flex-1 flex flex-col h-screen overflow-hidden"> 
+        <main className="flex-1 flex flex-col h-screen overflow-hidden">
           {/* Top Navigation Bar */}
           <header className="border-b border-border bg-background flex-shrink-0">
-            <div className="flex items-center justify-end px-6 py-3">
+            <div className="flex items-center justify-between px-6 py-3">
+              {/* Mobile Sidebar Toggle */}
+              <SidebarTrigger className="lg:hidden" />
+
               {/* User Profile */}
-              <UserButton 
-                appearance={{
-                  elements: {
-                    avatarBox: "w-8 h-8"
-                  }
-                }}
-              />
+              <div className="ml-auto">
+                <UserButton
+                  appearance={{
+                    elements: {
+                      avatarBox: "w-8 h-8"
+                    }
+                  }}
+                />
+              </div>
             </div>
           </header>
           

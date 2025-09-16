@@ -72,7 +72,7 @@ export default function ProblemsSection() {
               }`}
             >
               <X className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-              <p className="text-base text-gray-700 whitespace-nowrap">{problem}</p>
+              <p className="text-base text-gray-700 md:whitespace-nowrap">{problem}</p>
             </div>
           ))}
         </div>
