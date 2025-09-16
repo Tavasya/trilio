@@ -44,10 +44,15 @@ export default function CTASection() {
         <img src={trilioLogo} alt="Trilio" className={`h-12 w-auto mx-auto transition-all duration-700 delay-150 ${
           ctaVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-90'
         }`} />
-        <p className={`text-xl md:text-2xl font-semibold text-gray-700 max-w-2xl mx-auto transition-all duration-700 delay-300 ${
+        <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 mb-2 transition-all duration-700 delay-300 ${
           ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
-          Still not convinced? Book a call with the founder to see how we've helped 2K+ creators grow their LinkedIn presence.
+          Ready to grow your LinkedIn brand?
+        </h2>
+        <p className={`text-xl md:text-2xl text-gray-600 transition-all duration-700 delay-400 ${
+          ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+        }`}>
+          Try one week on us
         </p>
         <div className={`flex justify-center gap-4 transition-all duration-700 delay-500 ${
           ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'

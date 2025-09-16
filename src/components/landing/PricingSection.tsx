@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 
 const plans = [
@@ -52,20 +52,60 @@ const plans = [
 
 export default function PricingSection() {
   const [isYearly, setIsYearly] = useState(false);
+  const [visibleItems, setVisibleItems] = useState<number[]>([]);
+  const cardRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const [headerVisible, setHeaderVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.target === headerRef.current && entry.isIntersecting) {
+            setHeaderVisible(true);
+          } else if (entry.isIntersecting) {
+            const index = cardRefs.current.indexOf(entry.target as HTMLDivElement);
+            if (index !== -1 && !visibleItems.includes(index)) {
+              setTimeout(() => {
+                setVisibleItems(prev => [...prev, index]);
+              }, index * 150);
+            }
+          }
+        });
+      },
+      { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
+    );
+
+    if (headerRef.current) observer.observe(headerRef.current);
+
+    setTimeout(() => {
+      cardRefs.current.forEach((ref) => {
+        if (ref) observer.observe(ref);
+      });
+    }, 100);
+
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div className="py-16 px-6 bg-gray-50">
       <div className="max-w-6xl mx-auto">
-        <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3 text-center">
-          Ready to save time?
-        </h2>
+        <div ref={headerRef} className={`transition-all duration-700 ${
+          headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}>
+          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-3 text-center">
+            Ready to save time?
+          </h2>
 
-        <p className="text-xl text-gray-600 text-center mb-8">
-          Choose the offer that fits your LinkedIn activity
-        </p>
+          <p className="text-xl text-gray-600 text-center mb-8">
+            Choose the offer that fits your LinkedIn activity
+          </p>
+        </div>
 
         {/* Billing Toggle */}
-        <div className="flex items-center justify-center gap-3 mb-10">
+        <div className={`flex items-center justify-center gap-3 mb-10 transition-all duration-700 delay-300 ${
+          headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+        }`}>
           <span className={`text-base ${!isYearly ? 'text-gray-900 font-semibold' : 'text-gray-500'}`}>
             Monthly
           </span>
@@ -90,7 +130,12 @@ export default function PricingSection() {
           {plans.map((plan, index) => (
             <div
               key={index}
-              className={`relative bg-white rounded-xl p-6 ${
+              ref={(el) => {cardRefs.current[index] = el}}
+              className={`relative bg-white rounded-xl p-6 transition-all duration-700 ${
+                visibleItems.includes(index)
+                  ? 'opacity-100 translate-y-0'
+                  : 'opacity-0 translate-y-12'
+              } ${
                 plan.popular
                   ? 'border-2 border-primary shadow-lg'
                   : 'border border-gray-200'
