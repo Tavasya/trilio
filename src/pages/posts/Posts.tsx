@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchUserPosts, selectShouldFetchPosts } from '@/features/post/postSlice';
+import type { Post } from '@/features/post/postTypes';
+
 import { useAuth } from '@clerk/react-router';
 import { Link, useNavigate } from 'react-router';
 
@@ -73,7 +75,7 @@ export default function Posts() {
     }
   };
 
-  const getPostStatus = (post: any) => {
+  const getPostStatus = (post: Post) => {
     if (post.linkedin_post_id && post.linkedin_post_url) {
       return 'published';
     }
@@ -83,9 +85,41 @@ export default function Posts() {
     return 'draft';
   };
 
-  // Removed unused getStatusBadge function - since we removed the status badge from the UI
 
-  // Removed unused handleResumeWriting function - since we removed the Edit Draft button
+  const getStatusBadge = (post: Post) => {
+    const status = getPostStatus(post);
+
+    if (status === 'published') {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-green-100 text-green-800 border border-green-200">
+          <CheckCircle2 className="w-3 h-3" />
+          Published
+        </span>
+      );
+    }
+
+    if (status === 'scheduled') {
+      return (
+        <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+          <Calendar className="w-3 h-3" />
+          Scheduled
+        </span>
+      );
+    }
+
+    return (
+      <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-md text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+        <Clock className="w-3 h-3" />
+        Draft
+      </span>
+    );
+  };
+
+  const handleResumeWriting = (post: Post) => {
+    // Use the same approach as Edit button - navigate with postId
+    navigate(`/generate?postId=${post.id}`);
+  };
+
 
   const handleEditPost = (postId: string) => {
     navigate(`/generate?postId=${postId}`);

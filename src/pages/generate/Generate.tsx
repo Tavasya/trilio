@@ -29,9 +29,10 @@ export default function Generate() {
         // Fetch post data
         const response = await postService.fetchPostById(postId, token);
         if (response.success && response.post) {
+          // Set the full post content in the Redux state
           dispatch(setGeneratedPost({
             id: response.post.id,
-            content: response.post.content,
+            content: response.post.content || '',  // Ensure content is never undefined
             isEdited: false
           }));
         }
