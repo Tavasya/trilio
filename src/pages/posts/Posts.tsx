@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchUserPosts, selectShouldFetchPosts } from '@/features/post/postSlice';
 import type { Post } from '@/features/post/postTypes';
@@ -94,7 +94,7 @@ export default function Posts() {
 
   if (isLoading && posts.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#f3f2ef]">
+      <div className="flex items-center justify-center h-screen bg-white">
         <div className="flex flex-col items-center gap-3">
           <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
           <span className="text-sm text-gray-500">Loading your content...</span>
@@ -104,14 +104,14 @@ export default function Posts() {
   }
 
   return (
-    <div className="h-full bg-[#f3f2ef] overflow-y-auto">
-      <div className="max-w-2xl mx-auto px-4 py-6">
+    <div className="h-full bg-white overflow-y-auto">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Create Post Card */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-2">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6 max-w-2xl mx-auto">
           <div className="flex gap-3">
             {user?.imageUrl ? (
-              <img 
-                src={user.imageUrl} 
+              <img
+                src={user.imageUrl}
                 alt={`${user.firstName} ${user.lastName}`}
                 className="w-12 h-12 rounded-full object-cover"
               />
@@ -144,11 +144,18 @@ export default function Posts() {
             </div>
           </div>
         ) : (
-          <div className="space-y-2">
-            {posts.map((post) => (
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
+            {posts.map((post) => {
+              const MAX_CONTENT_LENGTH = 280;
+              const truncatedContent = post.content.length > MAX_CONTENT_LENGTH
+                ? post.content.substring(0, MAX_CONTENT_LENGTH)
+                : post.content;
+              const [showFullContent, setShowFullContent] = React.useState(false);
+
+              return (
               <div
                 key={post.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden relative"
+                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden relative flex flex-col break-inside-avoid mb-4"
               >
                 {/* Status Badge - Removed */}
 
@@ -209,7 +216,26 @@ export default function Posts() {
                 {/* Post Content */}
                 <div className="px-4 pb-3">
                   <p className="text-sm text-gray-900 whitespace-pre-wrap">
-                    {post.content}
+                    {showFullContent ? post.content : truncatedContent}
+                    {post.content.length > MAX_CONTENT_LENGTH && !showFullContent && (
+                      <>
+                        {'... '}
+                        <button
+                          onClick={() => setShowFullContent(true)}
+                          className="text-gray-600 hover:underline font-medium"
+                        >
+                          see more
+                        </button>
+                      </>
+                    )}
+                    {showFullContent && post.content.length > MAX_CONTENT_LENGTH && (
+                      <button
+                        onClick={() => setShowFullContent(false)}
+                        className="block text-gray-600 hover:underline font-medium mt-2"
+                      >
+                        see less
+                      </button>
+                    )}
                   </p>
                   {post.media_url && (
                     <div className="mt-3 p-2 bg-gray-50 rounded border border-gray-200">
@@ -273,7 +299,8 @@ export default function Posts() {
 
                 {/* Resume Writing Button - Removed */}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>
