@@ -198,20 +198,20 @@ export default function TrendingPostsModal({
   const selectedPostsArray = Array.from(selectedPosts.values());
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-6xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 sm:p-4">
+      <div className="bg-white rounded-t-2xl sm:rounded-xl shadow-xl w-full sm:max-w-6xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b">
-          <div className="flex items-center justify-between">
+        <div className="p-4 sm:p-6 border-b">
+          <div className="flex items-start justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Trending LinkedIn Posts</h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Trending LinkedIn Posts</h2>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 Select posts for inspiration or reference
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>
@@ -234,19 +234,19 @@ export default function TrendingPostsModal({
         </div>
 
         {/* Filters Bar */}
-        <div className="px-6 py-3 border-b flex items-center gap-4">
+        <div className="px-4 sm:px-6 py-2 sm:py-3 border-b flex flex-wrap items-center gap-2 sm:gap-4">
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-2 px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+            className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors text-xs sm:text-sm"
           >
-            <Filter className="w-4 h-4" />
-            Filters
+            <Filter className="w-3 sm:w-4 h-3 sm:h-4" />
+            <span className="hidden sm:inline">Filters</span>
           </button>
 
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as SortOption)}
-            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
+            className="px-2 sm:px-3 py-1.5 border border-gray-200 rounded-lg text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-primary/20"
           >
             <option value="likes">Most Liked</option>
             <option value="relevance">Most Relevant</option>
@@ -256,15 +256,15 @@ export default function TrendingPostsModal({
 
           <button
             onClick={() => setShowPreview(!showPreview)}
-            className={`flex items-center gap-2 px-3 py-1.5 border rounded-lg transition-colors text-sm ${
+            className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 border rounded-lg transition-colors text-xs sm:text-sm ${
               showPreview ? 'border-primary bg-primary/10 text-primary' : 'border-gray-200 hover:bg-gray-50'
             }`}
           >
-            Preview ({selectedPostsArray.length})
+            <span className="hidden sm:inline">Preview</span> ({selectedPostsArray.length})
           </button>
 
           {totalResults > 0 && (
-            <span className="text-sm text-gray-600 ml-auto">
+            <span className="text-xs sm:text-sm text-gray-600 ml-auto">
               {totalResults.toLocaleString()} results
             </span>
           )}
@@ -291,7 +291,7 @@ export default function TrendingPostsModal({
         {/* Content Area - Split View */}
         <div className="flex-1 flex overflow-hidden">
           {/* Main Results */}
-          <div className={`flex-1 overflow-y-auto p-6 ${showPreview ? 'border-r' : ''}`}>
+          <div className={`flex-1 overflow-y-auto p-4 sm:p-6 ${showPreview && 'sm:border-r'} ${showPreview && 'hidden sm:block'}`}>
             {/* Results */}
             <div className="space-y-4">
               {results.map((post) => {
@@ -430,7 +430,7 @@ export default function TrendingPostsModal({
 
           {/* Preview Panel */}
           {showPreview && (
-            <div className="w-96 overflow-y-auto p-6 bg-gray-50">
+            <div className="w-full sm:w-96 overflow-y-auto p-4 sm:p-6 bg-gray-50">
               <h3 className="font-semibold text-gray-900 mb-4">
                 Selected Posts ({selectedPostsArray.length})
               </h3>
@@ -475,9 +475,9 @@ export default function TrendingPostsModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+        <div className="p-4 sm:p-6 border-t bg-gray-50">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
               {selectedPostsArray.length > 0 ? (
                 <span>
                   {selectedPostsArray.length} post{selectedPostsArray.length !== 1 ? 's' : ''} selected
@@ -486,16 +486,17 @@ export default function TrendingPostsModal({
                 <span>Select posts for inspiration</span>
               )}
             </div>
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={onClose}>
+            <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+              <Button variant="outline" onClick={onClose} className="flex-1 sm:flex-none">
                 Cancel
               </Button>
               <Button
                 onClick={handleSave}
                 disabled={selectedPostsArray.length === 0}
-                className={selectedPostsArray.length === 0 ? 'opacity-50' : ''}
+                className={`flex-1 sm:flex-none ${selectedPostsArray.length === 0 ? 'opacity-50' : ''}`}
               >
-                Use Selected Posts
+                <span className="hidden sm:inline">Use Selected Posts</span>
+                <span className="sm:hidden">Use Selected</span>
               </Button>
             </div>
           </div>

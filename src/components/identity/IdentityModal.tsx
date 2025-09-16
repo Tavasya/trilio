@@ -138,20 +138,20 @@ export default function IdentityModal({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">
-      <div className="bg-white rounded-xl shadow-xl max-w-4xl w-full max-h-[85vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center bg-black/50 sm:p-4">
+      <div className="bg-white rounded-t-2xl sm:rounded-xl shadow-xl w-full sm:max-w-4xl max-h-[95vh] sm:max-h-[85vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6 border-b">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">Select Your Identities</h2>
-              <p className="text-sm text-gray-600 mt-1">
+        <div className="p-4 sm:p-6 border-b">
+          <div className="flex items-start justify-between">
+            <div className="flex-1">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900">Select Your Identities</h2>
+              <p className="text-xs sm:text-sm text-gray-600 mt-1">
                 Choose or create identities that represent your professional self
               </p>
             </div>
             <button
               onClick={onClose}
-              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              className="p-1.5 sm:p-2 hover:bg-gray-100 rounded-lg transition-colors ml-2"
             >
               <X className="w-5 h-5 text-gray-500" />
             </button>
@@ -171,25 +171,25 @@ export default function IdentityModal({
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div className="flex-1 overflow-y-auto p-4 sm:p-6">
           {/* Custom Identity Input */}
-          <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+          <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gray-50 rounded-lg">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-2">
               Can't find your identity? Add your own:
             </label>
-            <div className="flex gap-2">
+            <div className="flex flex-col sm:flex-row gap-2">
               <input
                 type="text"
                 placeholder="e.g., Data Scientist, Angel Investor..."
                 value={customIdentity}
                 onChange={(e) => setCustomIdentity(e.target.value)}
                 onKeyPress={handleKeyPress}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+                className="flex-1 px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
               />
               <Button
                 onClick={handleAddCustom}
                 disabled={!customIdentity.trim()}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 w-full sm:w-auto justify-center"
               >
                 <Plus className="w-4 h-4" />
                 Add
@@ -200,7 +200,7 @@ export default function IdentityModal({
           {/* Custom Identities */}
           {customIdentities.length > 0 && (
             <div className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">Your Custom Identities</h3>
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">Your Custom Identities</h3>
               <div className="flex flex-wrap gap-2">
                 {customIdentities.map(identity => {
                   const customId = `custom-${identity.toLowerCase().replace(/\s+/g, '-')}`;
@@ -228,10 +228,10 @@ export default function IdentityModal({
           {/* Predefined Identities by Category */}
           {Object.entries(groupedIdentities).map(([category, identities]) => (
             <div key={category} className="mb-6">
-              <h3 className="text-sm font-semibold text-gray-700 mb-3">
+              <h3 className="text-xs sm:text-sm font-semibold text-gray-700 mb-2 sm:mb-3">
                 {category}
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-1.5 sm:gap-2">
                 {identities.map(identity => {
                   const isSelected = selectedIdentities.includes(identity.id);
 
@@ -239,7 +239,7 @@ export default function IdentityModal({
                     <button
                       key={identity.id}
                       onClick={() => toggleIdentity(identity.id)}
-                      className={`px-3 py-2 rounded-lg border-2 font-medium text-sm transition-all duration-200 text-left ${
+                      className={`px-2 sm:px-3 py-1.5 sm:py-2 rounded-lg border-2 font-medium text-xs sm:text-sm transition-all duration-200 text-left ${
                         isSelected
                           ? 'border-primary bg-primary/10 text-primary'
                           : 'border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50'
@@ -266,9 +266,9 @@ export default function IdentityModal({
         </div>
 
         {/* Footer */}
-        <div className="p-6 border-t bg-gray-50">
-          <div className="flex items-center justify-between">
-            <div className="text-sm text-gray-600">
+        <div className="p-4 sm:p-6 border-t bg-gray-50">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+            <div className="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
               {selectedIdentities.length > 0 ? (
                 <span>
                   {selectedIdentities.length} identit{selectedIdentities.length !== 1 ? 'ies' : 'y'} selected
@@ -277,14 +277,14 @@ export default function IdentityModal({
                 <span>Select at least one identity</span>
               )}
             </div>
-            <div className="flex gap-3">
-              <Button variant="outline" onClick={onClose}>
+            <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+              <Button variant="outline" onClick={onClose} className="flex-1 sm:flex-none">
                 Cancel
               </Button>
               <Button
                 onClick={handleSave}
                 disabled={selectedIdentities.length === 0}
-                className={selectedIdentities.length === 0 ? 'opacity-50' : ''}
+                className={`flex-1 sm:flex-none ${selectedIdentities.length === 0 ? 'opacity-50' : ''}`}
               >
                 Save Selection
               </Button>
