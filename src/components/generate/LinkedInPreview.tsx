@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Heart, MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Lightbulb, Calendar, Image, X, Check, Loader2, AlertCircle } from 'lucide-react';
+import { Heart, MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Lightbulb, Calendar, Image, X, Check, Loader2, AlertCircle, MessageSquare } from 'lucide-react';
 import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -11,7 +11,12 @@ import { toast } from 'sonner';
 
 type ViewSize = 'desktop' | 'mobile';
 
-export default function LinkedInPreview() {
+interface LinkedInPreviewProps {
+  onToggleView?: () => void;
+  showToggle?: boolean;
+}
+
+export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPreviewProps) {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
   const { getToken } = useAuth();
@@ -146,9 +151,22 @@ export default function LinkedInPreview() {
       <div className="border-b">
         <div className="p-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-semibold">LinkedIn Preview</h2>
-              <p className="text-sm text-gray-500">See how your post will look</p>
+            <div className="flex items-center justify-between flex-1">
+              <div>
+                <h2 className="text-lg font-semibold">LinkedIn Preview</h2>
+                <p className="text-sm text-gray-500">See how your post will look</p>
+              </div>
+              {showToggle && (
+                <Button
+                  onClick={onToggleView}
+                  variant="outline"
+                  size="sm"
+                  className="lg:hidden mr-4"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Chat
+                </Button>
+              )}
             </div>
             {/* Save Status Indicator */}
             {postId && (

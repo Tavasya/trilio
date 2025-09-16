@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { SignedIn, SignedOut, SignInButton, SignUpButton, useUser, useClerk } from '@clerk/react-router';
+import { SignedIn, SignedOut, SignInButton, SignUpButton, useClerk } from '@clerk/react-router';
 import Hero from "@/components/landing/Hero";
 import ProblemsSection from "@/components/landing/ProblemsSection";
 import LeverageSection from "@/components/landing/LeverageSection";
@@ -14,7 +14,7 @@ import trilioLogo from "@/lib/logo/trilio-logo.png";
 
 export default function Landing() {
   const navigate = useNavigate();
-  const { user } = useUser();
+  // const { user } = useUser();
   const { loaded } = useClerk();
   const [_scrolledPastPurple, setScrolledPastPurple] = useState(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState(false);
@@ -67,13 +67,14 @@ export default function Landing() {
               <Button
                 onClick={() => {
                   // Check if user has completed onboarding
-                  const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${user?.id}`);
+                  // const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${user?.id}`);
 
-                  if (hasCompletedOnboarding) {
-                    navigate("/dashboard");
-                  } else {
-                    navigate("/onboarding/1");
-                  }
+                  // if (hasCompletedOnboarding) {
+                  //   navigate("/dashboard");
+                  // } else {
+                  //   navigate("/onboarding/1");
+                  // }
+                  navigate("/dashboard");
                 }}
                 className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
               >

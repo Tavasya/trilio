@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router";
-import { SignedIn, SignedOut, SignUpButton, useUser } from '@clerk/react-router';
+import { SignedIn, SignedOut, SignUpButton } from '@clerk/react-router';
 import trilioLogo from "@/lib/logo/trilio-logo.png";
 
 export default function CTASection() {
   const navigate = useNavigate();
-  const { user } = useUser();
+  // const { user } = useUser();
   const ctaRef = useRef<HTMLDivElement | null>(null);
   const [ctaVisible, setCtaVisible] = useState(false);
 
@@ -74,13 +74,14 @@ export default function CTASection() {
           <SignedIn>
             <button
               onClick={() => {
-                const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${user?.id}`);
+                // const hasCompletedOnboarding = localStorage.getItem(`onboarding_completed_${user?.id}`);
 
-                if (hasCompletedOnboarding) {
-                  navigate("/dashboard");
-                } else {
-                  navigate("/onboarding/1");
-                }
+                // if (hasCompletedOnboarding) {
+                //   navigate("/dashboard");
+                // } else {
+                //   navigate("/onboarding/1");
+                // }
+                navigate("/dashboard");
               }}
               className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center"
             >
