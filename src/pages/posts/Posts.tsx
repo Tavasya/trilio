@@ -10,6 +10,7 @@ import { MoreHorizontal, ThumbsUp, MessageSquare, Repeat2, Send, Heart, Lightbul
 
 import { useUser } from '@clerk/react-router';
 import { Button } from '@/components/ui/button';
+import { LogoLoader } from '@/components/ui/logo-loader';
 
 export default function Posts() {
   const dispatch = useAppDispatch();
@@ -18,6 +19,7 @@ export default function Posts() {
   const { user } = useUser();
   const { posts, isLoading } = useAppSelector(state => state.post);
   const shouldFetch = useAppSelector(selectShouldFetchPosts);
+  const [expandedPosts, setExpandedPosts] = React.useState<Set<string>>(new Set());
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -95,10 +97,7 @@ export default function Posts() {
   if (isLoading && posts.length === 0) {
     return (
       <div className="flex items-center justify-center h-screen bg-white">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
-          <span className="text-sm text-gray-500">Loading your content...</span>
-        </div>
+        <LogoLoader size="lg" text="Loading your posts..." />
       </div>
     );
   }
@@ -150,7 +149,7 @@ export default function Posts() {
               const truncatedContent = post.content.length > MAX_CONTENT_LENGTH
                 ? post.content.substring(0, MAX_CONTENT_LENGTH)
                 : post.content;
-              const [showFullContent, setShowFullContent] = React.useState(false);
+              const showFullContent = expandedPosts.has(post.id);
 
               return (
               <div
@@ -221,7 +220,7 @@ export default function Posts() {
                       <>
                         {'... '}
                         <button
-                          onClick={() => setShowFullContent(true)}
+                          onClick={() => setExpandedPosts(prev => new Set(prev).add(post.id))}
                           className="text-gray-600 hover:underline font-medium"
                         >
                           see more
@@ -230,7 +229,11 @@ export default function Posts() {
                     )}
                     {showFullContent && post.content.length > MAX_CONTENT_LENGTH && (
                       <button
-                        onClick={() => setShowFullContent(false)}
+                        onClick={() => setExpandedPosts(prev => {
+                          const newSet = new Set(prev);
+                          newSet.delete(post.id);
+                          return newSet;
+                        })}
                         className="block text-gray-600 hover:underline font-medium mt-2"
                       >
                         see less
