@@ -95,7 +95,7 @@ export default function TestimonialCarousel() {
                   <img
                     src={testimonial.avatar}
                     alt={testimonial.name}
-                    className="w-8 h-8 rounded-full"
+                    className="w-8 h-8 rounded-full object-cover shadow-lg"
                   />
                   <div className="flex-1">
                     <div className="flex items-start justify-between">

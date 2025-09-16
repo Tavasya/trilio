@@ -4,7 +4,7 @@ import { X } from 'lucide-react';
 const problems = [
   "It feels cringe… what if people judge me?",
   "I want to post, but I don't even know how to begin",
-  "I spend so long editing captions and picking images, and somehow it still doesn't feel like me",
+  "I spend hours editing the post, and it still doesn't feel right",
   "No one engages. I have no clue what's working or what's not",
   "It's just so hard to stay consistent… how do people do it?"
 ];
@@ -60,19 +60,19 @@ export default function ProblemsSection() {
           </p>
         </div>
 
-        <div className="flex flex-col gap-3 max-w-2xl mx-auto">
+        <div className="flex flex-col gap-3 mx-auto w-fit">
           {problems.map((problem, index) => (
             <div
               key={index}
               ref={(el) => {itemRefs.current[index] = el}}
-              className={`flex items-start gap-3 bg-gray-50 rounded-xl p-4 transition-all duration-500 ${
+              className={`flex items-start gap-3 bg-gray-50 rounded-xl p-4 shadow-md transition-all duration-500 ${
                 visibleItems.includes(index)
                   ? 'opacity-100 translate-x-0'
                   : 'opacity-0 -translate-x-12'
               }`}
             >
               <X className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-              <p className="text-base text-gray-700">{problem}</p>
+              <p className="text-base text-gray-700 whitespace-nowrap">{problem}</p>
             </div>
           ))}
         </div>
