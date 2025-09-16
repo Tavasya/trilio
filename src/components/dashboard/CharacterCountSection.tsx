@@ -29,6 +29,7 @@ const lengthOptions: LengthOption[] = [
   }
 ];
 
+
 interface CharacterCountSectionProps {
   value?: PostLength;
   onChange?: (length: PostLength) => void;

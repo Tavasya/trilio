@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback } from 'react';
-import { X, Search, Filter, Heart, MessageCircle, Eye, ChevronDown, Loader2, Check } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { X, Search, Filter, Heart, MessageCircle, ChevronDown, Loader2, Check } from 'lucide-react';
 import { Button } from '../ui/button';
 import { debounce } from 'lodash';
 import { API_CONFIG } from '@/shared/config/api';

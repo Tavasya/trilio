@@ -67,7 +67,7 @@ export default function QuickStartTasks() {
     const initialDelay = setTimeout(() => {
       tasks.forEach((_, index) => {
         setTimeout(() => {
-          setVisibleTasks(prev => index + 1);
+          setVisibleTasks(index + 1);
         }, index * 60); // 60ms delay between each task
       });
     }, 300); // Initial 300ms delay

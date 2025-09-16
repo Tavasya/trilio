@@ -4,13 +4,16 @@ import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateGeneratedPostContent, saveDraftToDatabase } from '@/features/chat/chatSlice';
+import { schedulePost } from '@/features/post/postSlice';
 import { useAuth, useUser } from '@clerk/react-router';
+import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
 
 type ViewSize = 'desktop' | 'mobile';
 
 export default function LinkedInPreview() {
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
   const { getToken } = useAuth();
   const { user } = useUser();
   const generatedPost = useAppSelector(state => state.chat.generatedPost);
@@ -26,13 +29,43 @@ export default function LinkedInPreview() {
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [postImage, setPostImage] = useState<string | null>(null);
   const [isEditingContent, setIsEditingContent] = useState(false);
-  
+
   const postContent = generatedPost?.content || "Your LinkedIn post content will appear here as you generate it...";
   const postId = generatedPost?.id;
-  
-  const handleSchedule = (date: Date, time: string) => {
-    console.log('Post scheduled for:', date, 'at', time);
-    // Here you would normally send this to your backend
+
+  const handleSchedule = async (date: Date, _time: string) => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        toast.error('Authentication required', { position: 'top-right' });
+        return;
+      }
+
+      // Get user's timezone
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      // Format the scheduled date/time in ISO format
+      const scheduledFor = date.toISOString();
+
+      // Dispatch the schedule action
+      await dispatch(schedulePost({
+        scheduleData: {
+          content: postContent,
+          scheduled_for: scheduledFor,
+          timezone: timezone,
+          visibility: 'PUBLIC'
+        },
+        token
+      })).unwrap();
+
+      // Close modal and navigate to posts page
+      setShowScheduleModal(false);
+      toast.success('Post scheduled successfully!', { position: 'top-right' });
+      navigate('/posts');
+    } catch (error) {
+      console.error('Failed to schedule post:', error);
+      toast.error('Failed to schedule post', { position: 'top-right' });
+    }
   };
   
   const handleImageUpload = () => {
@@ -193,7 +226,7 @@ export default function LinkedInPreview() {
                       <img src={userAvatar} alt={userName} className="w-full h-full rounded-full object-cover" />
                     ) : (
                       <span className="text-gray-600 font-semibold text-lg">
-                        {userName.split(' ').map(n => n[0]).join('')}
+                        {userName.split(' ').map((n: string) => n[0]).join('')}
                       </span>
                     )}
                   </div>

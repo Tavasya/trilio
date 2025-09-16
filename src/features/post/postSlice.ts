@@ -1,7 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { toast } from 'sonner';
-import type { LinkedInPost, LinkedInPostResponse, PostState, FetchPostsResponse, Post } from './postTypes';
+
+import type { LinkedInPost, LinkedInPostResponse, PostState, FetchPostsResponse, SchedulePostRequest, SchedulePostResponse } from './postTypes';
+
 import { postService } from './postService';
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
@@ -28,6 +30,14 @@ export const publishToLinkedIn = createAsyncThunk<LinkedInPostResponse, { post: 
   'post/publishToLinkedIn',
   async ({ post, token }) => {
     return await postService.publishToLinkedIn(post, token);
+  }
+);
+
+// Async thunk for scheduling a post
+export const schedulePost = createAsyncThunk<SchedulePostResponse, { scheduleData: SchedulePostRequest; token: string }>(
+  'post/schedulePost',
+  async ({ scheduleData, token }) => {
+    return await postService.schedulePost(scheduleData, token);
   }
 );
 
@@ -92,6 +102,27 @@ const postSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message || 'Failed to publish to LinkedIn';
         toast.error(action.error.message || 'Failed to publish to LinkedIn');
+      })
+      // Schedule post
+      .addCase(schedulePost.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(schedulePost.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.currentPost = null;
+
+        // Add the scheduled post to the posts array
+        if (action.payload.post) {
+          state.posts.unshift(action.payload.post);
+        }
+
+        toast.success('Post scheduled successfully!');
+      })
+      .addCase(schedulePost.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to schedule post';
+        toast.error(action.error.message || 'Failed to schedule post');
       });
   },
 });

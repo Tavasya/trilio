@@ -16,7 +16,7 @@ export default function Landing() {
   const navigate = useNavigate();
   const { user } = useUser();
   const { loaded } = useClerk();
-  const [scrolledPastPurple, setScrolledPastPurple] = useState(false);
+  const [_scrolledPastPurple, setScrolledPastPurple] = useState(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState(false);
 
   useEffect(() => {
