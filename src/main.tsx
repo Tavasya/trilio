@@ -8,6 +8,7 @@ import store from './store.ts'
 import AppRoutes from './router.tsx'
 import AuthRedirect from './components/AuthRedirect'
 import { Toaster } from 'sonner'
+import { Analytics } from '@vercel/analytics/react'
 
 // Import your Publishable Key
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY
@@ -29,5 +30,6 @@ createRoot(document.getElementById('root')!).render(
         </Provider>
       </ClerkProvider>
     </BrowserRouter>
+    <Analytics />
   </StrictMode>,
 )

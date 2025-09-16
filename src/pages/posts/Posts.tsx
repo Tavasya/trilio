@@ -1,6 +1,8 @@
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchUserPosts, selectShouldFetchPosts } from '@/features/post/postSlice';
+import type { Post } from '@/features/post/postTypes';
+
 import { useAuth } from '@clerk/react-router';
 import { Link, useNavigate } from 'react-router';
 
@@ -8,6 +10,7 @@ import { MoreHorizontal, ThumbsUp, MessageSquare, Repeat2, Send, Heart, Lightbul
 
 import { useUser } from '@clerk/react-router';
 import { Button } from '@/components/ui/button';
+import { LogoLoader } from '@/components/ui/logo-loader';
 
 export default function Posts() {
   const dispatch = useAppDispatch();
@@ -16,6 +19,7 @@ export default function Posts() {
   const { user } = useUser();
   const { posts, isLoading } = useAppSelector(state => state.post);
   const shouldFetch = useAppSelector(selectShouldFetchPosts);
+  const [expandedPosts, setExpandedPosts] = React.useState<Set<string>>(new Set());
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -73,7 +77,7 @@ export default function Posts() {
     }
   };
 
-  const getPostStatus = (post: any) => {
+  const getPostStatus = (post: Post) => {
     if (post.linkedin_post_id && post.linkedin_post_url) {
       return 'published';
     }
@@ -83,9 +87,8 @@ export default function Posts() {
     return 'draft';
   };
 
-  // Removed unused getStatusBadge function - since we removed the status badge from the UI
 
-  // Removed unused handleResumeWriting function - since we removed the Edit Draft button
+
 
   const handleEditPost = (postId: string) => {
     navigate(`/generate?postId=${postId}`);
@@ -93,24 +96,21 @@ export default function Posts() {
 
   if (isLoading && posts.length === 0) {
     return (
-      <div className="flex items-center justify-center h-screen bg-[#f3f2ef]">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-8 h-8 border-2 border-gray-300 border-t-gray-600 rounded-full animate-spin"></div>
-          <span className="text-sm text-gray-500">Loading your content...</span>
-        </div>
+      <div className="flex items-center justify-center h-screen bg-white">
+        <LogoLoader size="lg" text="Loading your posts..." />
       </div>
     );
   }
 
   return (
-    <div className="h-full bg-[#f3f2ef] overflow-y-auto">
-      <div className="max-w-2xl mx-auto px-4 py-6">
+    <div className="h-full bg-white overflow-y-auto">
+      <div className="max-w-7xl mx-auto px-4 py-6">
         {/* Create Post Card */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-2">
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6 max-w-2xl mx-auto">
           <div className="flex gap-3">
             {user?.imageUrl ? (
-              <img 
-                src={user.imageUrl} 
+              <img
+                src={user.imageUrl}
                 alt={`${user.firstName} ${user.lastName}`}
                 className="w-12 h-12 rounded-full object-cover"
               />
@@ -143,11 +143,18 @@ export default function Posts() {
             </div>
           </div>
         ) : (
-          <div className="space-y-2">
-            {posts.map((post) => (
+          <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
+            {posts.map((post) => {
+              const MAX_CONTENT_LENGTH = 280;
+              const truncatedContent = post.content.length > MAX_CONTENT_LENGTH
+                ? post.content.substring(0, MAX_CONTENT_LENGTH)
+                : post.content;
+              const showFullContent = expandedPosts.has(post.id);
+
+              return (
               <div
                 key={post.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden relative"
+                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden relative flex flex-col break-inside-avoid mb-4"
               >
                 {/* Status Badge - Removed */}
 
@@ -208,7 +215,30 @@ export default function Posts() {
                 {/* Post Content */}
                 <div className="px-4 pb-3">
                   <p className="text-sm text-gray-900 whitespace-pre-wrap">
-                    {post.content}
+                    {showFullContent ? post.content : truncatedContent}
+                    {post.content.length > MAX_CONTENT_LENGTH && !showFullContent && (
+                      <>
+                        {'... '}
+                        <button
+                          onClick={() => setExpandedPosts(prev => new Set(prev).add(post.id))}
+                          className="text-gray-600 hover:underline font-medium"
+                        >
+                          see more
+                        </button>
+                      </>
+                    )}
+                    {showFullContent && post.content.length > MAX_CONTENT_LENGTH && (
+                      <button
+                        onClick={() => setExpandedPosts(prev => {
+                          const newSet = new Set(prev);
+                          newSet.delete(post.id);
+                          return newSet;
+                        })}
+                        className="block text-gray-600 hover:underline font-medium mt-2"
+                      >
+                        see less
+                      </button>
+                    )}
                   </p>
                   {post.media_url && (
                     <div className="mt-3 p-2 bg-gray-50 rounded border border-gray-200">
@@ -272,7 +302,8 @@ export default function Posts() {
 
                 {/* Resume Writing Button - Removed */}
               </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </div>

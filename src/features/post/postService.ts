@@ -123,6 +123,43 @@ export class PostService {
 
     return data;
   }
+
+  async updateScheduledPost(postId: string, updateData: Partial<SchedulePostRequest>, token: string): Promise<SchedulePostResponse> {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/posts/schedule/${postId}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(updateData),
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || 'Failed to update scheduled post');
+    }
+
+    return data;
+  }
+
+  async deleteScheduledPost(postId: string, token: string): Promise<{ success: boolean }> {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/posts/schedule/${postId}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.error || 'Failed to delete scheduled post');
+    }
+
+    return data;
+  }
 }
 
 export const postService = new PostService();

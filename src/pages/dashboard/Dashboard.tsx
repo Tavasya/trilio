@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import IdentitySection from '../../components/dashboard/IdentitySection';
 import TopicsSection from '../../components/dashboard/TopicsSection';
 import ViralPostsSection from '../../components/dashboard/ViralPostsSection';
@@ -6,7 +5,6 @@ import WritingStylesSection from '../../components/dashboard/WritingStylesSectio
 import CharacterCountSection from '../../components/dashboard/CharacterCountSection';
 import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { postService } from '../../features/post/postService';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
 
@@ -27,7 +25,6 @@ const Dashboard = () => {
   const { getToken } = useAuth();
   const dispatch = useAppDispatch();
   const dashboardState = useAppSelector(selectDashboardState);
-  const [isLoading, setIsLoading] = useState(false);
 
   const handleGeneratePost = async () => {
     // Validate form
@@ -56,36 +53,41 @@ const Dashboard = () => {
       return;
     }
 
-    setIsLoading(true);
-    try {
-      const token = await getToken();
-      if (!token) {
-        toast.error('Authentication required', { position: 'top-right' });
-        return;
-      }
-
-      // Save as draft with all required fields
-      const response = await postService.saveDraft(
-        {
-          content: dashboardState.content,
-          visibility: 'PUBLIC',
-          identity: dashboardState.identity,
-          content_topics: dashboardState.contentTopics,
-          writing_style: dashboardState.writingStyle,
-          post_length: dashboardState.postLength,
-          trending_posts: dashboardState.trendingPosts
-        },
-        token
-      );
-
-      // Navigate to generate page with post ID
-      navigate(`/generate?postId=${response.post_id}`);
-    } catch (error) {
-      console.error('Failed to save draft:', error);
-      toast.error('Failed to save draft', { position: 'top-right' });
-    } finally {
-      setIsLoading(false);
+    const token = await getToken();
+    if (!token) {
+      toast.error('Authentication required', { position: 'top-right' });
+      return;
     }
+
+    // Prepare draft data
+    const draftData = {
+      content: dashboardState.content,
+      visibility: 'PUBLIC' as const,
+      identity: dashboardState.identity,
+      content_topics: dashboardState.contentTopics,
+      writing_style: dashboardState.writingStyle,
+      post_length: dashboardState.postLength,
+      trending_posts: dashboardState.trendingPosts
+    };
+
+    // Store draft data and token in session storage
+    sessionStorage.setItem('pendingDraft', JSON.stringify(draftData));
+    sessionStorage.setItem('pendingToken', token);
+
+    // Start the save operation in the background (don't await)
+    import('../../features/post/postService').then(({ postService }) => {
+      postService.saveDraft(draftData, token).then(response => {
+        if (response.post_id) {
+          // Store the post ID for the Generate page to pick up
+          sessionStorage.setItem('savedPostId', response.post_id);
+        }
+      }).catch(error => {
+        console.error('Background draft save failed:', error);
+      });
+    });
+
+    // Navigate immediately - Generate page will handle the loading
+    navigate('/generate?new=true');
   };
 
   return (
@@ -125,9 +127,8 @@ const Dashboard = () => {
             <Button
               onClick={handleGeneratePost}
               className="px-6 py-2.5 text-sm font-medium bg-primary hover:bg-primary/90 transition-all duration-200"
-              disabled={isLoading}
             >
-              {isLoading ? 'Saving...' : 'Generate Post'}
+              Generate Post
             </Button>
           </div>
         </div>

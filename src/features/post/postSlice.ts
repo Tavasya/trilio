@@ -41,6 +41,23 @@ export const schedulePost = createAsyncThunk<SchedulePostResponse, { scheduleDat
   }
 );
 
+// Async thunk for updating/rescheduling a scheduled post
+export const updateScheduledPost = createAsyncThunk<SchedulePostResponse, { postId: string; updateData: Partial<SchedulePostRequest>; token: string }>(
+  'post/updateScheduledPost',
+  async ({ postId, updateData, token }) => {
+    return await postService.updateScheduledPost(postId, updateData, token);
+  }
+);
+
+// Async thunk for deleting a scheduled post
+export const deleteScheduledPost = createAsyncThunk<{ success: boolean; postId: string }, { postId: string; token: string }>(
+  'post/deleteScheduledPost',
+  async ({ postId, token }) => {
+    const result = await postService.deleteScheduledPost(postId, token);
+    return { ...result, postId };
+  }
+);
+
 const postSlice = createSlice({
   name: 'post',
   initialState,
@@ -123,6 +140,47 @@ const postSlice = createSlice({
         state.isLoading = false;
         state.error = action.error.message || 'Failed to schedule post';
         toast.error(action.error.message || 'Failed to schedule post');
+      })
+      // Update scheduled post
+      .addCase(updateScheduledPost.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateScheduledPost.fulfilled, (state, action) => {
+        state.isLoading = false;
+
+        // Update the post in the posts array
+        if (action.payload.post) {
+          const index = state.posts.findIndex(p => p.id === action.payload.post!.id);
+          if (index !== -1) {
+            state.posts[index] = action.payload.post;
+          }
+        }
+
+        toast.success('Post rescheduled successfully!');
+      })
+      .addCase(updateScheduledPost.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to reschedule post';
+        toast.error(action.error.message || 'Failed to reschedule post');
+      })
+      // Delete scheduled post
+      .addCase(deleteScheduledPost.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteScheduledPost.fulfilled, (state, action) => {
+        state.isLoading = false;
+
+        // Remove the post from the posts array
+        state.posts = state.posts.filter(p => p.id !== action.payload.postId);
+
+        toast.success('Post deleted successfully!');
+      })
+      .addCase(deleteScheduledPost.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to delete post';
+        toast.error(action.error.message || 'Failed to delete post');
       });
   },
 });
