@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchUserPosts, selectShouldFetchPosts, setCurrentPost } from '@/features/post/postSlice';
+import { fetchUserPosts, selectShouldFetchPosts } from '@/features/post/postSlice';
+import type { Post } from '@/features/post/postTypes';
 import { useAuth } from '@clerk/react-router';
 import { Link, useNavigate } from 'react-router';
 
@@ -73,7 +74,7 @@ export default function Posts() {
     }
   };
 
-  const getPostStatus = (post: any) => {
+  const getPostStatus = (post: Post) => {
     if (post.linkedin_post_id && post.linkedin_post_url) {
       return 'published';
     }
@@ -83,7 +84,7 @@ export default function Posts() {
     return 'draft';
   };
 
-  const getStatusBadge = (post: any) => {
+  const getStatusBadge = (post: Post) => {
     const status = getPostStatus(post);
 
     if (status === 'published') {
@@ -112,13 +113,9 @@ export default function Posts() {
     );
   };
 
-  const handleResumeWriting = (post: any) => {
-    dispatch(setCurrentPost({
-      content: post.content,
-      media_url: post.media_url,
-      visibility: post.visibility
-    }));
-    navigate('/generate');
+  const handleResumeWriting = (post: Post) => {
+    // Use the same approach as Edit button - navigate with postId
+    navigate(`/generate?postId=${post.id}`);
   };
 
   const handleEditPost = (postId: string) => {

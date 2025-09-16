@@ -33,7 +33,7 @@ export default function LinkedInPreview() {
   const postContent = generatedPost?.content || "Your LinkedIn post content will appear here as you generate it...";
   const postId = generatedPost?.id;
 
-  const handleSchedule = async (date: Date, _time: string) => {
+  const handleSchedule = async (date: Date) => {
     try {
       const token = await getToken();
       if (!token) {
