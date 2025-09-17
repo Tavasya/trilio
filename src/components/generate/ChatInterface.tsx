@@ -108,14 +108,11 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
   };
 
   return (
-    <div className="h-full flex flex-col bg-white rounded-lg shadow-sm overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden">
       {/* Chat Header */}
-      <div className="border-b p-4 flex-shrink-0">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-lg font-semibold">AI Post Generator</h2>
-            <p className="text-sm text-gray-500">Chat with AI to create your LinkedIn post</p>
-          </div>
+      <div className="p-4 flex-shrink-0 min-h-[60px]">
+        <div className="flex justify-between items-center h-full">
+          <div></div>
           {showToggle && (
             <Button
               onClick={onToggleView}
@@ -200,24 +197,26 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       </div>
 
       {/* Input Area */}
-      <div className="border-t p-4 flex-shrink-0">
-        <div className="flex gap-2">
+      <div className="p-4 flex-shrink-0">
+        <div className="flex gap-2 items-center bg-gray-100 rounded-lg p-2">
           {/* Tool Selector Buttons */}
-          <div className="flex flex-col gap-2">
+          <div className="flex gap-2 pl-2">
             {AVAILABLE_TOOLS.map(tool => {
               const Icon = tool.icon;
               const isSelected = selectedTools.includes(tool.id);
               return (
-                <Button
+                <button
                   key={tool.id}
                   onClick={() => toggleTool(tool.id)}
-                  variant={isSelected ? "default" : "outline"}
-                  size="sm"
                   title={tool.description}
-                  className="h-8 w-8 p-0"
+                  className={`h-8 w-8 p-0 flex items-center justify-center rounded transition-colors ${
+                    isSelected
+                      ? 'text-primary'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
                 >
-                  <Icon className="w-4 h-4" />
-                </Button>
+                  <Icon className="w-5 h-5" />
+                </button>
               );
             })}
           </div>
@@ -227,15 +226,21 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message here..."
-            className="flex-1 min-h-[80px] max-h-[200px] p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="flex-1 h-8 p-1.5 bg-transparent border-none resize-none focus:outline-none overflow-hidden"
+            rows={1}
+            style={{ lineHeight: '1.25rem' }}
           />
-          <Button
+          <button
             onClick={handleSend}
-            className={`self-end ${(!inputValue.trim() || isStreaming) ? 'opacity-50' : ''}`}
+            className={`h-8 w-8 flex items-center justify-center rounded transition-colors ${
+              (!inputValue.trim() || isStreaming)
+                ? 'text-gray-400'
+                : 'text-primary hover:text-primary/80'
+            }`}
             disabled={false}
           >
-            <Send className="w-4 h-4" />
-          </Button>
+            <Send className="w-5 h-5" />
+          </button>
         </div>
       </div>
     </div>

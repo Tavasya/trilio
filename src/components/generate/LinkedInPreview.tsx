@@ -92,7 +92,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   };
   
   const getPreviewWidth = () => {
-    return viewSize === 'mobile' ? 'max-w-sm' : 'w-full max-w-2xl';
+    return viewSize === 'mobile' ? 'max-w-sm' : 'w-full';
   };
   
   const getTruncatedContent = () => {
@@ -149,28 +149,49 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
     <div className="h-full flex flex-col bg-white rounded-lg shadow-sm overflow-hidden">
       {/* Preview Header */}
       <div className="border-b">
-        <div className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center justify-between flex-1">
-              <div>
-                <h2 className="text-lg font-semibold">LinkedIn Preview</h2>
-                <p className="text-sm text-gray-500">See how your post will look</p>
-              </div>
-              {showToggle && (
-                <Button
-                  onClick={onToggleView}
-                  variant="outline"
-                  size="sm"
-                  className="lg:hidden mr-4"
-                >
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Chat
-                </Button>
-              )}
+        <div className="p-4 min-h-[60px] flex items-center">
+          <div className="flex items-center justify-between w-full relative">
+            {showToggle && (
+              <Button
+                onClick={onToggleView}
+                variant="outline"
+                size="sm"
+                className="lg:hidden"
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Chat
+              </Button>
+            )}
+
+            {/* Desktop/Mobile Toggle - Centered */}
+            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-4">
+              <button
+                onClick={() => setViewSize('desktop')}
+                className={`p-2 transition-colors ${
+                  viewSize === 'desktop'
+                    ? 'text-primary'
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+                title="Desktop view"
+              >
+                <Monitor className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setViewSize('mobile')}
+                className={`p-2 transition-colors ${
+                  viewSize === 'mobile'
+                    ? 'text-primary'
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+                title="Mobile view"
+              >
+                <Smartphone className="w-5 h-5" />
+              </button>
             </div>
+
             {/* Save Status Indicator */}
-            {postId && (
-              <div className="flex items-center gap-2 text-sm">
+            {/* {postId && (
+              <div className="flex items-center gap-2 text-sm ml-auto">
                 {saveStatus === 'saving' && (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
@@ -196,36 +217,8 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                   </>
                 )}
               </div>
-            )}
+            )} */}
           </div>
-        </div>
-        
-        {/* Size Toggle Buttons */}
-        <div className="border-t p-3 flex justify-center gap-1 bg-gray-50">
-          <button
-            onClick={() => setViewSize('desktop')}
-            className={`px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-              viewSize === 'desktop' 
-                ? 'bg-white shadow-sm border border-gray-300 text-primary' 
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-            title="Desktop view"
-          >
-            <Monitor className="w-4 h-4" />
-            <span className="text-xs font-medium">Desktop</span>
-          </button>
-          <button
-            onClick={() => setViewSize('mobile')}
-            className={`px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-              viewSize === 'mobile' 
-                ? 'bg-white shadow-sm border border-gray-300 text-primary' 
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-            title="Mobile view"
-          >
-            <Smartphone className="w-4 h-4" />
-            <span className="text-xs font-medium">Mobile</span>
-          </button>
         </div>
       </div>
 
@@ -271,11 +264,30 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                   value={postContent}
                   onChange={(e) => handleContentChange(e.target.value)}
                   onBlur={handleContentBlur}
-                  className="w-full min-h-[100px] p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900"
+                  className="w-full p-2 border-2 border-dashed border-gray-300 rounded resize-none focus:outline-none focus:border-gray-400 text-gray-900 whitespace-pre-wrap bg-transparent"
                   autoFocus
+                  style={{
+                    minHeight: 'auto',
+                    height: 'auto',
+                    overflow: 'hidden',
+                    fontFamily: 'inherit',
+                    fontSize: 'inherit',
+                    lineHeight: 'inherit'
+                  }}
+                  ref={(textarea) => {
+                    if (textarea) {
+                      textarea.style.height = 'auto';
+                      textarea.style.height = `${textarea.scrollHeight}px`;
+                    }
+                  }}
+                  onInput={(e) => {
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = 'auto';
+                    target.style.height = `${target.scrollHeight}px`;
+                  }}
                 />
               ) : (
-                <p 
+                <p
                   className="text-gray-900 whitespace-pre-wrap cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
                   onClick={() => setIsEditingContent(true)}
                   title="Click to edit"
@@ -284,7 +296,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                   {truncated && (
                     <>
                       {'... '}
-                      <button 
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowFullContent(true);
