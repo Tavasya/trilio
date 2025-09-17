@@ -108,7 +108,7 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
   };
 
   return (
-    <div className="h-full flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden rounded-lg">
       {/* Chat Header */}
       <div className="p-4 flex-shrink-0 min-h-[60px]">
         <div className="flex justify-between items-center h-full">
@@ -128,7 +128,7 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 custom-scrollbar">
         {messages.length === 0 && (
           <div className="flex justify-start">
             <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900">

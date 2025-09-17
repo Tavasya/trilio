@@ -1,7 +1,10 @@
 import { useState } from 'react';
-import { Heart, MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Lightbulb, Calendar, Image, X, Check, Loader2, AlertCircle, MessageSquare } from 'lucide-react';
+import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, Image, X, Check, Loader2, AlertCircle, MessageSquare } from 'lucide-react';
 import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
+import ThumbIcon from '@/lib/icons/thumb.svg?react';
+import HeartIcon from '@/lib/icons/heart.svg?react';
+import ClapIcon from '@/lib/icons/clap.svg?react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateGeneratedPostContent, saveDraftToDatabase } from '@/features/chat/chatSlice';
 import { schedulePost } from '@/features/post/postSlice';
@@ -92,7 +95,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   };
   
   const getPreviewWidth = () => {
-    return viewSize === 'mobile' ? 'max-w-sm' : 'w-full';
+    return viewSize === 'mobile' ? 'max-w-sm' : 'max-w-[552px]';
   };
   
   const getTruncatedContent = () => {
@@ -146,10 +149,10 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   const reposts = 8;
 
   return (
-    <div className="h-full flex flex-col bg-white rounded-lg shadow-sm overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden bg-gray-100 rounded-lg border border-gray-300">
       {/* Preview Header */}
-      <div className="border-b">
-        <div className="p-4 min-h-[60px] flex items-center">
+      <div className="p-4">
+        <div className="bg-transparent rounded-lg p-2 min-h-[48px] flex items-center">
           <div className="flex items-center justify-between w-full relative">
             {showToggle && (
               <Button
@@ -223,7 +226,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       </div>
 
       {/* LinkedIn Post Preview */}
-      <div className="flex-1 overflow-y-auto bg-gray-100 relative">
+      <div className="flex-1 overflow-y-auto bg-gray-100 relative custom-scrollbar">
         <div className="p-4 flex justify-center items-center relative pb-24">
           {/* Post Card with responsive width */}
           <div className={`bg-white border border-gray-200 rounded-lg ${getPreviewWidth()} transition-all duration-300`}>
@@ -270,9 +273,9 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                     minHeight: 'auto',
                     height: 'auto',
                     overflow: 'hidden',
-                    fontFamily: 'inherit',
-                    fontSize: 'inherit',
-                    lineHeight: 'inherit'
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                    fontSize: '14px',
+                    lineHeight: '1.42857'
                   }}
                   ref={(textarea) => {
                     if (textarea) {
@@ -287,10 +290,15 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                   }}
                 />
               ) : (
-                <p
+                <div
                   className="text-gray-900 whitespace-pre-wrap cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
                   onClick={() => setIsEditingContent(true)}
                   title="Click to edit"
+                  style={{
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                    fontSize: '14px',
+                    lineHeight: '1.42857'
+                  }}
                 >
                   {displayContent}
                   {truncated && (
@@ -307,7 +315,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                       </button>
                     </>
                   )}
-                </p>
+                </div>
               )}
               
               {/* Image Upload Area */}
@@ -340,15 +348,9 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             <div className="px-4 py-2 flex items-center justify-between text-xs text-gray-500">
               <div className="flex items-center gap-1">
                 <div className="flex -space-x-1">
-                  <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                    <ThumbsUp className="w-3 h-3 text-white fill-white" />
-                  </div>
-                  <div className="w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center">
-                    <Lightbulb className="w-3 h-3 text-white fill-white" />
-                  </div>
-                  <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                    <Heart className="w-3 h-3 text-white fill-white" />
-                  </div>
+                  <ThumbIcon className="w-4 h-4" />
+                  <HeartIcon className="w-4 h-4" />
+                  <ClapIcon className="w-4 h-4" />
                 </div>
                 <span className="ml-1">{reactions}</span>
               </div>

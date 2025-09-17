@@ -160,7 +160,7 @@ export default function Generate() {
   }
 
   return (
-    <div className="h-full bg-gray-50 flex flex-col">
+    <div className="h-full bg-white flex flex-col">
       {/* Desktop Layout */}
       <div className="hidden lg:flex h-full overflow-hidden">
         {/* Chat Interface - 50% width */}
