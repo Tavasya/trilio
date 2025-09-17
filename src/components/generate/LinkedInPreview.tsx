@@ -95,7 +95,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   };
   
   const getPreviewWidth = () => {
-    return viewSize === 'mobile' ? 'max-w-sm' : 'max-w-[552px]';
+    return viewSize === 'mobile' ? 'w-[375px]' : 'w-[552px]';
   };
   
   const getTruncatedContent = () => {
@@ -227,9 +227,9 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
 
       {/* LinkedIn Post Preview */}
       <div className="flex-1 overflow-y-auto bg-gray-100 relative custom-scrollbar">
-        <div className="p-4 flex justify-center items-center relative pb-24">
+        <div className="p-4 flex justify-center items-start relative min-h-full">
           {/* Post Card with responsive width */}
-          <div className={`bg-white border border-gray-200 rounded-lg ${getPreviewWidth()} transition-all duration-300`}>
+          <div className={`bg-white border border-gray-200 rounded-lg ${getPreviewWidth()}`}>
             {/* Post Header */}
             <div className="p-4">
               <div className="flex items-start justify-between">
@@ -315,6 +315,20 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                       </button>
                     </>
                   )}
+                  {!truncated && showFullContent && postContent.split('\n').length > (viewSize === 'mobile' ? 2 : 4) && (
+                    <>
+                      {' '}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowFullContent(false);
+                        }}
+                        className="text-gray-600 hover:underline font-medium"
+                      >
+                        see less
+                      </button>
+                    </>
+                  )}
                 </div>
               )}
               
@@ -388,7 +402,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       </div>
 
       {/* Schedule Post Button - Fixed to bottom right of preview container */}
-      <div className="fixed bottom-8 right-8 z-50 lg:absolute lg:bottom-8 lg:right-8 lg:z-10">
+      <div className="absolute bottom-4 right-4 z-10">
         <Button
           onClick={() => setShowScheduleModal(true)}
           className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-6 py-3"
