@@ -21,6 +21,19 @@ interface ChatInterfaceProps {
   showToggle?: boolean;
 }
 
+// Function to render text with markdown bold support
+const renderMarkdownText = (text: string) => {
+  // Split by ** markers and create spans
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      // Remove the ** markers and make bold
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    return <span key={index}>{part}</span>;
+  });
+};
+
 export default function ChatInterface({ postId, onToggleView, showToggle }: ChatInterfaceProps) {
   const dispatch = useAppDispatch();
   const { getToken } = useAuth();
@@ -160,8 +173,8 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 custom-scrollbar">
         {messages.length === 0 && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900">
-              <p className="text-sm">I'll help you generate an engaging LinkedIn post. What topic would you like to write about?</p>
+            <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900 break-words">
+              <div className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{renderMarkdownText("I'll help you generate an engaging LinkedIn post. What topic would you like to write about?")}</div>
             </div>
           </div>
         )}
@@ -176,9 +189,9 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
                 message.role === 'user'
                   ? 'bg-primary text-white'
                   : 'bg-gray-100 text-gray-900'
-              }`}
+              } break-words`}
             >
-              <p className="text-sm">{message.content}</p>
+              <div className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{renderMarkdownText(message.content)}</div>
               <p className={`text-xs mt-1 ${
                 message.role === 'user' ? 'text-white/70' : 'text-gray-500'
               }`}>
@@ -191,8 +204,8 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
         {/* Streaming Message */}
         {isStreaming && currentStreamingMessage && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900">
-              <p className="text-sm">{currentStreamingMessage}</p>
+            <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900 break-words">
+              <div className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{renderMarkdownText(currentStreamingMessage)}</div>
               <div className="flex items-center gap-1 mt-2">
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -210,7 +223,7 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
                 <div className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin text-gray-600" />
                   <span className="text-sm text-gray-600">
-                    {currentToolStatus.message}
+                    {renderMarkdownText(currentToolStatus.message)}
                   </span>
                 </div>
               ) : (
