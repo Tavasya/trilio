@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Send, Search, Loader2, Eye } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
@@ -26,20 +26,21 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
   const { getToken } = useAuth();
   const [inputValue, setInputValue] = useState('');
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  const { 
-    conversations, 
-    activeConversationId, 
-    currentStreamingMessage, 
+  const {
+    conversations,
+    activeConversationId,
+    currentStreamingMessage,
     isStreaming,
     currentToolStatus,
-    generatedPost 
+    generatedPost
   } = useAppSelector((state) => state.chat);
 
-  const currentConversation = activeConversationId 
-    ? conversations[activeConversationId] 
+  const currentConversation = activeConversationId
+    ? conversations[activeConversationId]
     : null;
-  
+
   const messages = currentConversation?.messages || [];
 
   useEffect(() => {
@@ -47,6 +48,34 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
     if (!activeConversationId && messages.length === 0) {
       dispatch(startNewConversation());
     }
+  }, []);
+
+  // Auto-scroll to bottom when new messages arrive or when streaming
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [messages, currentStreamingMessage]);
+
+  // Add keyboard listener for End key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'End' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        if (messagesContainerRef.current) {
+          messagesContainerRef.current.scrollTo({
+            top: messagesContainerRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const handleSend = async () => {
@@ -128,7 +157,7 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 custom-scrollbar">
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 custom-scrollbar">
         {messages.length === 0 && (
           <div className="flex justify-start">
             <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900">
@@ -197,7 +226,31 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       </div>
 
       {/* Input Area */}
-      <div className="p-4 flex-shrink-0">
+      <div className="p-4 flex-shrink-0 space-y-3">
+        {/* Example prompts - only show when no messages */}
+        {messages.length === 0 && (
+          <div className="flex flex-wrap gap-2 justify-center">
+            <button
+              onClick={() => setInputValue("Analyze trending topics in my industry")}
+              className="px-3 py-1.5 bg-white border border-gray-300 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+            >
+              Analyze trends
+            </button>
+            <button
+              onClick={() => setInputValue("Edit my LinkedIn post for better engagement")}
+              className="px-3 py-1.5 bg-white border border-gray-300 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+            >
+              Improve engagement
+            </button>
+            <button
+              onClick={() => setInputValue("Generate hooks for my LinkedIn content")}
+              className="px-3 py-1.5 bg-white border border-gray-300 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+            >
+              Create hooks
+            </button>
+          </div>
+        )}
+
         <div className="flex gap-2 items-center bg-gray-100 rounded-lg p-2">
           {/* Tool Selector Buttons */}
           <div className="flex gap-2 pl-2">

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, Image, X, MessageSquare } from 'lucide-react';
 import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
@@ -37,9 +37,28 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [postImage, setPostImage] = useState<string | null>(null);
   const [isEditingContent, setIsEditingContent] = useState(false);
+  const previewContainerRef = useRef<HTMLDivElement>(null);
 
   const postContent = generatedPost?.content || "Your LinkedIn post content will appear here as you generate it...";
   const postId = generatedPost?.id;
+
+  // Add keyboard listener for End key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'End' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        if (previewContainerRef.current) {
+          previewContainerRef.current.scrollTo({
+            top: previewContainerRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleSchedule = async (date: Date) => {
     try {
@@ -226,7 +245,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       </div>
 
       {/* LinkedIn Post Preview */}
-      <div className="flex-1 overflow-y-auto bg-gray-100 relative custom-scrollbar">
+      <div ref={previewContainerRef} className="flex-1 overflow-y-auto bg-gray-100 relative custom-scrollbar">
         <div className="p-4 flex justify-center items-start relative min-h-full">
           {/* Post Card with responsive width */}
           <div className={`bg-white border border-gray-200 rounded-lg ${getPreviewWidth()}`}>
