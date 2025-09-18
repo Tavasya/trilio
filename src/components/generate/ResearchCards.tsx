@@ -1,4 +1,7 @@
-import { ExternalLink } from 'lucide-react';
+import { ThumbsUp, MessageCircle, Repeat2, MoreHorizontal } from 'lucide-react';
+import ThumbIcon from '@/lib/icons/thumb.svg?react';
+import HeartIcon from '@/lib/icons/heart.svg?react';
+import ClapIcon from '@/lib/icons/clap.svg?react';
 
 interface ResearchCard {
   author_name: string;
@@ -40,48 +43,75 @@ export default function ResearchCards({ cards }: ResearchCardsProps) {
           style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
         >
           {cards.map((card, index) => (
-            <a
+            <div
               key={index}
-              href={card.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="min-w-[280px] max-w-[280px] p-3 bg-white border border-gray-200 rounded-lg hover:border-gray-300 hover:shadow-sm transition-all cursor-pointer block"
+              className="min-w-[320px] max-w-[320px] bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden flex flex-col"
             >
-              {/* Clean header with author and engagement */}
-              <div className="flex items-start justify-between mb-2">
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs font-medium text-gray-900 truncate">
-                    {card.author_name}
+              {/* Post Header */}
+              <div className="p-3 pb-2">
+                <div className="flex items-start justify-between">
+                  <div className="flex gap-2">
+                    <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-sm font-semibold flex-shrink-0">
+                      {card.author_name.split(' ').map(n => n[0]).join('')}
+                    </div>
+                    <div className="flex-1">
+                      <h3 className="text-sm font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
+                        {card.author_name}
+                      </h3>
+                      <p className="text-xs text-gray-500">
+                        {card.time_posted} • 🌐
+                      </p>
+                    </div>
                   </div>
-                  <div className="text-[10px] text-gray-500 truncate">
-                    {card.author_title}
+                  <button className="p-1 hover:bg-gray-100 rounded">
+                    <MoreHorizontal className="w-4 h-4 text-gray-600" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Post Content */}
+              <div className="px-3 pb-2">
+                <p className="text-xs text-gray-900 line-clamp-3 whitespace-pre-wrap">
+                  {card.hook || card.content}
+                </p>
+              </div>
+
+              {/* Engagement Stats */}
+              <div className="px-3 py-1.5 flex items-center justify-between text-xs text-gray-500">
+                <div className="flex items-center gap-1">
+                  <div className="flex -space-x-1">
+                    <ThumbIcon className="w-3.5 h-3.5" />
+                    <HeartIcon className="w-3.5 h-3.5" />
+                    <ClapIcon className="w-3.5 h-3.5" />
                   </div>
+                  <span className="ml-1 text-xs">{card.likes}</span>
                 </div>
-                <div className="flex items-center gap-1 text-[10px] text-gray-400">
-                  <span>{card.likes}</span>
-                  <span>•</span>
-                  <span>{card.time_posted}</span>
-                </div>
+                <a
+                  href={card.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-600 hover:underline text-xs"
+                >
+                  View on LinkedIn
+                </a>
               </div>
 
-              {/* Hook or first line - main focus */}
-              <div className="text-xs text-gray-700 line-clamp-2 mb-2 leading-relaxed">
-                {card.hook || card.content}
+              {/* Action Buttons */}
+              <div className="px-2 py-1 flex items-center justify-around border-t border-gray-200">
+                <button className="flex items-center gap-1 px-2 py-1.5 rounded hover:bg-gray-100 transition-colors text-gray-600">
+                  <ThumbsUp className="w-4 h-4" />
+                  <span className="text-xs font-medium">Like</span>
+                </button>
+                <button className="flex items-center gap-1 px-2 py-1.5 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                  <MessageCircle className="w-4 h-4" />
+                  <span className="text-xs font-medium">Comment</span>
+                </button>
+                <button className="flex items-center gap-1 px-2 py-1.5 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                  <Repeat2 className="w-4 h-4" />
+                  <span className="text-xs font-medium">Repost</span>
+                </button>
               </div>
-
-              {/* Subtle content preview */}
-              {card.hook && card.content && (
-                <div className="text-[11px] text-gray-500 line-clamp-2 leading-relaxed">
-                  {card.content}
-                </div>
-              )}
-
-              {/* Minimal link indicator */}
-              <div className="mt-2 flex items-center gap-1">
-                <ExternalLink className="w-2.5 h-2.5 text-gray-400" />
-                <span className="text-[10px] text-gray-400">LinkedIn</span>
-              </div>
-            </a>
+            </div>
           ))}
         </div>
 

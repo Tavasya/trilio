@@ -75,7 +75,9 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
 
     // Add persisted research cards
     if (persistedResearchCards) {
+      console.log('📚 Persisted research cards found:', persistedResearchCards);
       persistedResearchCards.forEach(cardBatch => {
+        console.log('📦 Processing card batch:', cardBatch);
         items.push({
           type: 'cards',
           data: {
@@ -86,7 +88,7 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
               likes: card.likes,
               time_posted: card.time_posted,
               url: card.profile_url,
-              hook: card.post_content.split('.')[0],  // Use first sentence as hook
+              hook: card.post_content ? card.post_content.split('.')[0] : '',  // Use first sentence as hook
               engagement_score: 0,
               hook_type: ''
             })),
@@ -96,10 +98,14 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
           timestamp: cardBatch.created_at
         });
       });
+    } else {
+      console.log('📚 No persisted research cards');
     }
 
     // Sort by timestamp
-    return items.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    const sorted = items.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    console.log('📝 Merged content items:', sorted);
+    return sorted;
   };
 
   const mergedContent = getMessagesWithCards();

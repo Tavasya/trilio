@@ -29,7 +29,6 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
 
   // Use Clerk user data with fallbacks
   const userName = user?.fullName || user?.firstName || "Your Name";
-  const userTitle = "Product Manager | Tech Enthusiast"; // You might want to make this editable or pull from user metadata
   const userAvatar = user?.imageUrl || "";
 
   const [viewSize, setViewSize] = useState<ViewSize>('desktop');
@@ -252,9 +251,9 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             {/* Post Header */}
             <div className="p-4">
               <div className="flex items-start justify-between">
-                <div className="flex gap-3">
+                <div className="flex gap-3 items-center">
                   {/* Avatar */}
-                  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
                     {userAvatar ? (
                       <img src={userAvatar} alt={userName} className="w-full h-full rounded-full object-cover" />
                     ) : (
@@ -264,12 +263,11 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                     )}
                   </div>
                   {/* User Info */}
-                  <div className="flex-1">
+                  <div className="flex flex-col">
                     <h3 className="font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
                       {userName}
                     </h3>
-                    <p className="text-sm text-gray-600">{userTitle}</p>
-                    <p className="text-xs text-gray-500">Just now • 🌐</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Just now • 🌐</p>
                   </div>
                 </div>
                 {/* More Options */}

@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Search, Filter, Heart, MessageCircle, Loader2, ChevronDown } from 'lucide-react';
+import { Search, Filter, Loader2, MoreHorizontal } from 'lucide-react';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
 import { debounce } from 'lodash';
 import { API_CONFIG } from '@/shared/config/api';
+import ThumbIcon from '@/lib/icons/thumb.svg?react';
+import HeartIcon from '@/lib/icons/heart.svg?react';
+import ClapIcon from '@/lib/icons/clap.svg?react';
 
 interface SearchPost {
   id: string;
@@ -223,74 +226,82 @@ const Research = () => {
             return (
               <div
                 key={post.id}
-                className="bg-white rounded-xl border border-gray-200 p-5 hover:shadow-lg transition-all duration-200"
+                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-all duration-200"
               >
-                {/* Author Info */}
-                <div className="flex items-start justify-between mb-3">
-                  <div>
-                    <h3 className="font-semibold text-gray-900">{post.author_name}</h3>
-                    <p className="text-xs text-gray-500">{post.author_title}</p>
-                  </div>
-                  <span className="text-xs text-gray-500">{post.time_posted}</span>
-                </div>
-
-                {/* Hook */}
-                {post.hook && (
-                  <p className="font-medium text-gray-800 mb-3">{post.hook}</p>
-                )}
-
-                {/* Content */}
-                <div className="text-sm text-gray-700 mb-3">
-                  {isExpanded ? (
-                    <div className="whitespace-pre-wrap">{post.content}</div>
-                  ) : (
-                    <p>{post.content_preview}</p>
-                  )}
-                  {post.content.length > post.content_preview.length && (
-                    <button
-                      onClick={() => togglePostExpansion(post.id)}
-                      className="text-primary hover:text-primary/80 font-medium mt-2 flex items-center gap-1"
-                    >
-                      {isExpanded ? 'Show less' : 'Read more'}
-                      <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                {/* Post Header */}
+                <div className="p-4 pb-3">
+                  <div className="flex items-start justify-between">
+                    <div className="flex gap-3">
+                      <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-semibold flex-shrink-0">
+                        {post.author_name.split(' ').map(n => n[0]).join('')}
+                      </div>
+                      <div className="flex-1">
+                        <h3 className="font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
+                          {post.author_name}
+                        </h3>
+                        <p className="text-xs text-gray-500">
+                          {post.time_posted} • 🌐
+                        </p>
+                      </div>
+                    </div>
+                    <button className="p-1 hover:bg-gray-100 rounded">
+                      <MoreHorizontal className="w-5 h-5 text-gray-600" />
                     </button>
-                  )}
+                  </div>
                 </div>
 
-                {/* Hashtags */}
-                {post.hashtags && post.hashtags.length > 0 && (
-                  <div className="flex flex-wrap gap-2 mb-3">
-                    {post.hashtags.map((tag, index) => (
-                      <span
-                        key={index}
-                        className="text-xs text-primary bg-primary/10 px-2 py-1 rounded"
+                {/* Post Content */}
+                <div className="px-4 pb-3">
+                  <p className="text-sm text-gray-900 whitespace-pre-wrap">
+                    {isExpanded ? (
+                      post.content || post.hook
+                    ) : (
+                      post.content_preview || post.hook || post.content.substring(0, 280)
+                    )}
+                    {post.content && post.content.length > 280 && !isExpanded && (
+                      <>
+                        {'... '}
+                        <button
+                          onClick={() => togglePostExpansion(post.id)}
+                          className="text-gray-600 hover:underline font-medium"
+                        >
+                          see more
+                        </button>
+                      </>
+                    )}
+                    {isExpanded && post.content && post.content.length > 280 && (
+                      <button
+                        onClick={() => togglePostExpansion(post.id)}
+                        className="block text-gray-600 hover:underline font-medium mt-2"
                       >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                )}
+                        see less
+                      </button>
+                    )}
+                  </p>
+                  {post.hashtags && post.hashtags.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-3">
+                      {post.hashtags.map((tag, index) => (
+                        <span
+                          key={index}
+                          className="text-xs text-blue-600 hover:underline cursor-pointer"
+                        >
+                          {tag.startsWith('#') ? tag : `#${tag}`}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
 
                 {/* Engagement Stats */}
-                <div className="flex items-center gap-4 text-xs text-gray-500 pt-3 border-t">
-                  <span className="flex items-center gap-1">
-                    <Heart className="w-3 h-3" />
-                    {post.likes.toLocaleString()}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <MessageCircle className="w-3 h-3" />
-                    {post.comments}
-                  </span>
-                  {post.post_url && (
-                    <a
-                      href={post.post_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-auto text-primary hover:text-primary/80"
-                    >
-                      View on LinkedIn →
-                    </a>
-                  )}
+                <div className="px-4 py-3 flex items-center text-xs text-gray-500 border-t">
+                  <div className="flex items-center gap-1">
+                    <div className="flex -space-x-1">
+                      <ThumbIcon className="w-4 h-4" />
+                      <HeartIcon className="w-4 h-4" />
+                      <ClapIcon className="w-4 h-4" />
+                    </div>
+                    <span className="ml-1">{post.likes.toLocaleString()}</span>
+                  </div>
                 </div>
               </div>
             );
