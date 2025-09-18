@@ -154,7 +154,7 @@ export default function Generate() {
   if (isLoading) {
     return (
       <div className="h-full bg-gray-50 flex items-center justify-center">
-        <LogoLoader size="lg" text="Setting up your workspace..." />
+        <LogoLoader size="lg" />
       </div>
     );
   }

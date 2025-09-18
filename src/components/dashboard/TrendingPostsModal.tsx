@@ -263,7 +263,7 @@ export default function TrendingPostsModal({
               showPreview ? 'border-primary bg-primary/10 text-primary' : 'border-gray-200 hover:bg-gray-50'
             }`}
           >
-            <span className="hidden sm:inline">Preview</span> ({selectedPostsArray.length})
+            Preview
           </button>
 
           {totalResults > 0 && (
