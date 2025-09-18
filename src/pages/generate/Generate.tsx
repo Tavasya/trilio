@@ -154,22 +154,22 @@ export default function Generate() {
   if (isLoading) {
     return (
       <div className="h-full bg-gray-50 flex items-center justify-center">
-        <LogoLoader size="lg" text="Setting up your workspace..." />
+        <LogoLoader size="lg" />
       </div>
     );
   }
 
   return (
-    <div className="h-full bg-gray-50 flex flex-col">
+    <div className="h-full bg-white flex flex-col">
       {/* Desktop Layout */}
       <div className="hidden lg:flex h-full overflow-hidden">
-        {/* Chat Interface - 3/5 width */}
-        <div className="w-3/5 p-4 h-full overflow-hidden">
+        {/* Chat Interface - 50% width */}
+        <div className="w-1/2 p-4 h-full overflow-hidden">
           <ChatInterface postId={currentPostId || postId} />
         </div>
 
-        {/* LinkedIn Preview - 2/5 width */}
-        <div className="w-2/5 p-4 h-full overflow-auto">
+        {/* LinkedIn Preview - 50% width */}
+        <div className="w-1/2 p-4 h-full overflow-auto">
           <LinkedInPreview />
         </div>
       </div>

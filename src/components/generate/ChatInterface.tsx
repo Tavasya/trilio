@@ -1,10 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Send, Search, Loader2, Eye } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { sendMessage, startNewConversation } from '@/features/chat/chatSlice';
+import { sendMessage, startNewConversation, clearResearchCards } from '@/features/chat/chatSlice';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
+import ResearchCards from './ResearchCards';
 
 // Define available tools with their metadata
 const AVAILABLE_TOOLS = [
@@ -21,32 +22,127 @@ interface ChatInterfaceProps {
   showToggle?: boolean;
 }
 
+// Function to render text with markdown bold support
+const renderMarkdownText = (text: string) => {
+  // Split by ** markers and create spans
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return parts.map((part, index) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      // Remove the ** markers and make bold
+      return <strong key={index}>{part.slice(2, -2)}</strong>;
+    }
+    return <span key={index}>{part}</span>;
+  });
+};
+
 export default function ChatInterface({ postId, onToggleView, showToggle }: ChatInterfaceProps) {
   const dispatch = useAppDispatch();
   const { getToken } = useAuth();
   const [inputValue, setInputValue] = useState('');
   const [selectedTools, setSelectedTools] = useState<string[]>([]);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
 
-  const { 
-    conversations, 
-    activeConversationId, 
-    currentStreamingMessage, 
+  const {
+    conversations,
+    activeConversationId,
+    currentStreamingMessage,
     isStreaming,
     currentToolStatus,
-    generatedPost 
+    generatedPost,
+    researchCards,
+    persistedResearchCards
   } = useAppSelector((state) => state.chat);
 
-  const currentConversation = activeConversationId 
-    ? conversations[activeConversationId] 
+
+  const currentConversation = activeConversationId
+    ? conversations[activeConversationId]
     : null;
-  
+
   const messages = currentConversation?.messages || [];
+
+  // Merge messages with persisted research cards chronologically
+  const getMessagesWithCards = () => {
+    const items: Array<{ type: 'message' | 'cards'; data: any; timestamp: string }> = [];
+
+    // Add messages
+    messages.forEach(msg => {
+      items.push({
+        type: 'message',
+        data: msg,
+        timestamp: msg.timestamp
+      });
+    });
+
+    // Add persisted research cards
+    if (persistedResearchCards) {
+      console.log('📚 Persisted research cards found:', persistedResearchCards);
+      persistedResearchCards.forEach(cardBatch => {
+        console.log('📦 Processing card batch:', cardBatch);
+        items.push({
+          type: 'cards',
+          data: {
+            cards: cardBatch.cards.map(card => ({
+              author_name: card.author_name,
+              author_title: card.author_title,
+              content: card.post_content,
+              likes: card.likes,
+              time_posted: card.time_posted,
+              url: card.profile_url,
+              hook: card.post_content ? card.post_content.split('.')[0] : '',  // Use first sentence as hook
+              engagement_score: 0,
+              hook_type: ''
+            })),
+            query: cardBatch.query,
+            mode: cardBatch.search_mode
+          },
+          timestamp: cardBatch.created_at
+        });
+      });
+    } else {
+      console.log('📚 No persisted research cards');
+    }
+
+    // Sort by timestamp
+    const sorted = items.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+    console.log('📝 Merged content items:', sorted);
+    return sorted;
+  };
+
+  const mergedContent = getMessagesWithCards();
 
   useEffect(() => {
     // Initialize with a welcome message if no conversation exists
     if (!activeConversationId && messages.length === 0) {
       dispatch(startNewConversation());
     }
+  }, []);
+
+  // Auto-scroll to bottom when new messages arrive or when streaming
+  useEffect(() => {
+    if (messagesContainerRef.current) {
+      messagesContainerRef.current.scrollTo({
+        top: messagesContainerRef.current.scrollHeight,
+        behavior: 'smooth'
+      });
+    }
+  }, [messages, currentStreamingMessage]);
+
+  // Add keyboard listener for End key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'End' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        if (messagesContainerRef.current) {
+          messagesContainerRef.current.scrollTo({
+            top: messagesContainerRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
   const handleSend = async () => {
@@ -65,7 +161,10 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
 
       const messageText = inputValue;
       setInputValue('');
-      
+
+      // Clear research cards when sending new message
+      dispatch(clearResearchCards());
+
       // Build context with live content and post_id
       const context: { post_id?: string; content?: string } = {};
 
@@ -108,14 +207,11 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
   };
 
   return (
-    <div className="h-full flex flex-col bg-white rounded-lg shadow-sm overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden rounded-lg">
       {/* Chat Header */}
-      <div className="border-b p-4 flex-shrink-0">
-        <div className="flex justify-between items-start">
-          <div>
-            <h2 className="text-lg font-semibold">AI Post Generator</h2>
-            <p className="text-sm text-gray-500">Chat with AI to create your LinkedIn post</p>
-          </div>
+      <div className="p-4 flex-shrink-0 min-h-[60px]">
+        <div className="flex justify-between items-center h-full">
+          <div></div>
           {showToggle && (
             <Button
               onClick={onToggleView}
@@ -131,42 +227,73 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       </div>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
-        {messages.length === 0 && (
+      <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 custom-scrollbar">
+        {mergedContent.length === 0 && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900">
-              <p className="text-sm">I'll help you generate an engaging LinkedIn post. What topic would you like to write about?</p>
+            <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900 break-words">
+              <div className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{renderMarkdownText("Type in here to ideate your idea further")}</div>
             </div>
           </div>
         )}
-        
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[80%] rounded-lg p-3 ${
-                message.role === 'user'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-900'
-              }`}
-            >
-              <p className="text-sm">{message.content}</p>
-              <p className={`text-xs mt-1 ${
-                message.role === 'user' ? 'text-white/70' : 'text-gray-500'
-              }`}>
-                {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </p>
-            </div>
-          </div>
-        ))}
-        
+
+        {mergedContent.map((item, index) => {
+          if (item.type === 'message') {
+            const message = item.data;
+            return (
+              <div
+                key={message.id}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-lg p-3 ${
+                    message.role === 'user'
+                      ? 'bg-primary text-white'
+                      : 'bg-gray-100 text-gray-900'
+                  } break-words`}
+                >
+                  <div className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{renderMarkdownText(message.content)}</div>
+                  <p className={`text-xs mt-1 ${
+                    message.role === 'user' ? 'text-white/70' : 'text-gray-500'
+                  }`}>
+                    {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </div>
+            );
+          } else if (item.type === 'cards') {
+            return (
+              <ResearchCards
+                key={`cards-${index}`}
+                cards={item.data.cards}
+                query={item.data.query}
+                mode={item.data.mode}
+                onCardClick={(card) => {
+                  console.log('Card clicked:', card);
+                }}
+              />
+            );
+          }
+          return null;
+        })}
+
+        {/* Research Cards - Show after user message, before AI response */}
+        {researchCards && (
+          <ResearchCards
+            cards={researchCards.cards}
+            query={researchCards.query}
+            mode={researchCards.mode}
+            onCardClick={(card) => {
+              // Optional: Handle card clicks, e.g., copy content or use as inspiration
+              console.log('Card clicked:', card);
+            }}
+          />
+        )}
+
         {/* Streaming Message */}
         {isStreaming && currentStreamingMessage && (
           <div className="flex justify-start">
-            <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900">
-              <p className="text-sm">{currentStreamingMessage}</p>
+            <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900 break-words">
+              <div className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{renderMarkdownText(currentStreamingMessage)}</div>
               <div className="flex items-center gap-1 mt-2">
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
                 <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
@@ -184,7 +311,7 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
                 <div className="flex items-center gap-2">
                   <Loader2 className="w-4 h-4 animate-spin text-gray-600" />
                   <span className="text-sm text-gray-600">
-                    {currentToolStatus.message}
+                    {renderMarkdownText(currentToolStatus.message)}
                   </span>
                 </div>
               ) : (
@@ -200,24 +327,50 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       </div>
 
       {/* Input Area */}
-      <div className="border-t p-4 flex-shrink-0">
-        <div className="flex gap-2">
+      <div className="p-4 flex-shrink-0 space-y-3">
+        {/* Example prompts - only show when no messages */}
+        {messages.length === 0 && (
+          <div className="flex flex-wrap gap-2 justify-center">
+            <button
+              onClick={() => setInputValue("Analyze trending topics in my industry")}
+              className="px-3 py-1.5 bg-white border border-gray-300 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+            >
+              Analyze trends
+            </button>
+            <button
+              onClick={() => setInputValue("Edit my LinkedIn post for better engagement")}
+              className="px-3 py-1.5 bg-white border border-gray-300 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+            >
+              Improve engagement
+            </button>
+            <button
+              onClick={() => setInputValue("Generate hooks for my LinkedIn content")}
+              className="px-3 py-1.5 bg-white border border-gray-300 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
+            >
+              Create hooks
+            </button>
+          </div>
+        )}
+
+        <div className="flex gap-2 items-center bg-gray-100 rounded-lg p-2">
           {/* Tool Selector Buttons */}
-          <div className="flex flex-col gap-2">
+          <div className="flex gap-2 pl-2">
             {AVAILABLE_TOOLS.map(tool => {
               const Icon = tool.icon;
               const isSelected = selectedTools.includes(tool.id);
               return (
-                <Button
+                <button
                   key={tool.id}
                   onClick={() => toggleTool(tool.id)}
-                  variant={isSelected ? "default" : "outline"}
-                  size="sm"
                   title={tool.description}
-                  className="h-8 w-8 p-0"
+                  className={`h-8 w-8 p-0 flex items-center justify-center rounded transition-colors ${
+                    isSelected
+                      ? 'text-primary'
+                      : 'text-gray-500 hover:text-gray-700'
+                  }`}
                 >
-                  <Icon className="w-4 h-4" />
-                </Button>
+                  <Icon className="w-5 h-5" />
+                </button>
               );
             })}
           </div>
@@ -227,15 +380,21 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message here..."
-            className="flex-1 min-h-[80px] max-h-[200px] p-3 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
+            className="flex-1 h-8 p-1.5 bg-transparent border-none resize-none focus:outline-none overflow-hidden"
+            rows={1}
+            style={{ lineHeight: '1.25rem' }}
           />
-          <Button
+          <button
             onClick={handleSend}
-            className={`self-end ${(!inputValue.trim() || isStreaming) ? 'opacity-50' : ''}`}
+            className={`h-8 w-8 flex items-center justify-center rounded transition-colors ${
+              (!inputValue.trim() || isStreaming)
+                ? 'text-gray-400'
+                : 'text-primary hover:text-primary/80'
+            }`}
             disabled={false}
           >
-            <Send className="w-4 h-4" />
-          </Button>
+            <Send className="w-5 h-5" />
+          </button>
         </div>
       </div>
     </div>

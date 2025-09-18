@@ -1,8 +1,11 @@
 import { useState, useEffect } from 'react';
-import { ChevronRight, Heart } from 'lucide-react';
+import { ChevronRight, MoreHorizontal } from 'lucide-react';
 import { useAuth } from '@clerk/react-router';
 import TrendingPostsModal from './TrendingPostsModal';
 import { API_CONFIG } from '@/shared/config/api';
+import ThumbIcon from '@/lib/icons/thumb.svg?react';
+import HeartIcon from '@/lib/icons/heart.svg?react';
+import ClapIcon from '@/lib/icons/clap.svg?react';
 
 interface ViralPost {
   id: string;
@@ -29,12 +32,16 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
   const [selectedPosts, setSelectedPosts] = useState<any[]>([]);
   const [previewPosts, setPreviewPosts] = useState<ViralPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
   const { getToken } = useAuth();
 
-  // Fetch AI posts on component mount
+  // Fetch AI posts only on initial mount or when topics actually change
   useEffect(() => {
-    fetchAIPosts();
-  }, []);
+    // Only fetch if we don't have posts yet
+    if (previewPosts.length === 0) {
+      fetchAIPosts();
+    }
+  }, []); // Remove topics dependency to prevent re-fetching
 
   // Notify parent when selection changes
   useEffect(() => {
@@ -50,8 +57,11 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
         return;
       }
 
+      // Use provided topics or default to startup content
+      const searchQuery = topics || 'startup';
+
       const params = new URLSearchParams({
-        q: 'recruiting',
+        q: searchQuery,
         limit: '4',
         sort_by: 'likes'
       });
@@ -82,7 +92,8 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
         const formattedPosts = data.posts.slice(0, 4).map((post: any) => ({
           id: post.id,
           title: post.author_name,
-          content: post.hook || post.content_preview,
+          content: post.content || post.hook || post.content_preview,
+          content_preview: post.content_preview || post.hook || (post.content ? post.content.substring(0, 150) : ''),
           likes: post.likes > 1000 ? `${(post.likes / 1000).toFixed(1)}K` : post.likes.toString(),
           comments: post.comments > 1000 ? `${(post.comments / 1000).toFixed(1)}K` : post.comments.toString(),
           views: post.likes ? `${(post.likes * 10 / 1000).toFixed(0)}K` : '0',
@@ -118,10 +129,13 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
     const formattedPosts = posts.slice(0, 4).map(post => ({
       id: post.id,
       title: post.author_name,
-      content: post.hook || post.content_preview,
+      content: post.content || post.hook || post.content_preview,
+      content_preview: post.content_preview || post.hook || (post.content ? post.content.substring(0, 150) : ''),
       likes: post.likes > 1000 ? `${(post.likes / 1000).toFixed(1)}K` : post.likes.toString(),
       comments: post.comments > 1000 ? `${(post.comments / 1000).toFixed(1)}K` : post.comments.toString(),
-      views: post.likes ? `${(post.likes * 10 / 1000).toFixed(0)}K` : '0'
+      views: post.likes ? `${(post.likes * 10 / 1000).toFixed(0)}K` : '0',
+      author_title: post.author_title,
+      time_posted: post.time_posted
     }));
     setPreviewPosts(formattedPosts);
   };
@@ -148,29 +162,37 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+        <div className="columns-1 md:columns-2 gap-3 space-y-3">
           {isLoading ? (
             // Loading skeleton
             [...Array(4)].map((_, i) => (
               <div
                 key={i}
-                className="relative bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-3"
+                className="bg-white rounded-lg shadow-sm border border-gray-200 p-3 break-inside-avoid mb-3"
               >
                 <div className="animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                  <div className="flex gap-2 mb-3">
+                    <div className="w-9 h-9 bg-gray-200 rounded-full"></div>
+                    <div className="flex-1">
+                      <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+                    </div>
+                  </div>
+                  <div className="h-3 bg-gray-200 rounded w-full mb-1"></div>
                   <div className="h-3 bg-gray-200 rounded w-full mb-1"></div>
                   <div className="h-3 bg-gray-200 rounded w-2/3 mb-3"></div>
-                  <div className="flex gap-3">
-                    <div className="h-3 bg-gray-200 rounded w-12"></div>
-                    <div className="h-3 bg-gray-200 rounded w-12"></div>
-                    <div className="h-3 bg-gray-200 rounded w-12"></div>
-                  </div>
+                  <div className="h-3 bg-gray-200 rounded w-12"></div>
                 </div>
               </div>
             ))
           ) : previewPosts.length > 0 ? (
             previewPosts.map((post: any) => {
               const isSelected = selectedPosts.some(p => p.id === post.id);
+              const isExpanded = expandedPosts.has(post.id);
+              // Check if content has line breaks or is long enough to need truncation
+              const lines = post.content ? post.content.split('\n').length : 0;
+              const needsExpansion = post.content && (post.content.length > 120 || lines > 3);
+
               return (
                 <div
                   key={post.id}
@@ -181,28 +203,85 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
                       setSelectedPosts(selectedPosts.filter(p => p.id !== post.id));
                     }
                   }}
-                  className="group relative bg-gradient-to-br from-gray-50 to-white rounded-xl border border-gray-200 p-3 hover:shadow-lg hover:border-primary/20 transition-all duration-200 cursor-pointer"
+                  className={`bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-all duration-200 break-inside-avoid mb-3 cursor-pointer ${
+                    isSelected ? 'border-primary ring-2 ring-primary/20' : 'border-gray-200 hover:border-gray-300'
+                  }`}
                 >
-                  <div className="absolute top-2 right-2">
-                    <span className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${
-                      isSelected ? 'bg-primary/10 text-primary' : 'bg-green-100 text-green-800'
-                    }`}>
-                      {isSelected ? 'Selected' : 'Trending'}
-                    </span>
+                  {/* Post Header */}
+                  <div className="p-3 pb-2">
+                    <div className="flex items-start justify-between">
+                      <div className="flex gap-2">
+                        <div className="w-9 h-9 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xs font-semibold flex-shrink-0">
+                          {post.title ? post.title.split(' ').map((n: string) => n[0]).join('').substring(0, 2) : 'UN'}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <h3 className="text-sm font-semibold text-gray-900 truncate hover:text-blue-600 cursor-pointer">
+                            {post.title}
+                          </h3>
+                          <p className="text-xs text-gray-500">
+                            {post.time_posted || '2h'} • 🌐
+                          </p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        {isSelected && (
+                          <div className="px-2 py-0.5 bg-primary text-white text-xs font-medium rounded">
+                            Selected
+                          </div>
+                        )}
+                        <button
+                          onClick={(e) => e.stopPropagation()}
+                          className="p-0.5 hover:bg-gray-100 rounded"
+                        >
+                          <MoreHorizontal className="w-4 h-4 text-gray-600" />
+                        </button>
+                      </div>
+                    </div>
                   </div>
 
-                  <h3 className="font-semibold text-sm text-gray-900 mb-1.5 pr-12 line-clamp-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-xs text-gray-600 line-clamp-2 mb-3">
-                    {post.content}
-                  </p>
+                  {/* Post Content */}
+                  <div className="px-3 pb-2">
+                    <p className={`text-xs text-gray-900 whitespace-pre-wrap ${!isExpanded ? 'line-clamp-3' : ''}`}>
+                      {post.content}
+                    </p>
+                    {needsExpansion && !isExpanded && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedPosts(prev => new Set(prev).add(post.id));
+                        }}
+                        className="text-gray-600 hover:underline font-medium text-xs"
+                      >
+                        see more
+                      </button>
+                    )}
+                    {isExpanded && needsExpansion && (
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setExpandedPosts(prev => {
+                            const newSet = new Set(prev);
+                            newSet.delete(post.id);
+                            return newSet;
+                          });
+                        }}
+                        className="text-gray-600 hover:underline font-medium text-xs mt-1"
+                      >
+                        see less
+                      </button>
+                    )}
+                  </div>
 
-                  <div className="flex items-center gap-3 text-xs text-gray-500">
-                    <span className="flex items-center gap-1">
-                      <Heart className="w-3 h-3" />
-                      {post.likes}
-                    </span>
+                  {/* Engagement Stats */}
+                  <div className="px-3 py-2 flex items-center text-xs text-gray-500 border-t">
+                    <div className="flex items-center gap-1">
+                      <div className="flex -space-x-1">
+                        <ThumbIcon className="w-3.5 h-3.5" />
+                        <HeartIcon className="w-3.5 h-3.5" />
+                        <ClapIcon className="w-3.5 h-3.5" />
+                      </div>
+                      <span className="ml-1">{post.likes}</span>
+                    </div>
                   </div>
                 </div>
               );

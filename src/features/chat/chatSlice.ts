@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { chatService } from './chatService';
-import type { ChatState, Message, SSEEvent, ToolStatus, MessageContext, GeneratedPost, SaveStatus, ConversationHistoryResponse } from './chatTypes';
+import type { ChatState, Message, SSEEvent, ToolStatus, MessageContext, GeneratedPost, SaveStatus, ResearchCardsData } from './chatTypes';
 import { toast } from 'sonner';
 import { postService } from '../post/postService';
 
@@ -14,6 +14,8 @@ const initialState: ChatState = {
   error: null,
   generatedPost: null,
   saveStatus: 'saved',
+  researchCards: null,
+  persistedResearchCards: null,
 };
 
 // Async thunk for saving draft to database
@@ -88,6 +90,10 @@ export const sendMessage = createAsyncThunk(
                   id: event.data.result.content_id
                 }));
               }
+              break;
+            case 'research_cards':
+              // Handle research cards from LinkedIn Research tool
+              dispatch(setResearchCards(event.data));
               break;
             case 'done':
               dispatch(completeStreaming(event.data.conversation_id));
@@ -229,6 +235,8 @@ const chatSlice = createSlice({
       state.currentStreamingMessage = '';
       state.isStreaming = false;
       state.error = null;
+      state.researchCards = null;
+      state.persistedResearchCards = null;
     },
     
     setGeneratedPost: (state, action: PayloadAction<GeneratedPost>) => {
@@ -263,34 +271,19 @@ const chatSlice = createSlice({
     clearGeneratedPost: (state) => {
       state.generatedPost = null;
     },
-    
+
     setSaveStatus: (state, action: PayloadAction<SaveStatus>) => {
       state.saveStatus = action.payload;
     },
-    
-    loadConversation: (state, action: PayloadAction<ConversationHistoryResponse | null>) => {
-      if (!action.payload) return;
-      
-      const { conversation, messages } = action.payload;
-      
-      // Set the conversation with loaded messages
-      if (conversation && messages) {
-        const conversationId = conversation.id;
-        state.conversations[conversationId] = {
-          conversation_id: conversationId,
-          messages: messages.map(msg => ({
-            id: msg.id,
-            role: msg.role as 'user' | 'assistant',
-            content: msg.content,
-            timestamp: msg.created_at,
-          })),
-          title: conversation.title,
-          createdAt: conversation.created_at,
-          updatedAt: conversation.updated_at,
-        };
-        state.activeConversationId = conversationId;
-      }
+
+    setResearchCards: (state, action: PayloadAction<ResearchCardsData>) => {
+      state.researchCards = action.payload;
     },
+
+    clearResearchCards: (state) => {
+      state.researchCards = null;
+    },
+    
   },
   extraReducers: (builder) => {
     builder
@@ -311,8 +304,8 @@ const chatSlice = createSlice({
       })
       .addCase(loadConversationHistory.fulfilled, (state, action) => {
         if (action.payload) {
-          const { conversation, messages } = action.payload;
-          
+          const { conversation, messages, research_cards } = action.payload;
+
           if (conversation && messages) {
             const conversationId = conversation.id;
             state.conversations[conversationId] = {
@@ -328,6 +321,12 @@ const chatSlice = createSlice({
               updatedAt: conversation.updated_at,
             };
             state.activeConversationId = conversationId;
+          }
+
+          // Load persisted research cards if available
+          if (research_cards) {
+            console.log('✅ Loading persisted research cards from API:', research_cards);
+            state.persistedResearchCards = research_cards;
           }
         }
       });
@@ -349,7 +348,8 @@ export const {
   replaceGeneratedPostContent,
   clearGeneratedPost,
   setSaveStatus,
-  loadConversation,
+  setResearchCards,
+  clearResearchCards,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

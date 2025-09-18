@@ -1,9 +1,12 @@
 import { useState, useEffect, useCallback } from 'react';
-import { X, Search, Filter, Heart, MessageCircle, ChevronDown, Loader2, Check } from 'lucide-react';
+import { X, Search, Filter, Loader2, MoreHorizontal } from 'lucide-react';
 import { Button } from '../ui/button';
 import { debounce } from 'lodash';
 import { API_CONFIG } from '@/shared/config/api';
 import { toast } from 'sonner';
+import ThumbIcon from '@/lib/icons/thumb.svg?react';
+import HeartIcon from '@/lib/icons/heart.svg?react';
+import ClapIcon from '@/lib/icons/clap.svg?react';
 
 interface SearchPost {
   id: string;
@@ -260,7 +263,7 @@ export default function TrendingPostsModal({
               showPreview ? 'border-primary bg-primary/10 text-primary' : 'border-gray-200 hover:bg-gray-50'
             }`}
           >
-            <span className="hidden sm:inline">Preview</span> ({selectedPostsArray.length})
+            Preview
           </button>
 
           {totalResults > 0 && (
@@ -300,90 +303,103 @@ export default function TrendingPostsModal({
                 return (
                   <div
                     key={post.id}
-                    className={`relative bg-gray-50 rounded-xl border-2 p-4 transition-all duration-200 ${
+                    onClick={() => togglePostSelection(post)}
+                    className={`bg-white rounded-lg shadow-sm border overflow-hidden relative flex flex-col transition-all duration-200 cursor-pointer ${
                       isSelected
-                        ? 'border-primary bg-primary/5'
-                        : 'border-gray-200 hover:shadow-md'
+                        ? 'border-primary ring-2 ring-primary/20'
+                        : 'border-gray-200 hover:shadow-md hover:border-gray-300'
                     }`}
                   >
-                    {/* Selection Checkbox */}
-                    <button
-                      onClick={() => togglePostSelection(post)}
-                      className={`absolute top-4 right-4 w-6 h-6 rounded border-2 flex items-center justify-center transition-colors ${
-                        isSelected
-                          ? 'bg-primary border-primary'
-                          : 'bg-white border-gray-300 hover:border-gray-400'
-                      }`}
-                    >
-                      {isSelected && <Check className="w-4 h-4 text-white" />}
-                    </button>
-
-                    {/* Author Info */}
-                    <div className="flex items-start justify-between mb-3 pr-8">
-                      <div>
-                        <h3 className="font-semibold text-gray-900">{post.author_name}</h3>
-                        <p className="text-xs text-gray-500">{post.author_title}</p>
-                      </div>
-                      <span className="text-xs text-gray-500">{post.time_posted}</span>
-                    </div>
-
-                    {/* Hook */}
-                    {post.hook && (
-                      <p className="font-medium text-gray-800 mb-3">{post.hook}</p>
-                    )}
-
-                    {/* Content */}
-                    <div className="text-sm text-gray-700 mb-3">
-                      {isExpanded ? (
-                        <div className="whitespace-pre-wrap">{post.content}</div>
-                      ) : (
-                        <p>{post.content_preview}</p>
-                      )}
-                      {post.content && post.content.length > post.content_preview.length && (
-                        <button
-                          onClick={() => togglePostExpansion(post.id)}
-                          className="text-primary hover:text-primary/80 font-medium mt-2 flex items-center gap-1"
-                        >
-                          {isExpanded ? 'Show less' : 'Read more'}
-                          <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Hashtags */}
-                    {post.hashtags && post.hashtags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {post.hashtags.map((tag, index) => (
-                          <span
-                            key={index}
-                            className="text-xs text-primary bg-primary/10 px-2 py-1 rounded"
+                    {/* Post Header */}
+                    <div className="p-4 pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex gap-3">
+                          <div className="w-12 h-12 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 font-semibold flex-shrink-0">
+                            {post.author_name.split(' ').map(n => n[0]).join('')}
+                          </div>
+                          <div className="flex-1">
+                            <h3 className="font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
+                              {post.author_name}
+                            </h3>
+                            <p className="text-xs text-gray-500">
+                              {post.time_posted} • 🌐
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          {isSelected && (
+                            <div className="px-3 py-1 bg-primary text-white text-sm font-medium rounded">
+                              Selected
+                            </div>
+                          )}
+                          <button
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1 hover:bg-gray-100 rounded"
                           >
-                            {tag}
-                          </span>
-                        ))}
+                            <MoreHorizontal className="w-5 h-5 text-gray-600" />
+                          </button>
+                        </div>
                       </div>
-                    )}
+                    </div>
+
+                    {/* Post Content */}
+                    <div className="px-4 pb-3">
+                      <p className="text-sm text-gray-900 whitespace-pre-wrap">
+                        {isExpanded ? (
+                          post.content || post.hook
+                        ) : (
+                          post.content_preview || post.hook || post.content.substring(0, 280)
+                        )}
+                        {post.content && post.content.length > 280 && !isExpanded && (
+                          <>
+                            {'... '}
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                togglePostExpansion(post.id);
+                              }}
+                              className="text-gray-600 hover:underline font-medium"
+                            >
+                              see more
+                            </button>
+                          </>
+                        )}
+                        {isExpanded && post.content && post.content.length > 280 && (
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              togglePostExpansion(post.id);
+                            }}
+                            className="block text-gray-600 hover:underline font-medium mt-2"
+                          >
+                            see less
+                          </button>
+                        )}
+                      </p>
+                      {post.hashtags && post.hashtags.length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-3">
+                          {post.hashtags.map((tag, index) => (
+                            <span
+                              key={index}
+                              className="text-xs text-blue-600 hover:underline cursor-pointer"
+                            >
+                              {tag.startsWith('#') ? tag : `#${tag}`}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
 
                     {/* Engagement Stats */}
-                    <div className="flex items-center gap-4 text-xs text-gray-500 pt-3 border-t">
-                      <span className="flex items-center gap-1">
-                        <Heart className="w-3 h-3" />
-                        {post.likes.toLocaleString()}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <MessageCircle className="w-3 h-3" />
-                        {post.comments}
-                      </span>
-                      {post.post_url && (
-                        <a
-                          href={post.post_url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="ml-auto text-primary hover:text-primary/80"
-                        >
-                          View on LinkedIn →
-                        </a>
-                      )}
+                    <div className="px-4 py-3 flex items-center text-xs text-gray-500 border-t">
+                      <div className="flex items-center gap-1">
+                        <div className="flex -space-x-1">
+                          <ThumbIcon className="w-4 h-4" />
+                          <HeartIcon className="w-4 h-4" />
+                          <ClapIcon className="w-4 h-4" />
+                        </div>
+                        <span className="ml-1">{post.likes.toLocaleString()}</span>
+                      </div>
                     </div>
                   </div>
                 );
@@ -442,29 +458,40 @@ export default function TrendingPostsModal({
                   {selectedPostsArray.map((post) => (
                     <div
                       key={post.id}
-                      className="bg-white rounded-lg border border-gray-200 p-3"
+                      className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
                     >
-                      <div className="flex items-start justify-between mb-2">
-                        <div className="flex-1">
-                          <p className="font-medium text-sm text-gray-900">{post.author_name}</p>
-                          <p className="text-xs text-gray-500 line-clamp-2">{post.hook || post.content_preview}</p>
+                      {/* Mini Post Header */}
+                      <div className="p-3">
+                        <div className="flex items-start justify-between">
+                          <div className="flex gap-2">
+                            <div className="w-8 h-8 bg-gray-300 rounded-full flex items-center justify-center text-gray-600 text-xs font-semibold flex-shrink-0">
+                              {post.author_name.split(' ').map(n => n[0]).join('')}
+                            </div>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-xs font-semibold text-gray-900 truncate">{post.author_name}</p>
+                              <p className="text-xs text-gray-500">{post.time_posted}</p>
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => togglePostSelection(post)}
+                            className="text-gray-400 hover:text-gray-600 ml-2"
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
                         </div>
-                        <button
-                          onClick={() => togglePostSelection(post)}
-                          className="ml-2 text-gray-400 hover:text-gray-600"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
+                        <p className="text-xs text-gray-700 mt-2 line-clamp-2">
+                          {post.content_preview || post.hook || post.content.substring(0, 100)}
+                        </p>
                       </div>
-                      <div className="flex items-center gap-3 text-xs text-gray-500">
-                        <span className="flex items-center gap-1">
-                          <Heart className="w-3 h-3" />
-                          {post.likes.toLocaleString()}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <MessageCircle className="w-3 h-3" />
-                          {post.comments}
-                        </span>
+                      {/* Mini Stats */}
+                      <div className="px-3 py-1.5 bg-gray-50 flex items-center justify-between text-xs text-gray-500">
+                        <div className="flex items-center gap-1">
+                          <div className="flex -space-x-1">
+                            <ThumbIcon className="w-3 h-3" />
+                            <HeartIcon className="w-3 h-3" />
+                          </div>
+                          <span className="ml-1">{post.likes.toLocaleString()}</span>
+                        </div>
                       </div>
                     </div>
                   ))}

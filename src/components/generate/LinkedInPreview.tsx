@@ -1,7 +1,10 @@
-import { useState } from 'react';
-import { Heart, MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Lightbulb, Calendar, Image, X, Check, Loader2, AlertCircle, MessageSquare } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, Image, X, MessageSquare } from 'lucide-react';
 import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
+import ThumbIcon from '@/lib/icons/thumb.svg?react';
+import HeartIcon from '@/lib/icons/heart.svg?react';
+import ClapIcon from '@/lib/icons/clap.svg?react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateGeneratedPostContent, saveDraftToDatabase } from '@/features/chat/chatSlice';
 import { schedulePost } from '@/features/post/postSlice';
@@ -26,7 +29,6 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
 
   // Use Clerk user data with fallbacks
   const userName = user?.fullName || user?.firstName || "Your Name";
-  const userTitle = "Product Manager | Tech Enthusiast"; // You might want to make this editable or pull from user metadata
   const userAvatar = user?.imageUrl || "";
 
   const [viewSize, setViewSize] = useState<ViewSize>('desktop');
@@ -34,9 +36,28 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [postImage, setPostImage] = useState<string | null>(null);
   const [isEditingContent, setIsEditingContent] = useState(false);
+  const previewContainerRef = useRef<HTMLDivElement>(null);
 
   const postContent = generatedPost?.content || "Your LinkedIn post content will appear here as you generate it...";
   const postId = generatedPost?.id;
+
+  // Add keyboard listener for End key
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'End' && !e.shiftKey && !e.ctrlKey && !e.metaKey) {
+        e.preventDefault();
+        if (previewContainerRef.current) {
+          previewContainerRef.current.scrollTo({
+            top: previewContainerRef.current.scrollHeight,
+            behavior: 'smooth'
+          });
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handleSchedule = async (date: Date) => {
     try {
@@ -92,7 +113,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   };
   
   const getPreviewWidth = () => {
-    return viewSize === 'mobile' ? 'max-w-sm' : 'w-full max-w-2xl';
+    return viewSize === 'mobile' ? 'w-[375px]' : 'w-[552px]';
   };
   
   const getTruncatedContent = () => {
@@ -146,31 +167,52 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   const reposts = 8;
 
   return (
-    <div className="h-full flex flex-col bg-white rounded-lg shadow-sm overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden bg-gray-100 rounded-lg border border-gray-300">
       {/* Preview Header */}
-      <div className="border-b">
-        <div className="p-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center justify-between flex-1">
-              <div>
-                <h2 className="text-lg font-semibold">LinkedIn Preview</h2>
-                <p className="text-sm text-gray-500">See how your post will look</p>
-              </div>
-              {showToggle && (
-                <Button
-                  onClick={onToggleView}
-                  variant="outline"
-                  size="sm"
-                  className="lg:hidden mr-4"
-                >
-                  <MessageSquare className="w-4 h-4 mr-2" />
-                  Chat
-                </Button>
-              )}
+      <div className="p-4">
+        <div className="bg-transparent rounded-lg p-2 min-h-[48px] flex items-center">
+          <div className="flex items-center justify-between w-full relative">
+            {showToggle && (
+              <Button
+                onClick={onToggleView}
+                variant="outline"
+                size="sm"
+                className="lg:hidden"
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Chat
+              </Button>
+            )}
+
+            {/* Desktop/Mobile Toggle - Centered */}
+            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-4">
+              <button
+                onClick={() => setViewSize('desktop')}
+                className={`p-2 transition-colors ${
+                  viewSize === 'desktop'
+                    ? 'text-primary'
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+                title="Desktop view"
+              >
+                <Monitor className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => setViewSize('mobile')}
+                className={`p-2 transition-colors ${
+                  viewSize === 'mobile'
+                    ? 'text-primary'
+                    : 'text-gray-400 hover:text-gray-600'
+                }`}
+                title="Mobile view"
+              >
+                <Smartphone className="w-5 h-5" />
+              </button>
             </div>
+
             {/* Save Status Indicator */}
-            {postId && (
-              <div className="flex items-center gap-2 text-sm">
+            {/* {postId && (
+              <div className="flex items-center gap-2 text-sm ml-auto">
                 {saveStatus === 'saving' && (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-gray-500" />
@@ -196,50 +238,22 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                   </>
                 )}
               </div>
-            )}
+            )} */}
           </div>
-        </div>
-        
-        {/* Size Toggle Buttons */}
-        <div className="border-t p-3 flex justify-center gap-1 bg-gray-50">
-          <button
-            onClick={() => setViewSize('desktop')}
-            className={`px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-              viewSize === 'desktop' 
-                ? 'bg-white shadow-sm border border-gray-300 text-primary' 
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-            title="Desktop view"
-          >
-            <Monitor className="w-4 h-4" />
-            <span className="text-xs font-medium">Desktop</span>
-          </button>
-          <button
-            onClick={() => setViewSize('mobile')}
-            className={`px-3 py-2 rounded-lg flex items-center gap-2 transition-colors ${
-              viewSize === 'mobile' 
-                ? 'bg-white shadow-sm border border-gray-300 text-primary' 
-                : 'text-gray-600 hover:bg-gray-100'
-            }`}
-            title="Mobile view"
-          >
-            <Smartphone className="w-4 h-4" />
-            <span className="text-xs font-medium">Mobile</span>
-          </button>
         </div>
       </div>
 
       {/* LinkedIn Post Preview */}
-      <div className="flex-1 overflow-y-auto bg-gray-100 relative">
-        <div className="p-4 flex justify-center items-center relative pb-24">
+      <div ref={previewContainerRef} className="flex-1 overflow-y-auto bg-gray-100 relative custom-scrollbar">
+        <div className="p-4 flex justify-center items-start relative min-h-full">
           {/* Post Card with responsive width */}
-          <div className={`bg-white border border-gray-200 rounded-lg ${getPreviewWidth()} transition-all duration-300`}>
+          <div className={`bg-white border border-gray-200 rounded-lg ${getPreviewWidth()}`}>
             {/* Post Header */}
             <div className="p-4">
               <div className="flex items-start justify-between">
-                <div className="flex gap-3">
+                <div className="flex gap-3 items-center">
                   {/* Avatar */}
-                  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center">
+                  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
                     {userAvatar ? (
                       <img src={userAvatar} alt={userName} className="w-full h-full rounded-full object-cover" />
                     ) : (
@@ -249,12 +263,11 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                     )}
                   </div>
                   {/* User Info */}
-                  <div className="flex-1">
+                  <div className="flex flex-col">
                     <h3 className="font-semibold text-gray-900 hover:text-blue-600 cursor-pointer">
                       {userName}
                     </h3>
-                    <p className="text-sm text-gray-600">{userTitle}</p>
-                    <p className="text-xs text-gray-500">Just now • 🌐</p>
+                    <p className="text-xs text-gray-500 mt-0.5">Just now • 🌐</p>
                   </div>
                 </div>
                 {/* More Options */}
@@ -271,20 +284,44 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                   value={postContent}
                   onChange={(e) => handleContentChange(e.target.value)}
                   onBlur={handleContentBlur}
-                  className="w-full min-h-[100px] p-2 border border-gray-300 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent text-gray-900"
+                  className="w-full p-2 border-2 border-dashed border-gray-300 rounded resize-none focus:outline-none focus:border-gray-400 text-gray-900 whitespace-pre-wrap bg-transparent"
                   autoFocus
+                  style={{
+                    minHeight: 'auto',
+                    height: 'auto',
+                    overflow: 'hidden',
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                    fontSize: '14px',
+                    lineHeight: '1.42857'
+                  }}
+                  ref={(textarea) => {
+                    if (textarea) {
+                      textarea.style.height = 'auto';
+                      textarea.style.height = `${textarea.scrollHeight}px`;
+                    }
+                  }}
+                  onInput={(e) => {
+                    const target = e.target as HTMLTextAreaElement;
+                    target.style.height = 'auto';
+                    target.style.height = `${target.scrollHeight}px`;
+                  }}
                 />
               ) : (
-                <p 
+                <div
                   className="text-gray-900 whitespace-pre-wrap cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
                   onClick={() => setIsEditingContent(true)}
                   title="Click to edit"
+                  style={{
+                    fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
+                    fontSize: '14px',
+                    lineHeight: '1.42857'
+                  }}
                 >
                   {displayContent}
                   {truncated && (
                     <>
                       {'... '}
-                      <button 
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setShowFullContent(true);
@@ -295,7 +332,21 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                       </button>
                     </>
                   )}
-                </p>
+                  {!truncated && showFullContent && postContent.split('\n').length > (viewSize === 'mobile' ? 2 : 4) && (
+                    <>
+                      {' '}
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setShowFullContent(false);
+                        }}
+                        className="text-gray-600 hover:underline font-medium"
+                      >
+                        see less
+                      </button>
+                    </>
+                  )}
+                </div>
               )}
               
               {/* Image Upload Area */}
@@ -328,15 +379,9 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             <div className="px-4 py-2 flex items-center justify-between text-xs text-gray-500">
               <div className="flex items-center gap-1">
                 <div className="flex -space-x-1">
-                  <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
-                    <ThumbsUp className="w-3 h-3 text-white fill-white" />
-                  </div>
-                  <div className="w-5 h-5 bg-yellow-400 rounded-full flex items-center justify-center">
-                    <Lightbulb className="w-3 h-3 text-white fill-white" />
-                  </div>
-                  <div className="w-5 h-5 bg-red-500 rounded-full flex items-center justify-center">
-                    <Heart className="w-3 h-3 text-white fill-white" />
-                  </div>
+                  <ThumbIcon className="w-4 h-4" />
+                  <HeartIcon className="w-4 h-4" />
+                  <ClapIcon className="w-4 h-4" />
                 </div>
                 <span className="ml-1">{reactions}</span>
               </div>
@@ -374,7 +419,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       </div>
 
       {/* Schedule Post Button - Fixed to bottom right of preview container */}
-      <div className="fixed bottom-8 right-8 z-50 lg:absolute lg:bottom-8 lg:right-8 lg:z-10">
+      <div className="absolute bottom-4 right-4 z-10">
         <Button
           onClick={() => setShowScheduleModal(true)}
           className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-6 py-3"
