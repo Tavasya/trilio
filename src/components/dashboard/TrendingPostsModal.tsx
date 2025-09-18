@@ -303,10 +303,11 @@ export default function TrendingPostsModal({
                 return (
                   <div
                     key={post.id}
-                    className={`bg-white rounded-lg shadow-sm border overflow-hidden relative flex flex-col transition-all duration-200 ${
+                    onClick={() => togglePostSelection(post)}
+                    className={`bg-white rounded-lg shadow-sm border overflow-hidden relative flex flex-col transition-all duration-200 cursor-pointer ${
                       isSelected
                         ? 'border-primary ring-2 ring-primary/20'
-                        : 'border-gray-200 hover:shadow-md'
+                        : 'border-gray-200 hover:shadow-md hover:border-gray-300'
                     }`}
                   >
                     {/* Post Header */}
@@ -326,17 +327,15 @@ export default function TrendingPostsModal({
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
+                          {isSelected && (
+                            <div className="px-3 py-1 bg-primary text-white text-sm font-medium rounded">
+                              Selected
+                            </div>
+                          )}
                           <button
-                            onClick={() => togglePostSelection(post)}
-                            className={`px-3 py-1 text-sm font-medium rounded transition-colors ${
-                              isSelected
-                                ? 'bg-primary text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                            }`}
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-1 hover:bg-gray-100 rounded"
                           >
-                            {isSelected ? 'Selected' : 'Select'}
-                          </button>
-                          <button className="p-1 hover:bg-gray-100 rounded">
                             <MoreHorizontal className="w-5 h-5 text-gray-600" />
                           </button>
                         </div>
@@ -355,7 +354,10 @@ export default function TrendingPostsModal({
                           <>
                             {'... '}
                             <button
-                              onClick={() => togglePostExpansion(post.id)}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                togglePostExpansion(post.id);
+                              }}
                               className="text-gray-600 hover:underline font-medium"
                             >
                               see more
@@ -364,7 +366,10 @@ export default function TrendingPostsModal({
                         )}
                         {isExpanded && post.content && post.content.length > 280 && (
                           <button
-                            onClick={() => togglePostExpansion(post.id)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              togglePostExpansion(post.id);
+                            }}
                             className="block text-gray-600 hover:underline font-medium mt-2"
                           >
                             see less
