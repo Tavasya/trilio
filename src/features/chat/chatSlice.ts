@@ -1,7 +1,7 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import { chatService } from './chatService';
-import type { ChatState, Message, SSEEvent, ToolStatus, MessageContext, GeneratedPost, SaveStatus, ConversationHistoryResponse } from './chatTypes';
+import type { ChatState, Message, SSEEvent, ToolStatus, MessageContext, GeneratedPost, SaveStatus, ConversationHistoryResponse, ResearchCardsData } from './chatTypes';
 import { toast } from 'sonner';
 import { postService } from '../post/postService';
 
@@ -14,6 +14,8 @@ const initialState: ChatState = {
   error: null,
   generatedPost: null,
   saveStatus: 'saved',
+  researchCards: null,
+  persistedResearchCards: null,
 };
 
 // Async thunk for saving draft to database
@@ -88,6 +90,10 @@ export const sendMessage = createAsyncThunk(
                   id: event.data.result.content_id
                 }));
               }
+              break;
+            case 'research_cards':
+              // Handle research cards from LinkedIn Research tool
+              dispatch(setResearchCards(event.data));
               break;
             case 'done':
               dispatch(completeStreaming(event.data.conversation_id));
@@ -229,6 +235,8 @@ const chatSlice = createSlice({
       state.currentStreamingMessage = '';
       state.isStreaming = false;
       state.error = null;
+      state.researchCards = null;
+      state.persistedResearchCards = null;
     },
     
     setGeneratedPost: (state, action: PayloadAction<GeneratedPost>) => {
@@ -263,16 +271,24 @@ const chatSlice = createSlice({
     clearGeneratedPost: (state) => {
       state.generatedPost = null;
     },
-    
+
     setSaveStatus: (state, action: PayloadAction<SaveStatus>) => {
       state.saveStatus = action.payload;
+    },
+
+    setResearchCards: (state, action: PayloadAction<ResearchCardsData>) => {
+      state.researchCards = action.payload;
+    },
+
+    clearResearchCards: (state) => {
+      state.researchCards = null;
     },
     
     loadConversation: (state, action: PayloadAction<ConversationHistoryResponse | null>) => {
       if (!action.payload) return;
-      
-      const { conversation, messages } = action.payload;
-      
+
+      const { conversation, messages, research_cards } = action.payload;
+
       // Set the conversation with loaded messages
       if (conversation && messages) {
         const conversationId = conversation.id;
@@ -289,6 +305,11 @@ const chatSlice = createSlice({
           updatedAt: conversation.updated_at,
         };
         state.activeConversationId = conversationId;
+      }
+
+      // Load persisted research cards if available
+      if (research_cards) {
+        state.persistedResearchCards = research_cards;
       }
     },
   },
@@ -349,6 +370,8 @@ export const {
   replaceGeneratedPostContent,
   clearGeneratedPost,
   setSaveStatus,
+  setResearchCards,
+  clearResearchCards,
   loadConversation,
 } = chatSlice.actions;
 

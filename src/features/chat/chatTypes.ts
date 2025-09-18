@@ -28,6 +28,24 @@ export interface GeneratedPost {
 
 export type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'error';
 
+export interface ResearchCard {
+  author_name: string;
+  author_title: string;
+  content: string;
+  likes: number;
+  time_posted: string;
+  url: string;
+  hook: string;
+  engagement_score?: number;
+  hook_type?: string;
+}
+
+export interface ResearchCardsData {
+  cards: ResearchCard[];
+  query: string;
+  mode: string;
+}
+
 export interface ChatState {
   conversations: Record<string, Conversation>;
   activeConversationId: string | null;
@@ -37,6 +55,8 @@ export interface ChatState {
   error: string | null;
   generatedPost: GeneratedPost | null;
   saveStatus: SaveStatus;
+  researchCards: ResearchCardsData | null;  // Current SSE research cards
+  persistedResearchCards: ResearchCardBatch[] | null;  // Historical cards from DB
 }
 
 // API Request Types
@@ -85,13 +105,33 @@ export interface ToolCallEvent {
   };
 }
 
-export type SSEEvent = 
+export type SSEEvent =
   | { type: 'conversation'; data: ConversationEvent }
   | { type: 'message'; data: MessageEvent }
   | { type: 'done'; data: DoneEvent }
   | { type: 'error'; data: ErrorEvent }
   | { type: 'tool_status'; data: ToolStatusEvent }
-  | { type: 'tool_call'; data: ToolCallEvent };
+  | { type: 'tool_call'; data: ToolCallEvent }
+  | { type: 'research_cards'; data: ResearchCardsData };
+
+// Research card batch from API (persisted cards)
+export interface ResearchCardBatch {
+  id: string;
+  conversation_id: string;
+  user_id: string;
+  query: string;
+  search_mode: string;
+  created_at: string;
+  cards: Array<{
+    author_name: string;
+    author_title: string;
+    post_content: string;
+    profile_url: string;
+    time_posted: string;
+    likes: number;
+    comments?: number;
+  }>;
+}
 
 // Conversation history response types
 export interface ConversationHistoryResponse {
@@ -110,4 +150,5 @@ export interface ConversationHistoryResponse {
     content: string;
     created_at: string;
   }>;
+  research_cards: ResearchCardBatch[] | null;  // NEW FIELD - persisted cards
 }

@@ -2,9 +2,10 @@ import { useState, useEffect, useRef } from 'react';
 import { Send, Search, Loader2, Eye } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { sendMessage, startNewConversation } from '@/features/chat/chatSlice';
+import { sendMessage, startNewConversation, clearResearchCards } from '@/features/chat/chatSlice';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
+import ResearchCards from './ResearchCards';
 
 // Define available tools with their metadata
 const AVAILABLE_TOOLS = [
@@ -47,14 +48,61 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
     currentStreamingMessage,
     isStreaming,
     currentToolStatus,
-    generatedPost
+    generatedPost,
+    researchCards,
+    persistedResearchCards
   } = useAppSelector((state) => state.chat);
+
 
   const currentConversation = activeConversationId
     ? conversations[activeConversationId]
     : null;
 
   const messages = currentConversation?.messages || [];
+
+  // Merge messages with persisted research cards chronologically
+  const getMessagesWithCards = () => {
+    const items: Array<{ type: 'message' | 'cards'; data: any; timestamp: string }> = [];
+
+    // Add messages
+    messages.forEach(msg => {
+      items.push({
+        type: 'message',
+        data: msg,
+        timestamp: msg.timestamp
+      });
+    });
+
+    // Add persisted research cards
+    if (persistedResearchCards) {
+      persistedResearchCards.forEach(cardBatch => {
+        items.push({
+          type: 'cards',
+          data: {
+            cards: cardBatch.cards.map(card => ({
+              author_name: card.author_name,
+              author_title: card.author_title,
+              content: card.post_content,
+              likes: card.likes,
+              time_posted: card.time_posted,
+              url: card.profile_url,
+              hook: card.post_content.split('.')[0],  // Use first sentence as hook
+              engagement_score: 0,
+              hook_type: ''
+            })),
+            query: cardBatch.query,
+            mode: cardBatch.search_mode
+          },
+          timestamp: cardBatch.created_at
+        });
+      });
+    }
+
+    // Sort by timestamp
+    return items.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
+  };
+
+  const mergedContent = getMessagesWithCards();
 
   useEffect(() => {
     // Initialize with a welcome message if no conversation exists
@@ -107,7 +155,10 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
 
       const messageText = inputValue;
       setInputValue('');
-      
+
+      // Clear research cards when sending new message
+      dispatch(clearResearchCards());
+
       // Build context with live content and post_id
       const context: { post_id?: string; content?: string } = {};
 
@@ -171,36 +222,67 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
 
       {/* Messages Area */}
       <div ref={messagesContainerRef} className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0 custom-scrollbar">
-        {messages.length === 0 && (
+        {mergedContent.length === 0 && (
           <div className="flex justify-start">
             <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900 break-words">
               <div className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{renderMarkdownText("I'll help you generate an engaging LinkedIn post. What topic would you like to write about?")}</div>
             </div>
           </div>
         )}
-        
-        {messages.map((message) => (
-          <div
-            key={message.id}
-            className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-          >
-            <div
-              className={`max-w-[80%] rounded-lg p-3 ${
-                message.role === 'user'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-100 text-gray-900'
-              } break-words`}
-            >
-              <div className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{renderMarkdownText(message.content)}</div>
-              <p className={`text-xs mt-1 ${
-                message.role === 'user' ? 'text-white/70' : 'text-gray-500'
-              }`}>
-                {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-              </p>
-            </div>
-          </div>
-        ))}
-        
+
+        {mergedContent.map((item, index) => {
+          if (item.type === 'message') {
+            const message = item.data;
+            return (
+              <div
+                key={message.id}
+                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
+              >
+                <div
+                  className={`max-w-[80%] rounded-lg p-3 ${
+                    message.role === 'user'
+                      ? 'bg-primary text-white'
+                      : 'bg-gray-100 text-gray-900'
+                  } break-words`}
+                >
+                  <div className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{renderMarkdownText(message.content)}</div>
+                  <p className={`text-xs mt-1 ${
+                    message.role === 'user' ? 'text-white/70' : 'text-gray-500'
+                  }`}>
+                    {new Date(message.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                  </p>
+                </div>
+              </div>
+            );
+          } else if (item.type === 'cards') {
+            return (
+              <ResearchCards
+                key={`cards-${index}`}
+                cards={item.data.cards}
+                query={item.data.query}
+                mode={item.data.mode}
+                onCardClick={(card) => {
+                  console.log('Card clicked:', card);
+                }}
+              />
+            );
+          }
+          return null;
+        })}
+
+        {/* Research Cards - Show after user message, before AI response */}
+        {researchCards && (
+          <ResearchCards
+            cards={researchCards.cards}
+            query={researchCards.query}
+            mode={researchCards.mode}
+            onCardClick={(card) => {
+              // Optional: Handle card clicks, e.g., copy content or use as inspiration
+              console.log('Card clicked:', card);
+            }}
+          />
+        )}
+
         {/* Streaming Message */}
         {isStreaming && currentStreamingMessage && (
           <div className="flex justify-start">

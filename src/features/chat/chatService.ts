@@ -78,10 +78,10 @@ export class ChatService {
           // Handle data lines
           else if (line.startsWith('data:') && currentEvent) {
             const dataStr = line.slice(5).trim();
-            
+
             try {
               const data = JSON.parse(dataStr);
-              
+
               switch (currentEvent) {
                 case 'conversation':
                   onEvent({ type: 'conversation', data });
@@ -94,6 +94,9 @@ export class ChatService {
                   break;
                 case 'tool_call':
                   onEvent({ type: 'tool_call', data });
+                  break;
+                case 'research_cards':
+                  onEvent({ type: 'research_cards', data });
                   break;
                 case 'done':
                   onEvent({ type: 'done', data });
