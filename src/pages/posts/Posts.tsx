@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchUserPosts, selectShouldFetchPosts } from '@/features/post/postSlice';
+import { fetchUserPosts, selectShouldFetchPosts, deletePost } from '@/features/post/postSlice';
 import type { Post } from '@/features/post/postTypes';
 
 import { useAuth } from '@clerk/react-router';
 import { Link, useNavigate } from 'react-router';
 
-import { MoreHorizontal, ThumbsUp, MessageSquare, Repeat2, Send, Edit } from 'lucide-react';
+import { ThumbsUp, MessageSquare, Repeat2, Send, Edit, Trash2 } from 'lucide-react';
 
 import { useUser } from '@clerk/react-router';
 import { Button } from '@/components/ui/button';
 import { LogoLoader } from '@/components/ui/logo-loader';
+import { DeleteConfirmationDialog } from '@/components/ui/delete-confirmation-dialog';
 import ThumbIcon from '@/lib/icons/thumb.svg?react';
 import HeartIcon from '@/lib/icons/heart.svg?react';
 import ClapIcon from '@/lib/icons/clap.svg?react';
@@ -23,6 +24,8 @@ export default function Posts() {
   const { posts, isLoading } = useAppSelector(state => state.post);
   const shouldFetch = useAppSelector(selectShouldFetchPosts);
   const [expandedPosts, setExpandedPosts] = React.useState<Set<string>>(new Set());
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [postToDelete, setPostToDelete] = React.useState<string | null>(null);
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -95,6 +98,22 @@ export default function Posts() {
 
   const handleEditPost = (postId: string) => {
     navigate(`/generate?postId=${postId}`);
+  };
+
+  const handleDeleteClick = (postId: string) => {
+    setPostToDelete(postId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!postToDelete) return;
+
+    const token = await getToken();
+    if (token) {
+      dispatch(deletePost({ postId: postToDelete, token }));
+    }
+    setPostToDelete(null);
+    setDeleteDialogOpen(false);
   };
 
   if (isLoading && posts.length === 0) {
@@ -208,9 +227,15 @@ export default function Posts() {
                         <Edit className="w-4 h-4" />
                         Edit
                       </Button>
-                      <button className="p-1 hover:bg-gray-100 rounded">
-                        <MoreHorizontal className="w-5 h-5 text-gray-600" />
-                      </button>
+                      <Button
+                        onClick={() => handleDeleteClick(post.id)}
+                        size="sm"
+                        variant="outline"
+                        className="flex items-center gap-1 hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -304,6 +329,14 @@ export default function Posts() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        itemType="post"
+      />
     </div>
   );
 }

@@ -143,8 +143,8 @@ export class PostService {
     return data;
   }
 
-  async deleteScheduledPost(postId: string, token: string): Promise<{ success: boolean }> {
-    const response = await fetch(`${API_CONFIG.BASE_URL}/api/posts/schedule/${postId}`, {
+  async deletePost(postId: string, token: string): Promise<{ success: boolean }> {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/posting/posts/${postId}`, {
       method: 'DELETE',
       headers: {
         'Authorization': `Bearer ${token}`,
@@ -155,7 +155,7 @@ export class PostService {
     const data = await response.json();
 
     if (!response.ok || !data.success) {
-      throw new Error(data.error || 'Failed to delete scheduled post');
+      throw new Error(data.error || 'Failed to delete post');
     }
 
     return data;

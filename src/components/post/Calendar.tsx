@@ -8,9 +8,10 @@ import {
   previousWeek
 } from '../../store/slices/calendarSlice';
 import { ChevronLeft, ChevronRight, Edit2, Trash2, Clock, Calendar as CalendarIcon } from 'lucide-react';
-import { fetchUserPosts, updateScheduledPost, deleteScheduledPost } from '../../features/post/postSlice';
+import { fetchUserPosts, updateScheduledPost, deletePost } from '../../features/post/postSlice';
 import type { Post } from '../../features/post/postTypes';
 import ScheduleModal from '../generate/ScheduleModal';
+import { DeleteConfirmationDialog } from '../ui/delete-confirmation-dialog';
 import { useAuth } from '@clerk/react-router';
 
 const Calendar: React.FC = () => {
@@ -21,6 +22,8 @@ const Calendar: React.FC = () => {
   const [selectedPost, setSelectedPost] = useState<Post | null>(null);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [editingPost, setEditingPost] = useState<Post | null>(null);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const [draggedPost, setDraggedPost] = useState<Post | null>(null);
   const [dragOverSlot, setDragOverSlot] = useState<{ date: Date; hour: number } | null>(null);
 
@@ -75,18 +78,27 @@ const Calendar: React.FC = () => {
     setShowScheduleModal(true);
   };
 
-  const handleDeletePost = async (postId: string) => {
+  const handleDeleteClick = (postId: string) => {
+    setPostToDelete(postId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!postToDelete) return;
+
     const token = await getToken();
     if (!token) return;
 
-    if (confirm('Are you sure you want to delete this scheduled post?')) {
-      try {
-        await dispatch(deleteScheduledPost({ postId, token })).unwrap();
-        dispatch(fetchUserPosts(token));
-      } catch (error) {
-        console.error('Failed to delete post:', error);
-      }
+    try {
+      await dispatch(deletePost({ postId: postToDelete, token })).unwrap();
+      dispatch(fetchUserPosts(token));
+      setSelectedPost(null);
+    } catch (error) {
+      console.error('Failed to delete post:', error);
     }
+
+    setPostToDelete(null);
+    setDeleteDialogOpen(false);
   };
 
   const handleReschedule = async (date: Date, _time: string) => {
@@ -484,7 +496,7 @@ const Calendar: React.FC = () => {
                                     <button
                                       onClick={(e) => {
                                         e.stopPropagation();
-                                        handleDeletePost(post.id);
+                                        handleDeleteClick(post.id);
                                       }}
                                       className="p-1 hover:bg-red-100 rounded transition-colors"
                                     >
@@ -582,8 +594,7 @@ const Calendar: React.FC = () => {
                     </button>
                     <button
                       onClick={() => {
-                        handleDeletePost(selectedPost.id);
-                        setSelectedPost(null);
+                        handleDeleteClick(selectedPost.id);
                       }}
                       className="flex items-center gap-2 px-4 py-2 border border-red-500 text-red-500 rounded-lg hover:bg-red-50 transition-colors"
                     >
@@ -615,6 +626,14 @@ const Calendar: React.FC = () => {
           onSchedule={handleReschedule}
         />
       )}
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        itemType="post"
+      />
     </div>
   );
 };

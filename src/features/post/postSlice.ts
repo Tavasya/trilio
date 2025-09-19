@@ -49,11 +49,11 @@ export const updateScheduledPost = createAsyncThunk<SchedulePostResponse, { post
   }
 );
 
-// Async thunk for deleting a scheduled post
-export const deleteScheduledPost = createAsyncThunk<{ success: boolean; postId: string }, { postId: string; token: string }>(
-  'post/deleteScheduledPost',
+// Async thunk for deleting any post (universal delete)
+export const deletePost = createAsyncThunk<{ success: boolean; postId: string }, { postId: string; token: string }>(
+  'post/deletePost',
   async ({ postId, token }) => {
-    const result = await postService.deleteScheduledPost(postId, token);
+    const result = await postService.deletePost(postId, token);
     return { ...result, postId };
   }
 );
@@ -164,12 +164,12 @@ const postSlice = createSlice({
         state.error = action.error.message || 'Failed to reschedule post';
         toast.error(action.error.message || 'Failed to reschedule post');
       })
-      // Delete scheduled post
-      .addCase(deleteScheduledPost.pending, (state) => {
+      // Delete post (universal)
+      .addCase(deletePost.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(deleteScheduledPost.fulfilled, (state, action) => {
+      .addCase(deletePost.fulfilled, (state, action) => {
         state.isLoading = false;
 
         // Remove the post from the posts array
@@ -177,7 +177,7 @@ const postSlice = createSlice({
 
         toast.success('Post deleted successfully!');
       })
-      .addCase(deleteScheduledPost.rejected, (state, action) => {
+      .addCase(deletePost.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message || 'Failed to delete post';
         toast.error(action.error.message || 'Failed to delete post');
