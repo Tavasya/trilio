@@ -146,7 +146,7 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="text-lg font-bold text-gray-900">
-              Trending in Your Topics <span className="text-red-500">*</span>
+              Trending in Your Topics
             </h2>
             {selectedPosts.length > 0 && (
               <p className="text-xs text-primary mt-0.5">

@@ -16,7 +16,6 @@ import {
   setWritingStyle,
   setPostLength,
   setTrendingPosts,
-  validateForm,
   selectDashboardState
 } from '../../features/dashboard/dashboardSlice';
 
@@ -28,29 +27,10 @@ const Dashboard = () => {
   const dashboardState = useAppSelector(selectDashboardState);
 
   const handleGeneratePost = async () => {
-    // Validate form
-    dispatch(validateForm());
-
-    // Check validation state after dispatching
+    // Only validate that content topic is filled
     const state = dashboardState;
-    if (!state.identity ||
-        !state.writingStyle ||
-        state.trendingPosts.length === 0 ||
-        !state.content.trim()) {
-
-      // Show validation errors
-      if (!state.content.trim()) {
-        toast.error('Please enter content topics', { position: 'top-right' });
-      }
-      if (!state.identity) {
-        toast.error('Please select an identity', { position: 'top-right' });
-      }
-      if (!state.writingStyle) {
-        toast.error('Please select a writing style', { position: 'top-right' });
-      }
-      if (state.trendingPosts.length === 0) {
-        toast.error('Please select at least one trending post for inspiration', { position: 'top-right' });
-      }
+    if (!state.content.trim()) {
+      toast.error('Please enter content topics', { position: 'top-right' });
       return;
     }
 
