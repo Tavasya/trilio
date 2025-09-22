@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
+import { postService } from '@/features/post/postService';
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
@@ -70,24 +71,20 @@ const Dashboard = () => {
       trending_posts: dashboardState.trendingPosts
     };
 
-    // Store draft data and token in session storage
-    sessionStorage.setItem('pendingDraft', JSON.stringify(draftData));
-    sessionStorage.setItem('pendingToken', token);
+    try {
+      // Wait for the save to complete before navigating
+      const response = await postService.saveDraft(draftData, token);
 
-    // Start the save operation in the background (don't await)
-    import('../../features/post/postService').then(({ postService }) => {
-      postService.saveDraft(draftData, token).then(response => {
-        if (response.post_id) {
-          // Store the post ID for the Generate page to pick up
-          sessionStorage.setItem('savedPostId', response.post_id);
-        }
-      }).catch(error => {
-        console.error('Background draft save failed:', error);
-      });
-    });
-
-    // Navigate immediately - Generate page will handle the loading
-    navigate('/generate?new=true');
+      if (response.post_id) {
+        // Navigate directly with the post ID
+        navigate(`/generate?postId=${response.post_id}`);
+      } else {
+        throw new Error('No post ID returned');
+      }
+    } catch (error) {
+      console.error('Failed to create draft:', error);
+      toast.error('Failed to create draft. Please try again.', { position: 'top-right' });
+    }
   };
 
   return (
