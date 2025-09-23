@@ -45,7 +45,7 @@ export default function WritingStylesSection({ value = '', onChange }: WritingSt
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="text-lg font-bold text-gray-900">
-              Writing Styles <span className="text-red-500">*</span>
+              Writing Styles
             </h2>
           </div>
           <button

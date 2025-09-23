@@ -45,7 +45,7 @@ export default function IdentitySection({ value = '', onChange }: IdentitySectio
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="text-lg font-bold text-gray-900">
-              Define Your Identity <span className="text-red-500">*</span>
+              Define Your Identity
             </h2>
           </div>
           <button

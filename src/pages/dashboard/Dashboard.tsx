@@ -7,6 +7,7 @@ import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
+import { postService } from '@/features/post/postService';
 
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
@@ -15,7 +16,6 @@ import {
   setWritingStyle,
   setPostLength,
   setTrendingPosts,
-  validateForm,
   selectDashboardState
 } from '../../features/dashboard/dashboardSlice';
 
@@ -27,29 +27,10 @@ const Dashboard = () => {
   const dashboardState = useAppSelector(selectDashboardState);
 
   const handleGeneratePost = async () => {
-    // Validate form
-    dispatch(validateForm());
-
-    // Check validation state after dispatching
+    // Only validate that content topic is filled
     const state = dashboardState;
-    if (!state.identity ||
-        !state.writingStyle ||
-        state.trendingPosts.length === 0 ||
-        !state.content.trim()) {
-
-      // Show validation errors
-      if (!state.content.trim()) {
-        toast.error('Please enter content topics', { position: 'top-right' });
-      }
-      if (!state.identity) {
-        toast.error('Please select an identity', { position: 'top-right' });
-      }
-      if (!state.writingStyle) {
-        toast.error('Please select a writing style', { position: 'top-right' });
-      }
-      if (state.trendingPosts.length === 0) {
-        toast.error('Please select at least one trending post for inspiration', { position: 'top-right' });
-      }
+    if (!state.content.trim()) {
+      toast.error('Please enter content topics', { position: 'top-right' });
       return;
     }
 
@@ -70,24 +51,20 @@ const Dashboard = () => {
       trending_posts: dashboardState.trendingPosts
     };
 
-    // Store draft data and token in session storage
-    sessionStorage.setItem('pendingDraft', JSON.stringify(draftData));
-    sessionStorage.setItem('pendingToken', token);
+    try {
+      // Wait for the save to complete before navigating
+      const response = await postService.saveDraft(draftData, token);
 
-    // Start the save operation in the background (don't await)
-    import('../../features/post/postService').then(({ postService }) => {
-      postService.saveDraft(draftData, token).then(response => {
-        if (response.post_id) {
-          // Store the post ID for the Generate page to pick up
-          sessionStorage.setItem('savedPostId', response.post_id);
-        }
-      }).catch(error => {
-        console.error('Background draft save failed:', error);
-      });
-    });
-
-    // Navigate immediately - Generate page will handle the loading
-    navigate('/generate?new=true');
+      if (response.post_id) {
+        // Navigate directly with the post ID
+        navigate(`/generate?postId=${response.post_id}`);
+      } else {
+        throw new Error('No post ID returned');
+      }
+    } catch (error) {
+      console.error('Failed to create draft:', error);
+      toast.error('Failed to create draft. Please try again.', { position: 'top-right' });
+    }
   };
 
   return (

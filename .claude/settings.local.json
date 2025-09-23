@@ -4,7 +4,8 @@
       "Bash(npm run typecheck:*)",
       "Bash(npx tsc:*)",
       "Bash(npm run lint)",
-      "Bash(npm run build:*)"
+      "Bash(npm run build:*)",
+      "mcp__trilio__schedule_post_api_posts_schedule_post"
     ],
     "deny": [],
     "ask": []

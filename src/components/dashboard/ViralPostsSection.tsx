@@ -19,6 +19,7 @@ interface ViralPost {
   comments?: number | string;
   views?: string;
   time_posted?: string;
+  post_url?: string;
 }
 
 interface ViralPostsSectionProps {
@@ -98,7 +99,8 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
           comments: post.comments > 1000 ? `${(post.comments / 1000).toFixed(1)}K` : post.comments.toString(),
           views: post.likes ? `${(post.likes * 10 / 1000).toFixed(0)}K` : '0',
           author_title: post.author_title,
-          time_posted: post.time_posted
+          time_posted: post.time_posted,
+          post_url: post.post_url
         }));
 
         console.log('Formatted posts:', formattedPosts);
@@ -135,7 +137,8 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
       comments: post.comments > 1000 ? `${(post.comments / 1000).toFixed(1)}K` : post.comments.toString(),
       views: post.likes ? `${(post.likes * 10 / 1000).toFixed(0)}K` : '0',
       author_title: post.author_title,
-      time_posted: post.time_posted
+      time_posted: post.time_posted,
+      post_url: post.post_url
     }));
     setPreviewPosts(formattedPosts);
   };
@@ -146,7 +149,7 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
         <div className="flex items-center justify-between mb-3">
           <div>
             <h2 className="text-lg font-bold text-gray-900">
-              Trending in Your Topics <span className="text-red-500">*</span>
+              Trending in Your Topics
             </h2>
             {selectedPosts.length > 0 && (
               <p className="text-xs text-primary mt-0.5">
@@ -228,6 +231,20 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
                           <div className="px-2 py-0.5 bg-primary text-white text-xs font-medium rounded">
                             Selected
                           </div>
+                        )}
+                        {post.post_url && (
+                          <a
+                            href={post.post_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            className="p-0.5 hover:bg-blue-50 rounded text-blue-600 hover:text-blue-700 transition-colors"
+                            title="View on LinkedIn"
+                          >
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                              <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                            </svg>
+                          </a>
                         )}
                         <button
                           onClick={(e) => e.stopPropagation()}

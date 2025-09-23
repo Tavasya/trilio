@@ -1,16 +1,17 @@
 import React, { useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchUserPosts, selectShouldFetchPosts } from '@/features/post/postSlice';
+import { fetchUserPosts, selectShouldFetchPosts, deletePost } from '@/features/post/postSlice';
 import type { Post } from '@/features/post/postTypes';
 
 import { useAuth } from '@clerk/react-router';
 import { Link, useNavigate } from 'react-router';
 
-import { MoreHorizontal, ThumbsUp, MessageSquare, Repeat2, Send, Edit } from 'lucide-react';
+import { ThumbsUp, MessageSquare, Repeat2, Send, Edit, Trash2 } from 'lucide-react';
 
 import { useUser } from '@clerk/react-router';
 import { Button } from '@/components/ui/button';
 import { LogoLoader } from '@/components/ui/logo-loader';
+import { DeleteConfirmationDialog } from '@/components/ui/delete-confirmation-dialog';
 import ThumbIcon from '@/lib/icons/thumb.svg?react';
 import HeartIcon from '@/lib/icons/heart.svg?react';
 import ClapIcon from '@/lib/icons/clap.svg?react';
@@ -23,6 +24,8 @@ export default function Posts() {
   const { posts, isLoading } = useAppSelector(state => state.post);
   const shouldFetch = useAppSelector(selectShouldFetchPosts);
   const [expandedPosts, setExpandedPosts] = React.useState<Set<string>>(new Set());
+  const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
+  const [postToDelete, setPostToDelete] = React.useState<string | null>(null);
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -95,6 +98,22 @@ export default function Posts() {
 
   const handleEditPost = (postId: string) => {
     navigate(`/generate?postId=${postId}`);
+  };
+
+  const handleDeleteClick = (postId: string) => {
+    setPostToDelete(postId);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!postToDelete) return;
+
+    const token = await getToken();
+    if (token) {
+      dispatch(deletePost({ postId: postToDelete, token }));
+    }
+    setPostToDelete(null);
+    setDeleteDialogOpen(false);
   };
 
   if (isLoading && posts.length === 0) {
@@ -199,6 +218,19 @@ export default function Posts() {
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
+                      {post.linkedin_post_url && (
+                        <a
+                          href={post.linkedin_post_url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 hover:bg-blue-50 rounded text-blue-600 hover:text-blue-700 transition-colors"
+                          title="View on LinkedIn"
+                        >
+                          <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                            <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                          </svg>
+                        </a>
+                      )}
                       <Button
                         onClick={() => handleEditPost(post.id)}
                         size="sm"
@@ -208,9 +240,15 @@ export default function Posts() {
                         <Edit className="w-4 h-4" />
                         Edit
                       </Button>
-                      <button className="p-1 hover:bg-gray-100 rounded">
-                        <MoreHorizontal className="w-5 h-5 text-gray-600" />
-                      </button>
+                      <Button
+                        onClick={() => handleDeleteClick(post.id)}
+                        size="sm"
+                        variant="outline"
+                        className="flex items-center gap-1 hover:bg-red-50 hover:text-red-600 hover:border-red-200"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </Button>
                     </div>
                   </div>
                 </div>
@@ -304,6 +342,14 @@ export default function Posts() {
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Dialog */}
+      <DeleteConfirmationDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onConfirm={handleConfirmDelete}
+        itemType="post"
+      />
     </div>
   );
 }

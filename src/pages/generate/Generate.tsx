@@ -15,15 +15,14 @@ export default function Generate() {
   const { getToken } = useAuth();
   const dispatch = useAppDispatch();
   const postId = searchParams.get('postId');
-  const isNew = searchParams.get('new') === 'true';
   const [mobileView, setMobileView] = useState<'chat' | 'preview'>('chat');
   const [isLoading, setIsLoading] = useState(true);
   const [currentPostId, setCurrentPostId] = useState<string | null>(postId);
 
   useEffect(() => {
     const initializePage = async () => {
-      // Skip if we already have a currentPostId set (to avoid re-running after navigation)
-      if (!isNew && !postId) {
+      // Skip if we don't have a postId
+      if (!postId) {
         setIsLoading(false);
         return;
       }
@@ -41,82 +40,8 @@ export default function Generate() {
           return;
         }
 
-        // Handle new draft creation from dashboard
-        if (isNew && !postId) {
-          // Check if draft was already saved in background
-          let savedPostId = sessionStorage.getItem('savedPostId');
-
-          if (savedPostId) {
-            // Draft already saved! Just use it
-            sessionStorage.removeItem('savedPostId');
-            sessionStorage.removeItem('pendingDraft');
-            sessionStorage.removeItem('pendingToken');
-
-            setCurrentPostId(savedPostId);
-            navigate(`/generate?postId=${savedPostId}`, { replace: true });
-            return;
-          }
-
-          // Draft might still be saving, wait for it
-          const pendingDraftData = sessionStorage.getItem('pendingDraft');
-          if (pendingDraftData) {
-            const draftData = JSON.parse(pendingDraftData);
-
-            // Poll for saved post ID (the background save might complete any moment)
-            let pollCount = 0;
-            const pollInterval = setInterval(() => {
-              savedPostId = sessionStorage.getItem('savedPostId');
-              pollCount++;
-
-              if (savedPostId) {
-                // Found it! Use the saved post
-                clearInterval(pollInterval);
-                sessionStorage.removeItem('savedPostId');
-                sessionStorage.removeItem('pendingDraft');
-                sessionStorage.removeItem('pendingToken');
-
-                setCurrentPostId(savedPostId);
-
-                // Set initial post state
-                dispatch(setGeneratedPost({
-                  id: savedPostId,
-                  content: draftData.content || '',
-                  isEdited: false
-                }));
-
-                navigate(`/generate?postId=${savedPostId}`, { replace: true });
-              } else if (pollCount > 20) { // After 2 seconds, save it ourselves
-                clearInterval(pollInterval);
-
-                // Background save didn't complete, do it now
-                postService.saveDraft(draftData, token).then(response => {
-                  if (response.post_id) {
-                    sessionStorage.removeItem('pendingDraft');
-                    sessionStorage.removeItem('pendingToken');
-
-                    setCurrentPostId(response.post_id);
-
-                    dispatch(setGeneratedPost({
-                      id: response.post_id,
-                      content: draftData.content || '',
-                      isEdited: false
-                    }));
-
-                    navigate(`/generate?postId=${response.post_id}`, { replace: true });
-                  }
-                }).catch(error => {
-                  console.error('Failed to create draft:', error);
-                  toast.error('Failed to create draft', { position: 'top-right' });
-                  setIsLoading(false);
-                });
-              }
-            }, 100); // Check every 100ms
-
-            return; // Don't set loading false yet
-          }
-        }
-        // Handle existing post loading
-        else if (postId) {
+        // Handle post loading (always expect a postId now)
+        if (postId) {
           setCurrentPostId(postId);
 
           // Fetch post data
@@ -136,6 +61,11 @@ export default function Generate() {
             // Conversation might not exist yet, which is fine
             console.log('No conversation history found');
           }
+        } else {
+          // No postId provided - this shouldn't happen with the new flow
+          toast.error('No post ID provided. Please start from the dashboard.', { position: 'top-right' });
+          navigate('/dashboard');
+          return;
         }
 
         setIsLoading(false);
@@ -149,7 +79,7 @@ export default function Generate() {
     };
 
     initializePage();
-  }, [postId, isNew, getToken, dispatch, navigate]);
+  }, [postId, getToken, dispatch, navigate]);
 
   if (isLoading) {
     return (

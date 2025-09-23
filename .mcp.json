@@ -1,16 +1,24 @@
 {
-    "mcpServers": {
-      "supabase": {
-        "command": "npx",
-        "args": [
-          "-y",
-          "@supabase/mcp-server-supabase",
-          "--read-only",
-          "--project-ref=dgxbrsphfozvjpbzebhe"
-        ],
-        "env": {
-          "SUPABASE_ACCESS_TOKEN": "sbp_47cdde13c874c59d59b74666148d569d03e6f443"
-        }
+  "mcpServers": {
+    "supabase": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "@supabase/mcp-server-supabase",
+        "--read-only",
+        "--project-ref=dgxbrsphfozvjpbzebhe"
+      ],
+      "env": {
+        "SUPABASE_ACCESS_TOKEN": "sbp_47cdde13c874c59d59b74666148d569d03e6f443"
       }
+    },
+    "trilio": {
+      "command": "npx",
+      "args": ["mcp-remote", "http://localhost:8080/mcp"]
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": ["shadcn@latest", "mcp"]
     }
   }
+}
