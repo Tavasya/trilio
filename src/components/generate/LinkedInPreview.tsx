@@ -7,7 +7,7 @@ import HeartIcon from '@/lib/icons/heart.svg?react';
 import ClapIcon from '@/lib/icons/clap.svg?react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { updateGeneratedPostContent, saveDraftToDatabase } from '@/features/chat/chatSlice';
-import { schedulePost } from '@/features/post/postSlice';
+import { schedulePost, publishToLinkedIn } from '@/features/post/postSlice';
 import { useAuth, useUser } from '@clerk/react-router';
 import { useNavigate } from 'react-router';
 import { toast } from 'sonner';
@@ -93,7 +93,33 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       toast.error('Failed to schedule post', { position: 'top-right' });
     }
   };
-  
+
+  const handlePostNow = async () => {
+    try {
+      const token = await getToken();
+      if (!token) {
+        toast.error('Authentication required', { position: 'top-right' });
+        return;
+      }
+
+      // Publish to LinkedIn immediately
+      await dispatch(publishToLinkedIn({
+        post: {
+          content: postContent,
+          visibility: 'PUBLIC',
+          media_url: postImage || undefined
+        },
+        token
+      })).unwrap();
+
+      toast.success('Posted to LinkedIn successfully!', { position: 'top-right' });
+      navigate('/posts');
+    } catch (error) {
+      console.error('Failed to post to LinkedIn:', error);
+      toast.error('Failed to post to LinkedIn', { position: 'top-right' });
+    }
+  };
+
   const handleImageUpload = () => {
     const input = document.createElement('input');
     input.type = 'file';
@@ -434,6 +460,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
         isOpen={showScheduleModal}
         onClose={() => setShowScheduleModal(false)}
         onSchedule={handleSchedule}
+        onPostNow={handlePostNow}
       />
     </div>
   );
