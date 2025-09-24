@@ -6,9 +6,10 @@ interface ScheduleModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSchedule: (date: Date, time: string) => void;
+  onPostNow?: () => void;
 }
 
-export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleModalProps) {
+export default function ScheduleModal({ isOpen, onClose, onSchedule, onPostNow }: ScheduleModalProps) {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [validationError, setValidationError] = useState<string>('');
@@ -120,7 +121,7 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleM
       <div className="relative bg-white rounded-t-2xl sm:rounded-lg shadow-xl p-4 sm:p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between mb-4 sm:mb-6">
-          <h2 className="text-lg sm:text-xl font-semibold">Schedule Post</h2>
+          <h2 className="text-lg sm:text-xl font-semibold">Publish Post</h2>
           <button
             onClick={onClose}
             className="p-1.5 sm:p-1 hover:bg-gray-100 rounded-lg transition-colors"
@@ -128,7 +129,8 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleM
             <X className="w-5 h-5 text-gray-500" />
           </button>
         </div>
-        
+
+
         {/* Date Selection */}
         <div className="mb-6">
           <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -242,12 +244,24 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleM
           >
             Cancel
           </Button>
+          {onPostNow && (
+            <Button
+              onClick={() => {
+                onPostNow();
+                onClose();
+              }}
+              variant="outline"
+              className="flex-1"
+            >
+              Post Now
+            </Button>
+          )}
           <Button
             onClick={handleSchedule}
             disabled={!selectedDate || !selectedTime || !!validationError}
             className="flex-1"
           >
-            Schedule Post
+            Schedule
           </Button>
         </div>
       </div>
