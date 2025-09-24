@@ -7,6 +7,7 @@ import { Provider } from 'react-redux'
 import store from './store.ts'
 import AppRoutes from './router.tsx'
 import AuthRedirect from './components/AuthRedirect'
+import GoogleAnalytics from './components/GoogleAnalytics'
 import { Toaster } from 'sonner'
 import { Analytics } from '@vercel/analytics/react'
 
@@ -23,6 +24,7 @@ createRoot(document.getElementById('root')!).render(
       <ClerkProvider publishableKey={PUBLISHABLE_KEY}>
         <Provider store={store}>
           <AuthRedirect />
+          <GoogleAnalytics />
           <Routes>
             <Route path="/*" element={<AppRoutes />} />
           </Routes>
