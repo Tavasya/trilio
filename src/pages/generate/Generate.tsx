@@ -59,7 +59,6 @@ export default function Generate() {
             await dispatch(loadConversationHistory({ postId, token })).unwrap();
           } catch (error) {
             // Conversation might not exist yet, which is fine
-            console.log('No conversation history found');
           }
         } else {
           // No postId provided - this shouldn't happen with the new flow
@@ -70,7 +69,6 @@ export default function Generate() {
 
         setIsLoading(false);
       } catch (error) {
-        console.error('Failed to initialize:', error);
         if (error instanceof Error && !error.message.includes('conversation')) {
           toast.error('Failed to load post', { position: 'top-right' });
         }

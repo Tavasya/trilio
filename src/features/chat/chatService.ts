@@ -106,7 +106,6 @@ export class ChatService {
                   break;
               }
             } catch (parseError) {
-              console.error('Failed to parse SSE data:', dataStr, parseError);
             }
           }
         }
@@ -144,7 +143,6 @@ export class ChatService {
 
       return await response.json();
     } catch (error) {
-      console.error('Error fetching conversation history:', error);
       return null;
     }
   }

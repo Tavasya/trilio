@@ -94,7 +94,6 @@ const Calendar: React.FC = () => {
       dispatch(fetchUserPosts(token));
       setSelectedPost(null);
     } catch (error) {
-      console.error('Failed to delete post:', error);
     }
 
     setPostToDelete(null);
@@ -120,7 +119,6 @@ const Calendar: React.FC = () => {
       setShowScheduleModal(false);
       dispatch(fetchUserPosts(token));
     } catch (error) {
-      console.error('Failed to reschedule:', error);
     }
   };
 
@@ -165,7 +163,6 @@ const Calendar: React.FC = () => {
 
       dispatch(fetchUserPosts(token));
     } catch (error) {
-      console.error('Failed to reschedule post:', error);
     }
 
     setDraggedPost(null);

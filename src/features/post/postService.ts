@@ -95,7 +95,6 @@ export class PostService {
   }
 
   async schedulePost(scheduleData: SchedulePostRequest, token: string): Promise<SchedulePostResponse> {
-    console.log('Scheduling post with data:', scheduleData);
 
     const response = await fetch(`${API_CONFIG.BASE_URL}/api/posts/schedule`, {
       method: 'POST',
@@ -110,14 +109,11 @@ export class PostService {
     try {
       data = await response.json();
     } catch (e) {
-      console.error('Failed to parse response:', e);
       throw new Error('Invalid response from server');
     }
 
-    console.log('Schedule response:', response.status, data);
 
     if (!response.ok || !data.success) {
-      console.error('Schedule failed:', data);
       throw new Error(data.error || data.detail || 'Failed to schedule post');
     }
 

@@ -325,7 +325,6 @@ const chatSlice = createSlice({
 
           // Load persisted research cards if available
           if (research_cards) {
-            console.log('✅ Loading persisted research cards from API:', research_cards);
             state.persistedResearchCards = research_cards;
           }
         }

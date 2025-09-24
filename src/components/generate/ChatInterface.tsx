@@ -75,9 +75,7 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
 
     // Add persisted research cards
     if (persistedResearchCards) {
-      console.log('📚 Persisted research cards found:', persistedResearchCards);
       persistedResearchCards.forEach(cardBatch => {
-        console.log('📦 Processing card batch:', cardBatch);
         items.push({
           type: 'cards',
           data: {
@@ -99,12 +97,10 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
         });
       });
     } else {
-      console.log('📚 No persisted research cards');
     }
 
     // Sort by timestamp
     const sorted = items.sort((a, b) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime());
-    console.log('📝 Merged content items:', sorted);
     return sorted;
   };
 
@@ -187,7 +183,6 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       
       setSelectedTools([]); // Reset selected tools after sending
     } catch (error) {
-      console.error('Failed to send message:', error);
     }
   };
 
@@ -268,7 +263,6 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
                 query={item.data.query}
                 mode={item.data.mode}
                 onCardClick={(card) => {
-                  console.log('Card clicked:', card);
                 }}
               />
             );
@@ -284,7 +278,6 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
             mode={researchCards.mode}
             onCardClick={(card) => {
               // Optional: Handle card clicks, e.g., copy content or use as inspiration
-              console.log('Card clicked:', card);
             }}
           />
         )}

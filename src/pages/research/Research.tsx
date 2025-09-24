@@ -75,7 +75,6 @@ const Research = () => {
       });
 
       const url = `${API_CONFIG.BASE_URL}/api/search/posts?${params}`;
-      console.log('Searching:', url);
 
       const response = await fetch(url, {
         headers: {
@@ -84,16 +83,13 @@ const Research = () => {
         },
       });
 
-      console.log('Response status:', response.status);
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('Search failed:', errorText);
         throw new Error(`Search failed: ${response.status}`);
       }
 
       const data: SearchResponse = await response.json();
-      console.log('Search results:', data);
 
       if (data.success) {
         if (append) {
@@ -108,7 +104,6 @@ const Research = () => {
         toast.error('Search returned no results');
       }
     } catch (error) {
-      console.error('Search error:', error);
       toast.error('Failed to search posts');
     } finally {
       setIsLoading(false);

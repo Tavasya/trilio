@@ -37,7 +37,6 @@ export default function CreatePost() {
       await dispatch(publishToLinkedIn({ post, token })).unwrap();
       navigate('/posts');
     } catch (error) {
-      console.error('Failed to publish:', error);
     }
   };
 

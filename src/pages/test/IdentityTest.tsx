@@ -43,7 +43,6 @@ export default function IdentityTest() {
 
   const handleSaveIdentity = (roles: string[]) => {
     setSelectedRoles(roles);
-    console.log('Selected roles:', roles);
   };
 
   return (

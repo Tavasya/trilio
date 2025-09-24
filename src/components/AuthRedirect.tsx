@@ -33,7 +33,6 @@ export default function AuthRedirect() {
         //     }
         //   }
         // } catch (error) {
-        //   console.error('Failed to fetch onboarding status:', error)
         //   // Fallback to onboarding if API fails
         //   navigate('/onboarding/1')
         // }
