@@ -105,7 +105,6 @@ export default function Onboarding() {
         
         navigate("/dashboard");
       } catch (error) {
-        console.error('Failed to complete onboarding:', error);
         toast.error('Failed to complete onboarding. Please try again.');
       }
       return;

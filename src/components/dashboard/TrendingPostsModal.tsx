@@ -135,7 +135,6 @@ export default function TrendingPostsModal({
         setCurrentOffset(offset);
       }
     } catch (error) {
-      console.error('Search error:', error);
       toast.error('Failed to search posts');
     } finally {
       setIsLoading(false);

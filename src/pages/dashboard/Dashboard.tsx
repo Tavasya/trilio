@@ -62,7 +62,6 @@ const Dashboard = () => {
         throw new Error('No post ID returned');
       }
     } catch (error) {
-      console.error('Failed to create draft:', error);
       toast.error('Failed to create draft. Please try again.', { position: 'top-right' });
     }
   };

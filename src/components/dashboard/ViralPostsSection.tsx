@@ -53,7 +53,6 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
     try {
       const token = await getToken();
       if (!token) {
-        console.error('No auth token available');
         setIsLoading(false);
         return;
       }
@@ -68,7 +67,6 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
       });
 
       const url = `${API_CONFIG.BASE_URL}/api/search/posts?${params}`;
-      console.log('Fetching trending posts from:', url);
 
       const response = await fetch(url, {
         headers: {
@@ -78,15 +76,12 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
       });
 
       if (!response.ok) {
-        console.error('Failed to fetch posts - Status:', response.status, 'StatusText:', response.statusText);
-        const errorText = await response.text();
-        console.error('Error response:', errorText);
+        await response.text();
         setIsLoading(false);
         return;
       }
 
       const data = await response.json();
-      console.log('API response:', data);
 
       if (data.success && data.posts && data.posts.length > 0) {
         // Format posts for display
@@ -103,13 +98,10 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
           post_url: post.post_url
         }));
 
-        console.log('Formatted posts:', formattedPosts);
         setPreviewPosts(formattedPosts);
       } else {
-        console.log('No posts returned or success=false. Data:', data);
       }
     } catch (error) {
-      console.error('Failed to fetch AI posts - Error:', error);
     } finally {
       setIsLoading(false);
     }
