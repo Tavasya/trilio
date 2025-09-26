@@ -85,7 +85,7 @@ const Research = () => {
 
 
       if (!response.ok) {
-        const errorText = await response.text();
+        await response.text();
         throw new Error(`Search failed: ${response.status}`);
       }
 

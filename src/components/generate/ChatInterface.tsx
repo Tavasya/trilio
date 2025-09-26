@@ -262,7 +262,7 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
                 cards={item.data.cards}
                 query={item.data.query}
                 mode={item.data.mode}
-                onCardClick={(card) => {
+                onCardClick={() => {
                 }}
               />
             );
@@ -276,7 +276,7 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
             cards={researchCards.cards}
             query={researchCards.query}
             mode={researchCards.mode}
-            onCardClick={(card) => {
+            onCardClick={() => {
               // Optional: Handle card clicks, e.g., copy content or use as inspiration
             }}
           />

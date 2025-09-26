@@ -23,14 +23,8 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule, onPostNow }
   // Get today's date in YYYY-MM-DD format for min date
   const today = new Date().toISOString().split('T')[0];
 
-  // Get current time for validation
-  const getCurrentTime = () => {
-    const now = new Date();
-    return `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
-  };
-  
   // Generate time slots every 30 minutes
-  const timeSlots = [];
+  const timeSlots: { value: string; display: string }[] = [];
   for (let hour = 0; hour < 24; hour++) {
     for (let minute = 0; minute < 60; minute += 30) {
       const time = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;

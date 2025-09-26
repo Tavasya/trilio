@@ -76,7 +76,7 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
       });
 
       if (!response.ok) {
-        const errorText = await response.text();
+        await response.text();
         setIsLoading(false);
         return;
       }
