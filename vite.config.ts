@@ -14,6 +14,7 @@ export default defineConfig({
     sitemap({
       hostname: 'https://trilio.app',
       dynamicRoutes: ['/'],
+      readable: true,
     })
   ],
   resolve: {

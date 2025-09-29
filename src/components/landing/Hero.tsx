@@ -89,7 +89,7 @@ export default function Hero() {
           >
             <img
               src={productScreenshot}
-              alt="Trilio Product Screenshot"
+              alt="Trilio AI LinkedIn content creation dashboard showing post editor and scheduling features"
               className="w-full h-auto"
             />
           </div>

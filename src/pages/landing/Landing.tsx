@@ -43,7 +43,7 @@ export default function Landing() {
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md">
         <div className="flex items-center justify-between px-6 py-4">
-          <img src={trilioLogo} alt="Trilio" className="h-8 w-auto" />
+          <img src={trilioLogo} alt="Trilio - AI LinkedIn Content Platform" className="h-8 w-auto" />
 
           <div className={`flex items-center gap-3 ${!loaded ? 'invisible' : 'visible'}`}>
             <SignedOut>
@@ -121,7 +121,7 @@ export default function Landing() {
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Company Info */}
             <div className="col-span-1 md:col-span-2">
-              <img src={trilioLogo} alt="Trilio" className="h-8 w-auto mb-4" />
+              <img src={trilioLogo} alt="Trilio LinkedIn automation tool logo" className="h-8 w-auto mb-4" />
               <p className="text-sm text-gray-600 mb-4">
               Authentic AI content for LinkedIn that connects and  converts your audience into prospects
               </p>
