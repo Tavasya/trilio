@@ -1,17 +1,18 @@
 import { Routes, Route } from "react-router";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 
 import Landing from "@/pages/landing/Landing";
-import Dashboard from "@/pages/dashboard/Dashboard";
 import AppLayout from "./layouts/AppLayout";
-import Research from '@/pages/research/Research'
-import Scheduler from '@/pages/scheduler/Scheduler'
-import Posts from '@/pages/posts/Posts'
-import CreatePost from '@/pages/create-post/CreatePost'
-// import Onboarding from '@/pages/onboarding/Onboarding'
-import Generate from '@/pages/generate/Generate'
 import ProtectedRoute from '@/components/ProtectedRoute'
-import IdentityTest from '@/pages/test/IdentityTest'
+
+// Lazy load all protected routes
+const Dashboard = lazy(() => import("@/pages/dashboard/Dashboard"));
+const Research = lazy(() => import('@/pages/research/Research'));
+const Scheduler = lazy(() => import('@/pages/scheduler/Scheduler'));
+const Posts = lazy(() => import('@/pages/posts/Posts'));
+const CreatePost = lazy(() => import('@/pages/create-post/CreatePost'));
+const Generate = lazy(() => import('@/pages/generate/Generate'));
+const IdentityTest = lazy(() => import('@/pages/test/IdentityTest'));
 
 const LoadingSpinner = () => (
     <div className="min-h-screen flex items-center justify-center">

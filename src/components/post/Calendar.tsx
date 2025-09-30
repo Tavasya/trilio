@@ -93,14 +93,15 @@ const Calendar: React.FC = () => {
       await dispatch(deletePost({ postId: postToDelete, token })).unwrap();
       dispatch(fetchUserPosts(token));
       setSelectedPost(null);
-    } catch (error) {
+    } catch {
+      // Error handled by Redux
     }
 
     setPostToDelete(null);
     setDeleteDialogOpen(false);
   };
 
-  const handleReschedule = async (date: Date, _time: string) => {
+  const handleReschedule = async (date: Date) => {
     if (!editingPost) return;
 
     const token = await getToken();
@@ -118,7 +119,8 @@ const Calendar: React.FC = () => {
       setEditingPost(null);
       setShowScheduleModal(false);
       dispatch(fetchUserPosts(token));
-    } catch (error) {
+    } catch {
+      // Error handled by Redux
     }
   };
 
@@ -162,7 +164,8 @@ const Calendar: React.FC = () => {
       })).unwrap();
 
       dispatch(fetchUserPosts(token));
-    } catch (error) {
+    } catch {
+      // Error handled by Redux
     }
 
     setDraggedPost(null);

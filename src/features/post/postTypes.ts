@@ -40,7 +40,7 @@ export interface DraftPostRequest {
   content_topics?: string[];
   writing_style?: string;
   post_length?: 'short' | 'medium' | 'long';
-  trending_posts?: any[];
+  trending_posts?: Array<Record<string, unknown>>;
 }
 
 export interface DraftPostResponse {

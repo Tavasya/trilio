@@ -88,7 +88,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       setShowScheduleModal(false);
       toast.success('Post scheduled successfully!', { position: 'top-right' });
       navigate('/posts');
-    } catch (error) {
+    } catch {
       toast.error('Failed to schedule post', { position: 'top-right' });
     }
   };
@@ -113,7 +113,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
 
       toast.success('Posted to LinkedIn successfully!', { position: 'top-right' });
       navigate('/posts');
-    } catch (error) {
+    } catch {
       toast.error('Failed to post to LinkedIn', { position: 'top-right' });
     }
   };
@@ -177,7 +177,8 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
           content: postContent,
           token
         })).unwrap();
-      } catch (error) {
+      } catch {
+        // Auto-save errors are silent
       }
     }
   };
