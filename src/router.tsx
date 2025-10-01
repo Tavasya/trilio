@@ -4,6 +4,12 @@ import { Suspense, lazy } from "react";
 import Landing from "@/pages/landing/Landing";
 import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from '@/components/ProtectedRoute'
+import LinkedInContentStrategies from '@/pages/blog/LinkedInContentStrategies';
+import AIReplacingMarketers from '@/pages/blog/AIReplacingMarketers';
+import PersonalBrandFounder from '@/pages/blog/PersonalBrandFounder';
+import StudentLinkedInGuide from '@/pages/blog/StudentLinkedInGuide';
+import LinkedInCharacterCounter from '@/pages/tools/LinkedInCharacterCounter';
+import LinkedInHashtagGenerator from '@/pages/tools/LinkedInHashtagGenerator';
 
 // Lazy load all protected routes
 const Dashboard = lazy(() => import("@/pages/dashboard/Dashboard"));
@@ -25,6 +31,12 @@ export default function AppRoutes() {
         <Suspense fallback={<LoadingSpinner />}>
             <Routes>
                 <Route path="/" element={<Landing />} />
+                <Route path="/blog/linkedin-content-strategies" element={<LinkedInContentStrategies />} />
+                <Route path="/blog/ai-replacing-linkedin-marketers" element={<AIReplacingMarketers />} />
+                <Route path="/blog/personal-brand-founder-linkedin" element={<PersonalBrandFounder />} />
+                <Route path="/blog/student-linkedin-opportunities-guide" element={<StudentLinkedInGuide />} />
+                <Route path="/tools/linkedin-character-counter" element={<LinkedInCharacterCounter />} />
+                <Route path="/tools/linkedin-hashtag-generator" element={<LinkedInHashtagGenerator />} />
                 {/* <Route path="/onboarding" element={<Navigate to="/onboarding/1" replace />} />
                 <Route path="/onboarding/:step" element={
                     <ProtectedRoute>
