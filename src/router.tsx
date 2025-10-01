@@ -1,17 +1,24 @@
 import { Routes, Route } from "react-router";
-import { Suspense } from "react";
+import { Suspense, lazy } from "react";
 
 import Landing from "@/pages/landing/Landing";
-import Dashboard from "@/pages/dashboard/Dashboard";
 import AppLayout from "./layouts/AppLayout";
-import Research from '@/pages/research/Research'
-import Scheduler from '@/pages/scheduler/Scheduler'
-import Posts from '@/pages/posts/Posts'
-import CreatePost from '@/pages/create-post/CreatePost'
-// import Onboarding from '@/pages/onboarding/Onboarding'
-import Generate from '@/pages/generate/Generate'
 import ProtectedRoute from '@/components/ProtectedRoute'
-import IdentityTest from '@/pages/test/IdentityTest'
+import LinkedInContentStrategies from '@/pages/blog/LinkedInContentStrategies';
+import AIReplacingMarketers from '@/pages/blog/AIReplacingMarketers';
+import PersonalBrandFounder from '@/pages/blog/PersonalBrandFounder';
+import StudentLinkedInGuide from '@/pages/blog/StudentLinkedInGuide';
+import LinkedInCharacterCounter from '@/pages/tools/LinkedInCharacterCounter';
+import LinkedInHashtagGenerator from '@/pages/tools/LinkedInHashtagGenerator';
+
+// Lazy load all protected routes
+const Dashboard = lazy(() => import("@/pages/dashboard/Dashboard"));
+const Research = lazy(() => import('@/pages/research/Research'));
+const Scheduler = lazy(() => import('@/pages/scheduler/Scheduler'));
+const Posts = lazy(() => import('@/pages/posts/Posts'));
+const CreatePost = lazy(() => import('@/pages/create-post/CreatePost'));
+const Generate = lazy(() => import('@/pages/generate/Generate'));
+const IdentityTest = lazy(() => import('@/pages/test/IdentityTest'));
 
 const LoadingSpinner = () => (
     <div className="min-h-screen flex items-center justify-center">
@@ -24,6 +31,12 @@ export default function AppRoutes() {
         <Suspense fallback={<LoadingSpinner />}>
             <Routes>
                 <Route path="/" element={<Landing />} />
+                <Route path="/blog/linkedin-content-strategies" element={<LinkedInContentStrategies />} />
+                <Route path="/blog/ai-replacing-linkedin-marketers" element={<AIReplacingMarketers />} />
+                <Route path="/blog/personal-brand-founder-linkedin" element={<PersonalBrandFounder />} />
+                <Route path="/blog/student-linkedin-opportunities-guide" element={<StudentLinkedInGuide />} />
+                <Route path="/tools/linkedin-character-counter" element={<LinkedInCharacterCounter />} />
+                <Route path="/tools/linkedin-hashtag-generator" element={<LinkedInHashtagGenerator />} />
                 {/* <Route path="/onboarding" element={<Navigate to="/onboarding/1" replace />} />
                 <Route path="/onboarding/:step" element={
                     <ProtectedRoute>

@@ -32,6 +32,8 @@ export interface FetchPostsResponse {
   error?: string;
 }
 
+import type { TrendingPost } from '../dashboard/dashboardSlice';
+
 export interface DraftPostRequest {
   content: string;
   media_url?: string;
@@ -40,7 +42,7 @@ export interface DraftPostRequest {
   content_topics?: string[];
   writing_style?: string;
   post_length?: 'short' | 'medium' | 'long';
-  trending_posts?: any[];
+  trending_posts?: TrendingPost[];
 }
 
 export interface DraftPostResponse {

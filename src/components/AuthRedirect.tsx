@@ -49,8 +49,8 @@ export default function AuthRedirect() {
           })
           // Clear stored UTM data after successful update
           sessionStorage.removeItem('utm_data')
-        } catch (error) {
-          console.error('Failed to update user with UTM data:', error)
+        } catch {
+          // Silently fail - UTM tracking is not critical
         }
       }
     }

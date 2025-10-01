@@ -30,7 +30,7 @@ interface ViralPostsSectionProps {
 
 export default function ViralPostsSection({ topics = '', onSelectionChange }: ViralPostsSectionProps) {
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedPosts, setSelectedPosts] = useState<any[]>([]);
+  const [selectedPosts, setSelectedPosts] = useState<ViralPost[]>([]);
   const [previewPosts, setPreviewPosts] = useState<ViralPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [expandedPosts, setExpandedPosts] = useState<Set<string>>(new Set());
@@ -85,14 +85,14 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
 
       if (data.success && data.posts && data.posts.length > 0) {
         // Format posts for display
-        const formattedPosts = data.posts.slice(0, 4).map((post: any) => ({
+        const formattedPosts = data.posts.slice(0, 4).map((post: Record<string, unknown>) => ({
           id: post.id,
           title: post.author_name,
           content: post.content || post.hook || post.content_preview,
-          content_preview: post.content_preview || post.hook || (post.content ? post.content.substring(0, 150) : ''),
-          likes: post.likes > 1000 ? `${(post.likes / 1000).toFixed(1)}K` : post.likes.toString(),
-          comments: post.comments > 1000 ? `${(post.comments / 1000).toFixed(1)}K` : post.comments.toString(),
-          views: post.likes ? `${(post.likes * 10 / 1000).toFixed(0)}K` : '0',
+          content_preview: String(post.content_preview || post.hook || (typeof post.content === 'string' ? post.content.substring(0, 150) : '')),
+          likes: typeof post.likes === 'number' && post.likes > 1000 ? `${(post.likes / 1000).toFixed(1)}K` : String(post.likes || 0),
+          comments: typeof post.comments === 'number' && post.comments > 1000 ? `${(post.comments / 1000).toFixed(1)}K` : String(post.comments || 0),
+          views: typeof post.likes === 'number' && post.likes ? `${(post.likes * 10 / 1000).toFixed(0)}K` : '0',
           author_title: post.author_title,
           time_posted: post.time_posted,
           post_url: post.post_url
@@ -100,8 +100,10 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
 
         setPreviewPosts(formattedPosts);
       } else {
+        // No posts found
       }
-    } catch (error) {
+    } catch {
+      // Error handled by loading state
     } finally {
       setIsLoading(false);
     }
@@ -117,17 +119,17 @@ export default function ViralPostsSection({ topics = '', onSelectionChange }: Vi
     return topics.split(',').map(t => t.trim()).filter(t => t).join(' ');
   };
 
-  const handleSaveSelectedPosts = (posts: any[]) => {
+  const handleSaveSelectedPosts = (posts: ViralPost[]) => {
     setSelectedPosts(posts);
     // Update preview with selected posts
     const formattedPosts = posts.slice(0, 4).map(post => ({
       id: post.id,
       title: post.author_name,
       content: post.content || post.hook || post.content_preview,
-      content_preview: post.content_preview || post.hook || (post.content ? post.content.substring(0, 150) : ''),
-      likes: post.likes > 1000 ? `${(post.likes / 1000).toFixed(1)}K` : post.likes.toString(),
-      comments: post.comments > 1000 ? `${(post.comments / 1000).toFixed(1)}K` : post.comments.toString(),
-      views: post.likes ? `${(post.likes * 10 / 1000).toFixed(0)}K` : '0',
+      content_preview: String(post.content_preview || post.hook || (typeof post.content === 'string' ? post.content.substring(0, 150) : '')),
+      likes: typeof post.likes === 'number' && post.likes > 1000 ? `${(post.likes / 1000).toFixed(1)}K` : String(post.likes || 0),
+      comments: typeof post.comments === 'number' && post.comments > 1000 ? `${(post.comments / 1000).toFixed(1)}K` : String(post.comments || 0),
+      views: typeof post.likes === 'number' && post.likes ? `${(post.likes * 10 / 1000).toFixed(0)}K` : '0',
       author_title: post.author_title,
       time_posted: post.time_posted,
       post_url: post.post_url
