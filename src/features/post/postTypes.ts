@@ -2,6 +2,7 @@ export interface LinkedInPost {
   content: string;
   media_url?: string;
   visibility?: 'PUBLIC' | 'CONNECTIONS';
+  draft_id?: string;
 }
 
 export interface Post {
@@ -75,6 +76,7 @@ export interface SchedulePostRequest {
   timezone: string;
   media_url?: string;
   visibility?: 'PUBLIC' | 'CONNECTIONS';
+  draft_id?: string;
 }
 
 export interface SchedulePostResponse {

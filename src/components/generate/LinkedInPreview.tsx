@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, Image, X, MessageSquare } from 'lucide-react';
 import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
+import ConnectLinkedInButton from '@/components/linkedin/ConnectLinkedInButton';
 import ThumbIcon from '@/lib/icons/thumb.svg?react';
 import HeartIcon from '@/lib/icons/heart.svg?react';
 import ClapIcon from '@/lib/icons/clap.svg?react';
@@ -30,6 +31,11 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   // Use Clerk user data with fallbacks
   const userName = user?.fullName || user?.firstName || "Your Name";
   const userAvatar = user?.imageUrl || "";
+
+  // Check if LinkedIn is connected via Clerk external accounts
+  const hasLinkedIn = user?.externalAccounts?.some(
+    account => account.provider === 'linkedin_oidc'
+  ) || false;
 
   const [viewSize, setViewSize] = useState<ViewSize>('desktop');
   const [showFullContent, setShowFullContent] = useState(false);
@@ -79,7 +85,8 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
           content: postContent,
           scheduled_for: scheduledFor,
           timezone: timezone,
-          visibility: 'PUBLIC'
+          visibility: 'PUBLIC',
+          draft_id: postId  // Include the draft post ID if it exists
         },
         token
       })).unwrap();
@@ -106,7 +113,8 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
         post: {
           content: postContent,
           visibility: 'PUBLIC',
-          media_url: postImage || undefined
+          media_url: postImage || undefined,
+          draft_id: postId  // Include the draft post ID if it exists
         },
         token
       })).unwrap();
@@ -442,15 +450,22 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
         </div>
       </div>
 
-      {/* Schedule Post Button - Fixed to bottom right of preview container */}
+      {/* Schedule Post Button or Connect LinkedIn - Fixed to bottom right of preview container */}
       <div className="absolute bottom-4 right-4 z-10">
-        <Button
-          onClick={() => setShowScheduleModal(true)}
-          className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-6 py-3"
-        >
-          <Calendar className="w-4 h-4" />
-          <span className="font-medium">Schedule Post</span>
-        </Button>
+        {hasLinkedIn ? (
+          <Button
+            onClick={() => setShowScheduleModal(true)}
+            className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-6 py-3"
+          >
+            <Calendar className="w-4 h-4" />
+            <span className="font-medium">Schedule Post</span>
+          </Button>
+        ) : (
+          <ConnectLinkedInButton
+            className="shadow-xl rounded-lg px-6 py-3"
+            onSuccess={() => window.location.reload()}
+          />
+        )}
       </div>
       
       {/* Schedule Modal */}

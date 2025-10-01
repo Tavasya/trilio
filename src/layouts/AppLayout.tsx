@@ -10,11 +10,19 @@ import {
   SidebarTrigger
 } from '@/components/ui/sidebar'
 import { Book, FileText, PlusCircle, Calendar } from 'lucide-react'
-import { UserButton } from '@clerk/react-router'
+import { Linkedin } from 'lucide-react'
+import { UserButton, useUser } from '@clerk/react-router'
 import trilioLogo from '@/lib/logo/trilio-logo.png'
+import ConnectLinkedInButton from '@/components/linkedin/ConnectLinkedInButton'
 
 export default function AppLayout() {
   const location = useLocation()
+  const { user } = useUser()
+
+  // Check if LinkedIn is connected via Clerk external accounts
+  const hasLinkedIn = user?.externalAccounts?.some(
+    account => account.provider === 'linkedin_oidc'
+  ) || false
 
   return (
     <div className="min-h-screen flex">
@@ -85,8 +93,16 @@ export default function AppLayout() {
               {/* Mobile Sidebar Toggle */}
               <SidebarTrigger className="lg:hidden" />
 
-              {/* User Profile */}
-              <div className="ml-auto">
+              {/* LinkedIn Connection Status & User Profile */}
+              <div className="ml-auto flex items-center gap-3">
+                {hasLinkedIn ? (
+                  <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg border border-green-200">
+                    <Linkedin className="w-4 h-4" />
+                    <span className="text-sm font-medium">LinkedIn Connected</span>
+                  </div>
+                ) : (
+                  <ConnectLinkedInButton size="sm" variant="outline" />
+                )}
                 <UserButton
                   appearance={{
                     elements: {
