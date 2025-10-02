@@ -33,17 +33,10 @@ export interface FetchPostsResponse {
   error?: string;
 }
 
-import type { TrendingPost } from '../dashboard/dashboardSlice';
-
 export interface DraftPostRequest {
   content: string;
   media_url?: string;
   visibility?: 'PUBLIC' | 'CONNECTIONS';
-  identity?: string;
-  content_topics?: string[];
-  writing_style?: string;
-  post_length?: 'short' | 'medium' | 'long';
-  trending_posts?: TrendingPost[];
 }
 
 export interface DraftPostResponse {
@@ -52,9 +45,23 @@ export interface DraftPostResponse {
   post: Post;
 }
 
+export interface ConversationData {
+  conversation_id: string;
+  title?: string;
+  messages: Array<{
+    id: string;
+    conversation_id: string;
+    role: string;
+    content: string;
+    created_at: string;
+  }>;
+  research_cards?: Array<any>;
+}
+
 export interface GetPostResponse {
   success: boolean;
   post: Post;
+  conversation?: ConversationData | null;
   error?: string;
 }
 
@@ -92,4 +99,33 @@ export interface PostState {
   isLoading: boolean;
   error: string | null;
   lastPostId: string | null;
+}
+
+export interface IdeaVariation {
+  title: string;
+  content: string;
+}
+
+export interface GenerateIdeasRequest {
+  topic?: string;
+  draft_content?: string;
+}
+
+export interface RegenerateVariationRequest {
+  topic: string;
+  index: number;
+  previous_content: string;
+}
+
+export interface GenerateIdeasResponse {
+  success: boolean;
+  variations: IdeaVariation[];
+}
+
+export interface EditSelectionRequest {
+  full_content: string;
+  selected_text: string;
+  edit_instruction: string;
+  selection_start: number;
+  selection_end: number;
 }

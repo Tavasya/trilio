@@ -1,93 +1,78 @@
 import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
-
-export type PostLength = 'short' | 'medium' | 'long';
-
-export interface TrendingPost {
-  id: string;
-  author_name?: string;
-  author_title?: string;
-  hook?: string;
-  content_preview?: string;
-  content?: string;
-  likes?: number | string;
-  comments?: number | string;
-  views?: string;
-  time_posted?: string;
-}
+import type { IdeaVariation } from '../post/postTypes';
 
 interface DashboardState {
-  content: string;
-  identity: string;  // Changed to single string
-  contentTopics: string[];
-  writingStyle: string;  // Changed to single string
-  postLength: PostLength;
-  trendingPosts: TrendingPost[];
-  isValid: boolean;
-  validationErrors: string[];
+  idea: string;
+  draftContent: string;
+  variations: IdeaVariation[];
+  isGenerating: boolean;
+  error: string | null;
+  streamingContents: Record<number, string>;  // Per-variation streaming text
+  chatMode: 'topic' | 'draft';
 }
 
 const initialState: DashboardState = {
-  content: '',
-  identity: '',  // Changed to empty string
-  contentTopics: [],
-  writingStyle: '',  // Changed to empty string
-  postLength: 'medium',
-  trendingPosts: [],
-  isValid: false,
-  validationErrors: [],
+  idea: '',
+  draftContent: '',
+  variations: [],
+  isGenerating: false,
+  error: null,
+  streamingContents: {},
+  chatMode: 'topic',
 };
 
 const dashboardSlice = createSlice({
   name: 'dashboard',
   initialState,
   reducers: {
-    setContent: (state, action: PayloadAction<string>) => {
-      state.content = action.payload;
-      // Parse topics from content
-      state.contentTopics = action.payload
-        .split(',')
-        .map(topic => topic.trim())
-        .filter(topic => topic.length > 0);
+    setIdea: (state, action: PayloadAction<string>) => {
+      state.idea = action.payload;
     },
 
-    setIdentity: (state, action: PayloadAction<string>) => {
-      state.identity = action.payload;
+    setDraftContent: (state, action: PayloadAction<string>) => {
+      state.draftContent = action.payload;
     },
 
-    setWritingStyle: (state, action: PayloadAction<string>) => {
-      state.writingStyle = action.payload;
+    setGenerating: (state, action: PayloadAction<boolean>) => {
+      state.isGenerating = action.payload;
     },
 
-    setPostLength: (state, action: PayloadAction<PostLength>) => {
-      state.postLength = action.payload;
+    setVariations: (state, action: PayloadAction<IdeaVariation[]>) => {
+      state.variations = action.payload;
     },
 
-    setTrendingPosts: (state, action: PayloadAction<TrendingPost[]>) => {
-      state.trendingPosts = action.payload;
+    setError: (state, action: PayloadAction<string | null>) => {
+      state.error = action.payload;
     },
 
-    validateForm: (state) => {
-      const errors: string[] = [];
+    startVariation: (state, action: PayloadAction<{ index: number; title: string }>) => {
+      const { index, title } = action.payload;
+      state.variations[index] = { title, content: '' };
+      state.streamingContents[index] = '';
+    },
 
-      if (!state.content.trim()) {
-        errors.push('Please enter content topics');
+    appendVariationContent: (state, action: PayloadAction<{ index: number; content: string }>) => {
+      const { index, content } = action.payload;
+      if (!state.streamingContents[index]) {
+        state.streamingContents[index] = '';
       }
+      state.streamingContents[index] += content;
+    },
 
-      if (!state.identity) {
-        errors.push('Please select an identity');
+    completeVariation: (state, action: PayloadAction<{ index: number; content: string }>) => {
+      const { index, content } = action.payload;
+      if (state.variations[index]) {
+        state.variations[index].content = content;
       }
+      delete state.streamingContents[index];
+    },
 
-      if (!state.writingStyle) {
-        errors.push('Please select a writing style');
-      }
-
-      if (state.trendingPosts.length === 0) {
-        errors.push('Please select at least one trending post for inspiration');
-      }
-
-      state.validationErrors = errors;
-      state.isValid = errors.length === 0;
+    setChatMode: (state, action: PayloadAction<'topic' | 'draft'>) => {
+      state.chatMode = action.payload;
+      // Reset variations when switching modes
+      state.variations = [];
+      state.streamingContents = {};
     },
 
     resetDashboard: () => initialState,
@@ -95,18 +80,19 @@ const dashboardSlice = createSlice({
 });
 
 export const {
-  setContent,
-  setIdentity,
-  setWritingStyle,
-  setPostLength,
-  setTrendingPosts,
-  validateForm,
+  setIdea,
+  setDraftContent,
+  setGenerating,
+  setVariations,
+  setError,
+  startVariation,
+  appendVariationContent,
+  completeVariation,
+  setChatMode,
   resetDashboard,
 } = dashboardSlice.actions;
 
 // Selectors
 export const selectDashboardState = (state: { dashboard: DashboardState }) => state.dashboard;
-export const selectIsFormValid = (state: { dashboard: DashboardState }) => state.dashboard.isValid;
-export const selectValidationErrors = (state: { dashboard: DashboardState }) => state.dashboard.validationErrors;
 
 export default dashboardSlice.reducer;

@@ -6,7 +6,7 @@ import { postService } from '../../features/post/postService';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
 import { useAppDispatch } from '@/store/hooks';
-import { setGeneratedPost, loadConversationHistory, startNewConversation } from '@/features/chat/chatSlice';
+import { setGeneratedPost, loadConversationFromPostResponse, startNewConversation } from '@/features/chat/chatSlice';
 import { LogoLoader } from '@/components/ui/logo-loader';
 
 export default function Generate() {
@@ -44,7 +44,7 @@ export default function Generate() {
         if (postId) {
           setCurrentPostId(postId);
 
-          // Fetch post data
+          // Fetch post data and conversation history in one call
           const response = await postService.fetchPostById(postId, token);
           if (response.success && response.post) {
             dispatch(setGeneratedPost({
@@ -52,13 +52,11 @@ export default function Generate() {
               content: response.post.content || '',
               isEdited: false
             }));
-          }
 
-          // Fetch conversation history for this post
-          try {
-            await dispatch(loadConversationHistory({ postId, token })).unwrap();
-          } catch (error) {
-            // Conversation might not exist yet, which is fine
+            // Load conversation data if it exists
+            if (response.conversation) {
+              dispatch(loadConversationFromPostResponse(response.conversation));
+            }
           }
         } else {
           // No postId provided - this shouldn't happen with the new flow
@@ -91,13 +89,13 @@ export default function Generate() {
     <div className="h-full bg-white flex flex-col">
       {/* Desktop Layout */}
       <div className="hidden lg:flex h-full overflow-hidden">
-        {/* Chat Interface - 50% width */}
-        <div className="w-1/2 p-4 h-full overflow-hidden">
+        {/* Chat Interface - 35% width */}
+        <div className="w-[35%] p-4 h-full overflow-hidden">
           <ChatInterface postId={currentPostId || postId} />
         </div>
 
-        {/* LinkedIn Preview - 50% width */}
-        <div className="w-1/2 p-4 h-full overflow-auto">
+        {/* LinkedIn Preview - 65% width */}
+        <div className="w-[65%] p-4 h-full overflow-auto">
           <LinkedInPreview />
         </div>
       </div>

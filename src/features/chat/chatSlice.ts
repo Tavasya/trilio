@@ -283,7 +283,43 @@ const chatSlice = createSlice({
     clearResearchCards: (state) => {
       state.researchCards = null;
     },
-    
+
+    setPersistedResearchCards: (state, action: PayloadAction<any[]>) => {
+      state.persistedResearchCards = action.payload;
+    },
+
+    loadConversationFromPostResponse: (state, action: PayloadAction<{
+      conversation_id: string;
+      messages: Array<{
+        id: string;
+        conversation_id: string;
+        role: string;
+        content: string;
+        created_at: string;
+      }>;
+      research_cards?: Array<any>;
+    }>) => {
+      const { conversation_id, messages, research_cards } = action.payload;
+
+      state.conversations[conversation_id] = {
+        conversation_id,
+        messages: messages.map((msg) => ({
+          id: msg.id,
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content,
+          timestamp: msg.created_at,
+        })),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+      };
+
+      state.activeConversationId = conversation_id;
+
+      if (research_cards && research_cards.length > 0) {
+        state.persistedResearchCards = research_cards;
+      }
+    },
+
   },
   extraReducers: (builder) => {
     builder
@@ -349,6 +385,8 @@ export const {
   setSaveStatus,
   setResearchCards,
   clearResearchCards,
+  setPersistedResearchCards,
+  loadConversationFromPostResponse,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;
