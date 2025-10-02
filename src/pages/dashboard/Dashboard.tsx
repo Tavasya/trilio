@@ -6,28 +6,44 @@ import { postService } from '@/features/post/postService';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import {
   setIdea,
+  setDraftContent,
   setGenerating,
   setVariations,
   setError,
   startVariation,
   appendVariationContent,
   completeVariation,
-  selectDashboardState
+  selectDashboardState,
+  setChatMode
 } from '../../features/dashboard/dashboardSlice';
 import { Sparkles, Loader2, RefreshCw } from 'lucide-react';
 import type { IdeaVariation } from '@/features/post/postTypes';
 import { useState } from 'react';
+import ModeSlider from '@/components/dashboard/ModeSlider';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { getToken } = useAuth();
   const dispatch = useAppDispatch();
-  const { idea, variations, isGenerating, streamingContents } = useAppSelector(selectDashboardState);
+  const {
+    idea,
+    draftContent,
+    variations,
+    isGenerating,
+    streamingContents,
+    chatMode
+  } = useAppSelector(selectDashboardState);
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
 
   const handleGenerateIdeas = async () => {
-    if (!idea.trim()) {
+    // Validation based on mode
+    if (chatMode === 'topic' && !idea.trim()) {
       toast.error('Please enter an idea or topic', { position: 'top-right' });
+      return;
+    }
+
+    if (chatMode === 'draft' && !draftContent.trim()) {
+      toast.error('Please enter your draft content', { position: 'top-right' });
       return;
     }
 
@@ -43,7 +59,9 @@ const Dashboard = () => {
 
     try {
       await postService.streamGenerateIdeas(
-        { topic: idea },
+        chatMode === 'topic'
+          ? { topic: idea }
+          : { draft_content: draftContent },
         token,
         (index, title) => {
           dispatch(startVariation({ index, title }));
@@ -60,13 +78,13 @@ const Dashboard = () => {
         (error, index) => {
           dispatch(setError(error.message));
           dispatch(setGenerating(false));
-          toast.error(`Failed to generate ${index !== undefined ? `variation ${index + 1}` : 'ideas'}. Please try again.`, { position: 'top-right' });
+          toast.error(`Failed to generate ${index !== undefined ? `variation ${index + 1}` : 'variations'}. Please try again.`, { position: 'top-right' });
         }
       );
     } catch (error) {
-      dispatch(setError(error instanceof Error ? error.message : 'Failed to generate ideas'));
+      dispatch(setError(error instanceof Error ? error.message : 'Failed to generate variations'));
       dispatch(setGenerating(false));
-      toast.error('Failed to generate ideas. Please try again.', { position: 'top-right' });
+      toast.error('Failed to generate variations. Please try again.', { position: 'top-right' });
     }
   };
 
@@ -84,7 +102,7 @@ const Dashboard = () => {
       } else {
         throw new Error('No post ID returned');
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to save draft. Please try again.', { position: 'top-right' });
     }
   };
@@ -140,36 +158,71 @@ const Dashboard = () => {
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
             Generate LinkedIn Post Ideas
           </h1>
-          <p className="text-gray-600">Tell us what you want to talk about and we'll create variations for you</p>
+          <p className="text-gray-600">
+            {chatMode === 'topic'
+              ? 'Tell us what you want to talk about and we\'ll create variations for you'
+              : 'Select a draft and we\'ll create variations to refine it'
+            }
+          </p>
+        </div>
+
+        {/* Mode Slider */}
+        <div className="mb-3">
+          <ModeSlider
+            mode={chatMode}
+            onModeChange={(mode) => dispatch(setChatMode(mode))}
+          />
         </div>
 
         {/* Input Section */}
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          <label htmlFor="idea-input" className="block text-sm font-medium text-gray-700 mb-2">
-            What do you want to talk about?
-          </label>
-          <textarea
-            id="idea-input"
-            value={idea}
-            onChange={(e) => dispatch(setIdea(e.target.value))}
-            placeholder="e.g., AI in marketing, productivity tips, startup lessons..."
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-            rows={3}
-          />
+          {chatMode === 'topic' ? (
+            <>
+              <label htmlFor="idea-input" className="block text-sm font-medium text-gray-700 mb-2">
+                What do you want to talk about?
+              </label>
+              <textarea
+                id="idea-input"
+                value={idea}
+                onChange={(e) => dispatch(setIdea(e.target.value))}
+                placeholder="e.g., AI in marketing, productivity tips, startup lessons..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                rows={3}
+              />
+            </>
+          ) : (
+            <>
+              <label htmlFor="draft-input" className="block text-sm font-medium text-gray-700 mb-2">
+                Paste your draft content
+              </label>
+              <textarea
+                id="draft-input"
+                value={draftContent}
+                onChange={(e) => dispatch(setDraftContent(e.target.value))}
+                placeholder="Paste your existing LinkedIn post or content here to get refined variations..."
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                rows={6}
+              />
+            </>
+          )}
           <Button
             onClick={handleGenerateIdeas}
-            disabled={isGenerating || !idea.trim()}
+            disabled={
+              isGenerating ||
+              (chatMode === 'topic' && !idea.trim()) ||
+              (chatMode === 'draft' && !draftContent.trim())
+            }
             className="mt-4 w-full sm:w-auto px-6 py-2.5 text-sm font-medium bg-primary hover:bg-primary/90 transition-all duration-200 disabled:opacity-50"
           >
             {isGenerating ? (
               <>
                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Generating Ideas...
+                Generating Variations...
               </>
             ) : (
               <>
                 <Sparkles className="w-4 h-4 mr-2" />
-                Generate Ideas
+                Generate Variations
               </>
             )}
           </Button>

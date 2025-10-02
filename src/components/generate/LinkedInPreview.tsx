@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, X, MessageSquare, Bold, Italic, List, ImagePlus, Edit3, Loader2 } from 'lucide-react';
+import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, X, MessageSquare, Bold, Italic, List, ImagePlus, Edit3 } from 'lucide-react';
 import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
 import ConnectLinkedInButton from '@/components/linkedin/ConnectLinkedInButton';

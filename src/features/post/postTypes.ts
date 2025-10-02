@@ -107,7 +107,8 @@ export interface IdeaVariation {
 }
 
 export interface GenerateIdeasRequest {
-  topic: string;
+  topic?: string;
+  draft_content?: string;
 }
 
 export interface RegenerateVariationRequest {

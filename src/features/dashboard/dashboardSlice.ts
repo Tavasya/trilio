@@ -4,18 +4,22 @@ import type { IdeaVariation } from '../post/postTypes';
 
 interface DashboardState {
   idea: string;
+  draftContent: string;
   variations: IdeaVariation[];
   isGenerating: boolean;
   error: string | null;
   streamingContents: Record<number, string>;  // Per-variation streaming text
+  chatMode: 'topic' | 'draft';
 }
 
 const initialState: DashboardState = {
   idea: '',
+  draftContent: '',
   variations: [],
   isGenerating: false,
   error: null,
   streamingContents: {},
+  chatMode: 'topic',
 };
 
 const dashboardSlice = createSlice({
@@ -24,6 +28,10 @@ const dashboardSlice = createSlice({
   reducers: {
     setIdea: (state, action: PayloadAction<string>) => {
       state.idea = action.payload;
+    },
+
+    setDraftContent: (state, action: PayloadAction<string>) => {
+      state.draftContent = action.payload;
     },
 
     setGenerating: (state, action: PayloadAction<boolean>) => {
@@ -60,18 +68,27 @@ const dashboardSlice = createSlice({
       delete state.streamingContents[index];
     },
 
+    setChatMode: (state, action: PayloadAction<'topic' | 'draft'>) => {
+      state.chatMode = action.payload;
+      // Reset variations when switching modes
+      state.variations = [];
+      state.streamingContents = {};
+    },
+
     resetDashboard: () => initialState,
   },
 });
 
 export const {
   setIdea,
+  setDraftContent,
   setGenerating,
   setVariations,
   setError,
   startVariation,
   appendVariationContent,
   completeVariation,
+  setChatMode,
   resetDashboard,
 } = dashboardSlice.actions;
 
