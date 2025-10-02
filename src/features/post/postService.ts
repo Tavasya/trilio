@@ -1,5 +1,6 @@
 import { API_CONFIG } from '@/shared/config/api';
-import type { FetchPostsResponse, LinkedInPost, LinkedInPostResponse, DraftPostRequest, DraftPostResponse, GetPostResponse, UpdateDraftRequest, UpdateDraftResponse, SchedulePostRequest, SchedulePostResponse } from './postTypes';
+import { handleSSEStream } from '@/shared/utils/sse';
+import type { FetchPostsResponse, LinkedInPost, LinkedInPostResponse, DraftPostRequest, DraftPostResponse, GetPostResponse, UpdateDraftRequest, UpdateDraftResponse, SchedulePostRequest, SchedulePostResponse, GenerateIdeasRequest } from './postTypes';
 
 export class PostService {
   async fetchUserPosts(token: string): Promise<FetchPostsResponse> {
@@ -155,6 +156,48 @@ export class PostService {
     }
 
     return data;
+  }
+
+  async streamGenerateIdeas(
+    request: GenerateIdeasRequest,
+    token: string,
+    onVariationStart: (index: number, title: string) => void,
+    onVariationChunk: (index: number, content: string) => void,
+    onVariationComplete: (index: number, content: string) => void,
+    onComplete: () => void,
+    onError: (error: Error, index?: number) => void
+  ): Promise<void> {
+    await handleSSEStream(
+      `${API_CONFIG.BASE_URL}/api/ideas/generate`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      },
+      (eventType, data) => {
+        switch (eventType) {
+          case 'variation_start':
+            onVariationStart(data.index, data.title);
+            break;
+          case 'variation_chunk':
+            onVariationChunk(data.index, data.content);
+            break;
+          case 'variation_complete':
+            onVariationComplete(data.index, data.content);
+            break;
+          case 'done':
+            onComplete();
+            break;
+          case 'error':
+            onError(new Error(data.error), data.index);
+            break;
+        }
+      },
+      onError
+    );
   }
 }
 
