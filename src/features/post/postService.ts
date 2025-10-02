@@ -1,6 +1,6 @@
 import { API_CONFIG } from '@/shared/config/api';
 import { handleSSEStream } from '@/shared/utils/sse';
-import type { FetchPostsResponse, LinkedInPost, LinkedInPostResponse, DraftPostRequest, DraftPostResponse, GetPostResponse, UpdateDraftRequest, UpdateDraftResponse, SchedulePostRequest, SchedulePostResponse, GenerateIdeasRequest, RegenerateVariationRequest } from './postTypes';
+import type { FetchPostsResponse, LinkedInPost, LinkedInPostResponse, DraftPostRequest, DraftPostResponse, GetPostResponse, UpdateDraftRequest, UpdateDraftResponse, SchedulePostRequest, SchedulePostResponse, GenerateIdeasRequest, RegenerateVariationRequest, EditSelectionRequest } from './postTypes';
 
 export class PostService {
   async fetchUserPosts(token: string): Promise<FetchPostsResponse> {
@@ -235,6 +235,43 @@ export class PostService {
             break;
           case 'error':
             onError(new Error(data.error), data.index);
+            break;
+        }
+      },
+      onError
+    );
+  }
+
+  async streamEditSelection(
+    request: EditSelectionRequest,
+    token: string,
+    onChunk: (content: string) => void,
+    onComplete: () => void,
+    onError: (error: Error) => void
+  ): Promise<void> {
+    await handleSSEStream(
+      `${API_CONFIG.BASE_URL}/api/ideas/edit-selection`,
+      {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(request),
+      },
+      (eventType, data) => {
+        switch (eventType) {
+          case 'edit_chunk':
+            if (data.content) {
+              onChunk(data.content);
+            }
+            break;
+          case 'edit_complete':
+          case 'done':
+            onComplete();
+            break;
+          case 'error':
+            onError(new Error(data.error || 'Failed to edit selection'));
             break;
         }
       },

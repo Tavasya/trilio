@@ -120,3 +120,11 @@ export interface GenerateIdeasResponse {
   success: boolean;
   variations: IdeaVariation[];
 }
+
+export interface EditSelectionRequest {
+  full_content: string;
+  selected_text: string;
+  edit_instruction: string;
+  selection_start: number;
+  selection_end: number;
+}
