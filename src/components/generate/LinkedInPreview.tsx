@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, Image, X, MessageSquare } from 'lucide-react';
+import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, X, MessageSquare, Bold, Italic, List, ImagePlus } from 'lucide-react';
 import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
 import ConnectLinkedInButton from '@/components/linkedin/ConnectLinkedInButton';
@@ -43,6 +43,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   const [postImage, setPostImage] = useState<string | null>(null);
   const [isEditingContent, setIsEditingContent] = useState(false);
   const previewContainerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const postContent = generatedPost?.content || "Your LinkedIn post content will appear here as you generate it...";
   const postId = generatedPost?.id;
@@ -145,13 +146,13 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   };
   
   const getPreviewWidth = () => {
-    return viewSize === 'mobile' ? 'w-[375px]' : 'w-[552px]';
+    return viewSize === 'mobile' ? 'w-[375px]' : 'w-[700px]';
   };
   
   const getTruncatedContent = () => {
     const lines = postContent.split('\n');
     const maxLines = viewSize === 'mobile' ? 2 : 4;
-    
+
     if (!showFullContent && lines.length > maxLines) {
       return {
         text: lines.slice(0, maxLines).join('\n'),
@@ -163,6 +164,11 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       truncated: false
     };
   };
+
+  const renderFormattedText = (text: string) => {
+    // LinkedIn uses Unicode bold/italic characters, so just return the text as-is
+    return text;
+  };
   
   const handleContentChange = (newContent: string) => {
     dispatch(updateGeneratedPostContent(newContent));
@@ -170,7 +176,10 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   
   const handleContentBlur = async () => {
     setIsEditingContent(false);
-    
+
+    // Expand content when exiting edit mode
+    setShowFullContent(true);
+
     // Only save if we have a post ID and the content has been edited
     if (postId && generatedPost?.isEdited && saveStatus === 'unsaved') {
       try {
@@ -179,7 +188,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
           toast.error('Authentication required', { position: 'top-right' });
           return;
         }
-        
+
         await dispatch(saveDraftToDatabase({
           postId,
           content: postContent,
@@ -188,6 +197,125 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       } catch {
         // Auto-save errors are silent
       }
+    }
+  };
+
+  // Auto-resize textarea when entering edit mode
+  useEffect(() => {
+    if (isEditingContent && textareaRef.current) {
+      const textarea = textareaRef.current;
+      textarea.style.height = 'auto';
+      textarea.style.height = `${textarea.scrollHeight}px`;
+    }
+  }, [isEditingContent]);
+
+  const applyBoldFormatting = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = postContent.substring(start, end);
+
+    if (!selectedText) {
+      toast.error('Please select text to format', { position: 'top-right' });
+      return;
+    }
+
+    // Convert to Unicode Mathematical Bold (using fromCodePoint for supplementary plane)
+    const boldText = selectedText.split('').map(char => {
+      const code = char.charCodeAt(0);
+      // A-Z: 0x1D400 - 0x1D419
+      if (code >= 65 && code <= 90) {
+        return String.fromCodePoint(0x1D400 + (code - 65));
+      }
+      // a-z: 0x1D41A - 0x1D433
+      if (code >= 97 && code <= 122) {
+        return String.fromCodePoint(0x1D41A + (code - 97));
+      }
+      // 0-9: 0x1D7CE - 0x1D7D7
+      if (code >= 48 && code <= 57) {
+        return String.fromCodePoint(0x1D7CE + (code - 48));
+      }
+      return char;
+    }).join('');
+
+    const beforeText = postContent.substring(0, start);
+    const afterText = postContent.substring(end);
+    const newContent = beforeText + boldText + afterText;
+
+    handleContentChange(newContent);
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start, start + boldText.length);
+    }, 0);
+  };
+
+  const applyItalicFormatting = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = postContent.substring(start, end);
+
+    if (!selectedText) {
+      toast.error('Please select text to format', { position: 'top-right' });
+      return;
+    }
+
+    // Convert to Unicode Mathematical Italic (using fromCodePoint for supplementary plane)
+    const italicText = selectedText.split('').map(char => {
+      const code = char.charCodeAt(0);
+      // A-Z: 0x1D434 - 0x1D44D
+      if (code >= 65 && code <= 90) {
+        return String.fromCodePoint(0x1D434 + (code - 65));
+      }
+      // a-z: 0x1D44E - 0x1D467
+      if (code >= 97 && code <= 122) {
+        return String.fromCodePoint(0x1D44E + (code - 97));
+      }
+      return char;
+    }).join('');
+
+    const beforeText = postContent.substring(0, start);
+    const afterText = postContent.substring(end);
+    const newContent = beforeText + italicText + afterText;
+
+    handleContentChange(newContent);
+
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(start, start + italicText.length);
+    }, 0);
+  };
+
+  const insertBulletList = () => {
+    const textarea = textareaRef.current;
+    if (!textarea) return;
+
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = postContent.substring(start, end);
+
+    const beforeText = postContent.substring(0, start);
+    const afterText = postContent.substring(end);
+
+    if (selectedText) {
+      // Convert selected lines to bullet points
+      const lines = selectedText.split('\n');
+      const bulletLines = lines.map(line => line.trim() ? `• ${line.trim()}` : line).join('\n');
+      const newContent = `${beforeText}${bulletLines}${afterText}`;
+      handleContentChange(newContent);
+    } else {
+      // Insert a new bullet point
+      const newContent = `${beforeText}• ${afterText}`;
+      handleContentChange(newContent);
+      setTimeout(() => {
+        textarea.focus();
+        textarea.setSelectionRange(start + 2, start + 2);
+      }, 0);
     }
   };
   
@@ -277,7 +405,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
 
       {/* LinkedIn Post Preview */}
       <div ref={previewContainerRef} className="flex-1 overflow-y-auto bg-gray-100 relative custom-scrollbar">
-        <div className="p-4 flex justify-center items-start relative min-h-full">
+        <div className="p-4 flex justify-center items-start gap-2 relative min-h-full">
           {/* Post Card with responsive width */}
           <div className={`bg-white border border-gray-200 rounded-lg ${getPreviewWidth()}`}>
             {/* Post Header */}
@@ -313,6 +441,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             <div className="px-4 pb-3">
               {isEditingContent ? (
                 <textarea
+                  ref={textareaRef}
                   value={postContent}
                   onChange={(e) => handleContentChange(e.target.value)}
                   onBlur={handleContentBlur}
@@ -326,12 +455,6 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                     fontSize: '14px',
                     lineHeight: '1.42857'
                   }}
-                  ref={(textarea) => {
-                    if (textarea) {
-                      textarea.style.height = 'auto';
-                      textarea.style.height = `${textarea.scrollHeight}px`;
-                    }
-                  }}
                   onInput={(e) => {
                     const target = e.target as HTMLTextAreaElement;
                     target.style.height = 'auto';
@@ -341,7 +464,10 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
               ) : (
                 <div
                   className="text-gray-900 whitespace-pre-wrap cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
-                  onClick={() => setIsEditingContent(true)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setIsEditingContent(true);
+                  }}
                   title="Click to edit"
                   style={{
                     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
@@ -349,7 +475,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                     lineHeight: '1.42857'
                   }}
                 >
-                  {displayContent}
+                  {renderFormattedText(displayContent)}
                   {truncated && (
                     <>
                       {'... '}
@@ -380,13 +506,13 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                   )}
                 </div>
               )}
-              
-              {/* Image Upload Area */}
-              {postImage ? (
+
+              {/* Image Display Area */}
+              {postImage && (
                 <div className="mt-3 relative group">
-                  <img 
-                    src={postImage} 
-                    alt="Post attachment" 
+                  <img
+                    src={postImage}
+                    alt="Post attachment"
                     className="w-full rounded-lg object-cover"
                   />
                   <button
@@ -396,14 +522,6 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                     <X className="w-4 h-4" />
                   </button>
                 </div>
-              ) : (
-                <button
-                  onClick={handleImageUpload}
-                  className="mt-3 w-full p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-gray-400 transition-colors flex items-center justify-center gap-2 text-gray-500 hover:text-gray-600"
-                >
-                  <Image className="w-5 h-5" />
-                  <span className="text-sm font-medium">Add Image</span>
-                </button>
               )}
             </div>
 
@@ -447,6 +565,43 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             </div>
           </div>
 
+          {/* Formatting Toolbar - Right side */}
+          <div className="sticky top-0 flex flex-col gap-1 p-1">
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={applyBoldFormatting}
+              className="p-2 hover:bg-gray-200 rounded transition-colors"
+              title="Bold (Unicode characters)"
+            >
+              <Bold className="w-4 h-4 text-gray-700" />
+            </button>
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={applyItalicFormatting}
+              className="p-2 hover:bg-gray-200 rounded transition-colors"
+              title="Italic (Unicode characters)"
+            >
+              <Italic className="w-4 h-4 text-gray-700" />
+            </button>
+            <div className="h-px w-6 bg-gray-300 my-1" />
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={insertBulletList}
+              className="p-2 hover:bg-gray-200 rounded transition-colors"
+              title="Bullet list"
+            >
+              <List className="w-4 h-4 text-gray-700" />
+            </button>
+            <div className="h-px w-6 bg-gray-300 my-1" />
+            <button
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={handleImageUpload}
+              className="p-2 hover:bg-gray-200 rounded transition-colors"
+              title="Add image"
+            >
+              <ImagePlus className="w-4 h-4 text-gray-700" />
+            </button>
+          </div>
         </div>
       </div>
 

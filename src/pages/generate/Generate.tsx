@@ -89,13 +89,13 @@ export default function Generate() {
     <div className="h-full bg-white flex flex-col">
       {/* Desktop Layout */}
       <div className="hidden lg:flex h-full overflow-hidden">
-        {/* Chat Interface - 50% width */}
-        <div className="w-1/2 p-4 h-full overflow-hidden">
+        {/* Chat Interface - 35% width */}
+        <div className="w-[35%] p-4 h-full overflow-hidden">
           <ChatInterface postId={currentPostId || postId} />
         </div>
 
-        {/* LinkedIn Preview - 50% width */}
-        <div className="w-1/2 p-4 h-full overflow-auto">
+        {/* LinkedIn Preview - 65% width */}
+        <div className="w-[65%] p-4 h-full overflow-auto">
           <LinkedInPreview />
         </div>
       </div>

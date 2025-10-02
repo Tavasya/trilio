@@ -90,8 +90,8 @@ export default function AppLayout() {
           {/* Top Navigation Bar */}
           <header className="border-b border-border bg-background flex-shrink-0">
             <div className="flex items-center justify-between px-6 py-3">
-              {/* Mobile Sidebar Toggle */}
-              <SidebarTrigger className="lg:hidden" />
+              {/* Sidebar Toggle */}
+              <SidebarTrigger />
 
               {/* LinkedIn Connection Status & User Profile */}
               <div className="ml-auto flex items-center gap-3">
