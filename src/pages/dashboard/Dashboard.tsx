@@ -14,14 +14,16 @@ import {
   completeVariation,
   selectDashboardState
 } from '../../features/dashboard/dashboardSlice';
-import { Sparkles, Loader2 } from 'lucide-react';
+import { Sparkles, Loader2, RefreshCw } from 'lucide-react';
 import type { IdeaVariation } from '@/features/post/postTypes';
+import { useState } from 'react';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { getToken } = useAuth();
   const dispatch = useAppDispatch();
   const { idea, variations, isGenerating, streamingContents } = useAppSelector(selectDashboardState);
+  const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
 
   const handleGenerateIdeas = async () => {
     if (!idea.trim()) {
@@ -87,6 +89,49 @@ const Dashboard = () => {
     }
   };
 
+  const handleRegenerateVariation = async (index: number, previousContent: string) => {
+    if (!idea.trim()) {
+      toast.error('Original topic required for regeneration', { position: 'top-right' });
+      return;
+    }
+
+    const token = await getToken();
+    if (!token) {
+      toast.error('Authentication required', { position: 'top-right' });
+      return;
+    }
+
+    setRegeneratingIndex(index);
+
+    try {
+      await postService.streamRegenerateVariation(
+        { topic: idea, index, previous_content: previousContent },
+        token,
+        (idx, title) => {
+          dispatch(startVariation({ index: idx, title }));
+        },
+        (idx, content) => {
+          dispatch(appendVariationContent({ index: idx, content }));
+        },
+        (idx, content) => {
+          dispatch(completeVariation({ index: idx, content }));
+        },
+        () => {
+          setRegeneratingIndex(null);
+        },
+        (error) => {
+          dispatch(setError(error.message));
+          setRegeneratingIndex(null);
+          toast.error('Failed to regenerate variation. Please try again.', { position: 'top-right' });
+        }
+      );
+    } catch (error) {
+      dispatch(setError(error instanceof Error ? error.message : 'Failed to regenerate variation'));
+      setRegeneratingIndex(null);
+      toast.error('Failed to regenerate variation. Please try again.', { position: 'top-right' });
+    }
+  };
+
   return (
     <div className="h-full overflow-y-auto bg-gradient-to-br from-gray-50 via-white to-gray-50 p-6">
       <div className="max-w-4xl mx-auto">
@@ -136,34 +181,53 @@ const Dashboard = () => {
             <h2 className="text-xl font-semibold text-gray-900 mb-4">
               {isGenerating ? 'Generating variations...' : 'Choose a variation to continue'}
             </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
               {variations.map((variation, index) => {
                 const isStreaming = streamingContents[index] !== undefined;
                 const displayContent = isStreaming ? streamingContents[index] : variation.content;
                 const hasContent = variation.title || displayContent;
+                const isRegenerating = regeneratingIndex === index;
 
                 return (
                   <div
                     key={index}
-                    onClick={() => !isGenerating && variation.content ? handleSelectVariation(variation) : undefined}
-                    className={`bg-white rounded-lg shadow-sm border border-gray-200 p-5 transition-all duration-200 ${
-                      !isGenerating && variation.content
-                        ? 'cursor-pointer hover:shadow-md hover:border-primary'
-                        : 'cursor-default'
-                    } ${isStreaming ? 'ring-2 ring-primary/30' : ''}`}
+                    className={`bg-white rounded-lg shadow-sm border border-gray-200 p-5 transition-all duration-200 h-fit ${
+                      isStreaming ? 'ring-2 ring-primary/30' : ''
+                    }`}
                   >
                     {hasContent ? (
                       <>
                         <h3 className="text-lg font-semibold text-gray-900 mb-3">
                           {variation.title || 'Generating...'}
                         </h3>
-                        <p className="text-sm text-gray-600 whitespace-pre-wrap">
+                        <p className="text-sm text-gray-600 whitespace-pre-wrap mb-4">
                           {displayContent}
                           {isStreaming && <span className="animate-pulse ml-0.5">▊</span>}
                         </p>
-                        {!isGenerating && variation.content && (
-                          <div className="mt-4 text-primary text-sm font-medium">
-                            Click to edit →
+                        {!isGenerating && !isRegenerating && variation.content && (
+                          <div className="flex gap-2">
+                            <Button
+                              onClick={() => handleSelectVariation(variation)}
+                              className="flex-1 bg-primary hover:bg-primary/90 text-white"
+                            >
+                              Select & Edit →
+                            </Button>
+                            <Button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleRegenerateVariation(index, variation.content);
+                              }}
+                              variant="outline"
+                              className="px-3"
+                            >
+                              <RefreshCw className="w-4 h-4" />
+                            </Button>
+                          </div>
+                        )}
+                        {isRegenerating && (
+                          <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                            Regenerating...
                           </div>
                         )}
                       </>

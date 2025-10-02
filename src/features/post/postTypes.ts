@@ -110,6 +110,12 @@ export interface GenerateIdeasRequest {
   topic: string;
 }
 
+export interface RegenerateVariationRequest {
+  topic: string;
+  index: number;
+  previous_content: string;
+}
+
 export interface GenerateIdeasResponse {
   success: boolean;
   variations: IdeaVariation[];
