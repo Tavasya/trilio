@@ -835,7 +835,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
               style={{
                 minWidth: '320px',
                 top: `${editButtonPosition.top + 40}px`,
-                left: `${Math.max(10, editButtonPosition.left - 160)}px`
+                left: `${Math.min(Math.max(10, editButtonPosition.left - 160), window.innerWidth - 340)}px`
               }}
             >
               <div className="mb-3">
