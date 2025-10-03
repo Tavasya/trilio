@@ -80,16 +80,23 @@ export default function LeverageSection({ mode = 'business' }: LeverageSectionPr
   }, []);
 
   return (
-    <div className="py-20 px-6">
-      <div className="max-w-6xl mx-auto">
+    <div className="relative">
+      {/* Top section with primary background and white curved indent */}
+      <div className="h-16 bg-primary">
+        <div className="h-full bg-white rounded-b-[3rem]"></div>
+      </div>
+
+      {/* Main content - full width primary */}
+      <div className="bg-primary py-20">
+        <div className="max-w-6xl mx-auto px-6">
           <div ref={headerRef} className={`transition-all duration-700 ${
             headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
-            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-center">
               {mode === 'business' ? "Posting isn't just for likes, it's leverage." : "It's not about going viral, it's about being found."}
             </h2>
 
-            <p className="text-xl text-gray-600 text-center mb-12">
+            <p className="text-xl text-white/90 text-center mb-12">
               {mode === 'business' ? "Here's why founders can't afford to stay invisible:" : "Here's why optimizing your LinkedIn matters for your career:"}
             </p>
           </div>
@@ -105,16 +112,22 @@ export default function LeverageSection({ mode = 'business' }: LeverageSectionPr
                     : 'opacity-0 translate-y-12'
                 }`}
               >
-                <div className="text-6xl md:text-7xl font-bold text-primary mb-3">
+                <div className="text-6xl md:text-7xl font-bold text-white mb-3">
                   {stat.number}
                 </div>
-                <p className="text-base text-gray-900">
+                <p className="text-base text-white/80">
                   {stat.text}
                 </p>
               </div>
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Bottom section with primary background and white curved indent */}
+      <div className="h-16 bg-primary">
+        <div className="h-full bg-white rounded-t-[3rem]"></div>
+      </div>
     </div>
   );
 }
