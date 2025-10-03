@@ -2,6 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { Star, ShieldCheck } from "lucide-react";
 import { SignUpButton } from '@clerk/react-router';
 import productScreenshot from '@/lib/product/3.png';
+import RecruiterNotifications from '@/components/landing/RecruiterNotifications';
 
 interface HeroProps {
   mode?: 'business' | 'student';
@@ -88,23 +89,29 @@ export default function Hero({ mode = 'business' }: HeroProps) {
           </SignUpButton>
         </div>
 
-        {/* Product Screenshot - Bigger with tilt */}
+        {/* Product Screenshot for business, Notifications for students */}
         <div className="mt-10 perspective-1000 w-full max-w-7xl mx-auto h-[700px] flex items-start justify-center pt-10">
-          <div
-            ref={screenshotRef}
-            className="rounded-xl w-full max-w-2xl mx-auto overflow-hidden border border-gray-300 shadow-2xl transition-transform duration-700 ease-out"
-            style={{
-              transform: `rotateX(${tiltAmount}deg)`,
-              transformStyle: 'preserve-3d',
-              transformOrigin: 'center bottom'
-            }}
-          >
-            <img
-              src={productScreenshot}
-              alt="Trilio AI LinkedIn content creation dashboard showing post editor and scheduling features"
-              className="w-full h-auto"
-            />
-          </div>
+          {mode === 'business' ? (
+            <div
+              ref={screenshotRef}
+              className="rounded-xl w-full max-w-2xl mx-auto overflow-hidden border border-gray-300 shadow-2xl transition-transform duration-700 ease-out"
+              style={{
+                transform: `rotateX(${tiltAmount}deg)`,
+                transformStyle: 'preserve-3d',
+                transformOrigin: 'center bottom'
+              }}
+            >
+              <img
+                src={productScreenshot}
+                alt="Trilio AI LinkedIn content creation dashboard showing post editor and scheduling features"
+                className="w-full h-auto"
+              />
+            </div>
+          ) : (
+            <div className="w-full max-w-2xl mx-auto">
+              <RecruiterNotifications />
+            </div>
+          )}
         </div>
       </div>
     </div>

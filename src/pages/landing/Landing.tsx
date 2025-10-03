@@ -66,7 +66,7 @@ export default function Landing() {
                 }
                 onClick={() => setMode('student')}
               >
-                For students
+                For job seekers
               </Button>
             </nav>
             {/* Mobile toggle buttons */}
