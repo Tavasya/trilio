@@ -10,7 +10,7 @@ interface ScheduleModalProps {
   onPostNow?: () => void;
 }
 
-export default function ScheduleModal({ isOpen, onClose, onSchedule, onPostNow }: ScheduleModalProps) {
+export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleModalProps) {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [validationError, setValidationError] = useState<string>('');
