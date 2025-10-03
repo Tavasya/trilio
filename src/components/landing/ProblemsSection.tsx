@@ -73,21 +73,24 @@ export default function ProblemsSection({ mode = 'business' }: ProblemsSectionPr
           </p>
         </div>
 
-        <div className="flex flex-col gap-3 mx-auto w-fit">
-          {problems.map((problem, index) => (
-            <div
-              key={index}
-              ref={(el) => {itemRefs.current[index] = el}}
-              className={`flex items-start gap-3 bg-gray-50 rounded-xl p-4 shadow-md transition-all duration-500 ${
-                visibleItems.includes(index)
-                  ? 'opacity-100 translate-x-0'
-                  : 'opacity-0 -translate-x-12'
-              }`}
-            >
-              <X className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-              <p className="text-base text-gray-700 md:whitespace-nowrap">{problem}</p>
-            </div>
-          ))}
+        <div className="flex flex-col gap-6 mx-auto w-fit">
+          {problems.map((problem, index) => {
+            const rotations = ['-rotate-1', 'rotate-2', '-rotate-1.5', 'rotate-1', '-rotate-2'];
+            return (
+              <div
+                key={index}
+                ref={(el) => {itemRefs.current[index] = el}}
+                className={`flex items-start gap-3 bg-gray-50 rounded-xl p-5 shadow-md transition-all duration-500 transform ${
+                  visibleItems.includes(index)
+                    ? `opacity-100 translate-x-0 ${rotations[index]}`
+                    : 'opacity-0 -translate-x-12'
+                }`}
+              >
+                <X className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
+                <p className="text-base text-gray-700 md:whitespace-nowrap">{problem}</p>
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

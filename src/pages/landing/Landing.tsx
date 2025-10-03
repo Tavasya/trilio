@@ -44,10 +44,10 @@ export default function Landing() {
     <div className="min-h-screen bg-white">
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 z-50 bg-white">
-        <div className="flex items-center justify-between px-6 py-4">
-          <div className="flex items-center gap-8">
-            <img src={trilioLogo} alt="Trilio - AI LinkedIn Content Platform" className="h-8 w-auto" />
-            <nav className="flex items-center gap-6">
+        <div className="flex items-center justify-between px-3 sm:px-6 py-4">
+          <div className="flex items-center gap-2 sm:gap-8">
+            <img src={trilioLogo} alt="Trilio - AI LinkedIn Content Platform" className="h-7 sm:h-8 w-auto" />
+            <nav className="hidden sm:flex items-center gap-6">
               <Button
                 variant={mode === 'business' ? 'default' : 'ghost'}
                 className={mode === 'business' ?
@@ -69,23 +69,47 @@ export default function Landing() {
                 For students
               </Button>
             </nav>
+            {/* Mobile toggle buttons */}
+            <div className="flex sm:hidden gap-1">
+              <Button
+                variant={mode === 'business' ? 'default' : 'ghost'}
+                className={mode === 'business' ?
+                  "px-2 py-1 text-xs bg-primary/10 text-primary hover:bg-primary/20 transition-colors" :
+                  "px-2 py-1 text-xs text-gray-700 hover:bg-gray-100/50 transition-colors"
+                }
+                onClick={() => setMode('business')}
+              >
+                Business
+              </Button>
+              <Button
+                variant={mode === 'student' ? 'default' : 'ghost'}
+                className={mode === 'student' ?
+                  "px-2 py-1 text-xs bg-primary/10 text-primary hover:bg-primary/20 transition-colors" :
+                  "px-2 py-1 text-xs text-gray-700 hover:bg-gray-100/50 transition-colors"
+                }
+                onClick={() => setMode('student')}
+              >
+                Students
+              </Button>
+            </div>
           </div>
 
-          <div className={`flex items-center gap-3 ${!loaded ? 'invisible' : 'visible'}`}>
+          <div className={`flex items-center gap-2 sm:gap-3 ${!loaded ? 'invisible' : 'visible'}`}>
             <SignedOut>
               <SignInButton mode="modal">
                 <Button
                   variant="ghost"
-                  className="px-4 py-2 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                  className="px-2 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-100/50 transition-colors"
                 >
                   Login
                 </Button>
               </SignInButton>
               <SignUpButton mode="modal">
                 <Button
-                  className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
+                  className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-3 sm:px-4 py-2 text-sm sm:text-base"
                 >
-                  Try for Free
+                  <span className="hidden sm:inline">Try for Free</span>
+                  <span className="sm:hidden">Try Free</span>
                 </Button>
               </SignUpButton>
             </SignedOut>
@@ -102,7 +126,7 @@ export default function Landing() {
                   // }
                   navigate("/dashboard");
                 }}
-                className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-4 py-2"
+                className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-3 sm:px-4 py-2 text-sm sm:text-base"
               >
                 Go to App
               </Button>
