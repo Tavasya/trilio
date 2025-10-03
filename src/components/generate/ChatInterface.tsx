@@ -1,20 +1,20 @@
 import { useState, useEffect, useRef } from 'react';
-import { Send, Search, Loader2, Eye } from 'lucide-react';
+import { Send, Loader2, Eye, Edit3 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { sendMessage, startNewConversation, clearResearchCards } from '@/features/chat/chatSlice';
+import { sendMessage, startNewConversation, clearResearchCards, toggleEditMode } from '@/features/chat/chatSlice';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
 import ResearchCards from './ResearchCards';
 
 // Define available tools with their metadata
-const AVAILABLE_TOOLS = [
-  { id: 'linkedin_research', name: 'LinkedIn Research', icon: Search, description: 'Search LinkedIn data' },
-  // Easy to add more tools here:
-  // { id: 'ai_enhance', name: 'AI Enhance', icon: Brain, description: 'Enhance with AI' },
-  // { id: 'trending', name: 'Trending Topics', icon: TrendingUp, description: 'Find trending topics' },
-  // { id: 'audience', name: 'Audience Analysis', icon: Users, description: 'Analyze target audience' },
-];
+// const AVAILABLE_TOOLS = [
+//   { id: 'linkedin_research', name: 'LinkedIn Research', icon: Search, description: 'Search LinkedIn data' },
+//   // Easy to add more tools here:
+//   // { id: 'ai_enhance', name: 'AI Enhance', icon: Brain, description: 'Enhance with AI' },
+//   // { id: 'trending', name: 'Trending Topics', icon: TrendingUp, description: 'Find trending topics' },
+//   // { id: 'audience', name: 'Audience Analysis', icon: Users, description: 'Analyze target audience' },
+// ];
 
 interface ChatInterfaceProps {
   postId?: string | null;
@@ -39,8 +39,9 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
   const dispatch = useAppDispatch();
   const { getToken } = useAuth();
   const [inputValue, setInputValue] = useState('');
-  const [selectedTools, setSelectedTools] = useState<string[]>([]);
+  // const [selectedTools, setSelectedTools] = useState<string[]>([]);
   const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   const {
     conversations,
@@ -50,7 +51,8 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
     currentToolStatus,
     generatedPost,
     researchCards,
-    persistedResearchCards
+    persistedResearchCards,
+    isEditMode
   } = useAppSelector((state) => state.chat);
 
 
@@ -141,6 +143,15 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
+  // Auto-resize textarea as user types
+  useEffect(() => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+    }
+  }, [inputValue]);
+
   const handleSend = async () => {
     if (!inputValue.trim()) return;
     if (isStreaming) {
@@ -161,8 +172,8 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       // Clear research cards when sending new message
       dispatch(clearResearchCards());
 
-      // Build context with live content and post_id
-      const context: { post_id?: string; content?: string } = {};
+      // Build context with live content, post_id, and edit_mode
+      const context: { post_id?: string; content?: string; edit_mode?: boolean } = {};
 
       // Always include post_id if we have one (from props)
       if (postId) {
@@ -173,16 +184,18 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       if (generatedPost) {
         context.content = generatedPost.content;
       }
-      
-      await dispatch(sendMessage({ 
-        message: messageText, 
+
+      // Include edit mode flag
+      context.edit_mode = isEditMode;
+
+      await dispatch(sendMessage({
+        message: messageText,
         token,
-        tools: selectedTools.length > 0 ? selectedTools : undefined,
+        tools: undefined, // selectedTools.length > 0 ? selectedTools : undefined,
         context: Object.keys(context).length > 0 ? context : undefined
       })).unwrap();
-      
-      setSelectedTools([]); // Reset selected tools after sending
-    } catch (error) {
+    } catch {
+      // Error is handled by the Redux thunk
     }
   };
 
@@ -193,13 +206,13 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
     }
   };
 
-  const toggleTool = (toolId: string) => {
-    setSelectedTools(prev => 
-      prev.includes(toolId) 
-        ? prev.filter(id => id !== toolId)
-        : [...prev, toolId]
-    );
-  };
+  // const toggleTool = (toolId: string) => {
+  //   setSelectedTools(prev =>
+  //     prev.includes(toolId)
+  //       ? prev.filter(id => id !== toolId)
+  //       : [...prev, toolId]
+  //   );
+  // };
 
   return (
     <div className="h-full flex flex-col overflow-hidden rounded-lg">
@@ -348,7 +361,7 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
         <div className="flex gap-2 items-center bg-gray-100 rounded-lg p-2">
           {/* Tool Selector Buttons */}
           <div className="flex gap-2 pl-2">
-            {AVAILABLE_TOOLS.map(tool => {
+            {/* {AVAILABLE_TOOLS.map(tool => {
               const Icon = tool.icon;
               const isSelected = selectedTools.includes(tool.id);
               return (
@@ -365,15 +378,30 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
                   <Icon className="w-5 h-5" />
                 </button>
               );
-            })}
+            })} */}
+            {/* Edit Mode Toggle - Only show when there's content */}
+            {generatedPost && (
+              <button
+                onClick={() => dispatch(toggleEditMode())}
+                title={isEditMode ? 'Edit Mode: ON - AI will modify content' : 'Edit Mode: OFF - AI will discuss only'}
+                className={`h-8 w-8 p-0 flex items-center justify-center rounded transition-colors ${
+                  isEditMode
+                    ? 'text-primary bg-primary/10'
+                    : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <Edit3 className="w-5 h-5" />
+              </button>
+            )}
           </div>
 
           <textarea
+            ref={textareaRef}
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Type your message here..."
-            className="flex-1 h-8 p-1.5 bg-transparent border-none resize-none focus:outline-none overflow-hidden"
+            className="flex-1 min-h-[32px] max-h-[120px] p-1.5 bg-transparent border-none resize-none focus:outline-none overflow-y-auto"
             rows={1}
             style={{ lineHeight: '1.25rem' }}
           />
