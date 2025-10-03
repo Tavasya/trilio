@@ -239,7 +239,7 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
         {mergedContent.length === 0 && (
           <div className="flex justify-start">
             <div className="max-w-[80%] rounded-lg p-3 bg-gray-100 text-gray-900 break-words">
-              <div className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{renderMarkdownText("Type in here to ideate your idea further")}</div>
+              <div className="text-sm whitespace-pre-wrap break-words overflow-wrap-anywhere">{renderMarkdownText("What else do you want to change?")}</div>
             </div>
           </div>
         )}

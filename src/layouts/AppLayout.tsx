@@ -124,10 +124,13 @@ export default function AppLayout() {
               {/* LinkedIn Connection Status & User Profile */}
               <div className="ml-auto flex items-center gap-3">
                 {hasLinkedIn ? (
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg border border-green-200">
-                    <Linkedin className="w-4 h-4" />
-                    <span className="text-sm font-medium">LinkedIn Connected</span>
-                  </div>
+                  <button
+                    onClick={() => window.open('https://www.linkedin.com/in/me', '_blank')}
+                    className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title="Go to LinkedIn"
+                  >
+                    <Linkedin className="w-4 h-4 text-gray-600" />
+                  </button>
                 ) : (
                   <ConnectLinkedInButton size="sm" variant="outline" />
                 )}
