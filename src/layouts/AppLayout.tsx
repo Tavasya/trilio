@@ -19,36 +19,20 @@ import { useEffect } from 'react'
 export default function AppLayout() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { user, isLoaded } = useUser()
-
-  console.log('[AppLayout] Current URL:', window.location.href)
-  console.log('[AppLayout] Search params:', location.search)
-  console.log('[AppLayout] User loaded:', isLoaded)
-  console.log('[AppLayout] User object:', user)
-  console.log('[AppLayout] External accounts:', user?.externalAccounts)
+  const { user } = useUser()
 
   // Check if LinkedIn is connected via Clerk external accounts
   const hasLinkedIn = user?.externalAccounts?.some(
     account => account.provider === 'linkedin_oidc'
   ) || false
 
-  console.log('[AppLayout] LinkedIn connected:', hasLinkedIn)
-
   // Clean up Clerk modal state from URL after OAuth
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     if (params.has('__clerk_modal_state')) {
-      console.log('[AppLayout] Detected Clerk modal state in URL, cleaning up...')
-      console.log('[AppLayout] Clerk modal state:', params.get('__clerk_modal_state'))
-
-      // Remove the clerk modal state parameter
       params.delete('__clerk_modal_state')
-
-      // Replace the URL without the parameter
       const newSearch = params.toString()
       const newUrl = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`
-
-      console.log('[AppLayout] Navigating to clean URL:', newUrl)
       navigate(newUrl, { replace: true })
     }
   }, [location.search, location.pathname, navigate])
