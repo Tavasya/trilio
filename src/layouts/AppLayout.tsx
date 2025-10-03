@@ -1,4 +1,4 @@
-import { Outlet, Link, useLocation } from 'react-router'
+import { Outlet, Link, useLocation, useNavigate } from 'react-router'
 import {
   Sidebar,
   SidebarContent,
@@ -9,20 +9,33 @@ import {
   SidebarMenuButton,
   SidebarTrigger
 } from '@/components/ui/sidebar'
-import { Book, FileText, PlusCircle, Calendar } from 'lucide-react'
+import { Book, FileText, PlusCircle, Calendar, Mic } from 'lucide-react'
 import { Linkedin } from 'lucide-react'
 import { UserButton, useUser } from '@clerk/react-router'
 import trilioLogo from '@/lib/logo/trilio-logo.png'
 import ConnectLinkedInButton from '@/components/linkedin/ConnectLinkedInButton'
+import { useEffect } from 'react'
 
 export default function AppLayout() {
   const location = useLocation()
+  const navigate = useNavigate()
   const { user } = useUser()
 
   // Check if LinkedIn is connected via Clerk external accounts
   const hasLinkedIn = user?.externalAccounts?.some(
     account => account.provider === 'linkedin_oidc'
   ) || false
+
+  // Clean up Clerk modal state from URL after OAuth
+  useEffect(() => {
+    const params = new URLSearchParams(location.search)
+    if (params.has('__clerk_modal_state')) {
+      params.delete('__clerk_modal_state')
+      const newSearch = params.toString()
+      const newUrl = `${location.pathname}${newSearch ? `?${newSearch}` : ''}`
+      navigate(newUrl, { replace: true })
+    }
+  }, [location.search, location.pathname, navigate])
 
   return (
     <div className="min-h-screen flex">
@@ -50,11 +63,11 @@ export default function AppLayout() {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                       asChild
-                      isActive={location.pathname === '/posts'}
+                      isActive={location.pathname === '/voice'}
                   >
-                    <Link to="/posts">
-                      <FileText className='h-4 w-4' />
-                      <span>My Posts</span>
+                    <Link to="/voice">
+                      <Mic className='h-4 w-4' />
+                      <span>Voice</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -66,7 +79,19 @@ export default function AppLayout() {
                   >
                     <Link to="/research">
                       <Book className='h-4 w-4' />
-                      <span>Research</span>
+                      <span>Trend Analyzer</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                      asChild
+                      isActive={location.pathname === '/posts'}
+                  >
+                    <Link to="/posts">
+                      <FileText className='h-4 w-4' />
+                      <span>Drafts</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

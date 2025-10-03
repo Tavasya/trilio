@@ -13,6 +13,7 @@ import LinkedInHashtagGenerator from '@/pages/tools/LinkedInHashtagGenerator';
 
 // Lazy load all protected routes
 const Dashboard = lazy(() => import("@/pages/dashboard/Dashboard"));
+const Voice = lazy(() => import('@/pages/voice/Voice'));
 const Research = lazy(() => import('@/pages/research/Research'));
 const Scheduler = lazy(() => import('@/pages/scheduler/Scheduler'));
 const Posts = lazy(() => import('@/pages/posts/Posts'));
@@ -49,6 +50,7 @@ export default function AppRoutes() {
                     </ProtectedRoute>
                 } >
                     <Route path="/dashboard" element={<Dashboard />} />
+                    <Route path="/voice" element={<Voice />} />
                     <Route path="/research" element={<Research />} />
                     <Route path="/scheduler" element={<Scheduler />} />
                     <Route path="/posts" element={<Posts />} />

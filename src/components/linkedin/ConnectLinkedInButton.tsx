@@ -19,7 +19,6 @@ export default function ConnectLinkedInButton({
   const { openUserProfile } = useClerk()
 
   const handleConnect = () => {
-    // Open user profile to connected accounts section
     openUserProfile()
   }
 
