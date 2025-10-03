@@ -19,14 +19,7 @@ export default function ConnectLinkedInButton({
   const { openUserProfile } = useClerk()
 
   const handleConnect = () => {
-    console.log('[ConnectLinkedInButton] Connect button clicked')
-    console.log('[ConnectLinkedInButton] Opening Clerk user profile modal')
-    try {
-      openUserProfile()
-      console.log('[ConnectLinkedInButton] User profile modal opened successfully')
-    } catch (error) {
-      console.error('[ConnectLinkedInButton] Error opening user profile:', error)
-    }
+    openUserProfile()
   }
 
   return (

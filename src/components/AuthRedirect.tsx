@@ -61,15 +61,10 @@ export default function AuthRedirect() {
   // Handle navigation when user is signed in
   useEffect(() => {
     const handleAuthRedirect = async () => {
-      console.log('[AuthRedirect] Checking auth redirect...')
-      console.log('[AuthRedirect] isLoaded:', isLoaded, 'isSignedIn:', isSignedIn)
-      console.log('[AuthRedirect] Current path:', location.pathname)
-
       if (!isLoaded || !isSignedIn || !user) return
 
       // Only handle redirect if we're on the landing page
       if (location.pathname === '/') {
-        console.log('[AuthRedirect] Redirecting to dashboard')
         // Always go to dashboard for now
         navigate('/dashboard')
         // try {
