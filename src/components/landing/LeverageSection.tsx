@@ -82,39 +82,39 @@ export default function LeverageSection({ mode = 'business' }: LeverageSectionPr
   return (
     <div className="py-20 px-6">
       <div className="max-w-6xl mx-auto">
-        <div ref={headerRef} className={`transition-all duration-700 ${
-          headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
-        }`}>
-          <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
-            {mode === 'business' ? "Posting isn't just for likes, it's leverage." : "It's not about going viral, it's about being found."}
-          </h2>
+          <div ref={headerRef} className={`transition-all duration-700 ${
+            headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
+          }`}>
+            <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
+              {mode === 'business' ? "Posting isn't just for likes, it's leverage." : "It's not about going viral, it's about being found."}
+            </h2>
 
-          <p className="text-xl text-gray-600 text-center mb-12">
-            {mode === 'business' ? "Here's why founders can't afford to stay invisible:" : "Here's why optimizing your LinkedIn matters for your career:"}
-          </p>
-        </div>
+            <p className="text-xl text-gray-600 text-center mb-12">
+              {mode === 'business' ? "Here's why founders can't afford to stay invisible:" : "Here's why optimizing your LinkedIn matters for your career:"}
+            </p>
+          </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
-          {stats.map((stat, index) => (
-            <div
-              key={index}
-              ref={(el) => {itemRefs.current[index] = el}}
-              className={`text-center transition-all duration-700 ${
-                visibleItems.includes(index)
-                  ? 'opacity-100 translate-y-0'
-                  : 'opacity-0 translate-y-12'
-              }`}
-            >
-              <div className="text-6xl md:text-7xl font-bold text-primary mb-3">
-                {stat.number}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
+            {stats.map((stat, index) => (
+              <div
+                key={index}
+                ref={(el) => {itemRefs.current[index] = el}}
+                className={`text-center transition-all duration-700 ${
+                  visibleItems.includes(index)
+                    ? 'opacity-100 translate-y-0'
+                    : 'opacity-0 translate-y-12'
+                }`}
+              >
+                <div className="text-6xl md:text-7xl font-bold text-primary mb-3">
+                  {stat.number}
+                </div>
+                <p className="text-base text-gray-900">
+                  {stat.text}
+                </p>
               </div>
-              <p className="text-base text-gray-900">
-                {stat.text}
-              </p>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-      </div>
     </div>
   );
 }

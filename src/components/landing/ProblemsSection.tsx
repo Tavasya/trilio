@@ -59,8 +59,7 @@ export default function ProblemsSection({ mode = 'business' }: ProblemsSectionPr
   }, []);
 
   return (
-    <div className="py-20">
-      <div className="bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 mx-6 rounded-3xl py-16 px-8">
+    <div className="py-20 px-6">
       <div className="max-w-4xl mx-auto">
         <div ref={headerRef} className={`transition-all duration-700 ${
           headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
@@ -90,7 +89,6 @@ export default function ProblemsSection({ mode = 'business' }: ProblemsSectionPr
             </div>
           ))}
         </div>
-      </div>
       </div>
     </div>
   );

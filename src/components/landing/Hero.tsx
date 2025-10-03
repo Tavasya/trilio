@@ -89,10 +89,10 @@ export default function Hero({ mode = 'business' }: HeroProps) {
         </div>
 
         {/* Product Screenshot - Bigger with tilt */}
-        <div className="mt-10 perspective-1000">
+        <div className="mt-10 perspective-1000 w-full max-w-7xl mx-auto h-[700px] flex items-start justify-center pt-10">
           <div
             ref={screenshotRef}
-            className="rounded-xl w-full max-w-7xl mx-auto overflow-hidden border border-gray-300 shadow-2xl transition-transform duration-700 ease-out"
+            className="rounded-xl w-full max-w-2xl mx-auto overflow-hidden border border-gray-300 shadow-2xl transition-transform duration-700 ease-out"
             style={{
               transform: `rotateX(${tiltAmount}deg)`,
               transformStyle: 'preserve-3d',

@@ -113,20 +113,30 @@ export default function Landing() {
 
       {/* Primary Rounded Container with Carousel - All in first viewport */}
       <div className="pt-1 px-1">
-        <div className="relative min-h-[calc(100vh-8px)] flex flex-col rounded-xl">
+        <div className="relative min-h-[calc(100vh-8px)] flex flex-col rounded-xl overflow-hidden">
           {/* Background with fade-in effect */}
-          <div className={`absolute inset-0 bg-white rounded-xl transition-opacity duration-1000 ${
+          <div className={`absolute inset-0 rounded-xl transition-all duration-1000 ${
             backgroundLoaded ? 'opacity-100' : 'opacity-0'
           }`}>
+            {/* Multiple gradient layers for vibrant effect */}
+            <div className={`absolute inset-0 ${
+              mode === 'student'
+                ? 'bg-gradient-to-br from-blue-100 via-indigo-50 to-transparent'
+                : 'bg-gradient-to-br from-purple-100 via-indigo-50 to-transparent'
+            } rounded-xl`} />
+            <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-bl from-pink-100 via-pink-50 to-transparent rounded-full blur-3xl opacity-70" />
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-gradient-to-tr from-rose-100 via-pink-50 to-transparent rounded-full blur-3xl opacity-60" />
+            <div className="absolute top-1/2 right-1/3 w-64 h-64 bg-gradient-to-l from-fuchsia-100 via-pink-50 to-transparent rounded-full blur-2xl opacity-50" />
+            <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-white rounded-xl" />
           </div>
-          
+
           {/* Hero - Centered in middle */}
           <div className="relative flex-1 flex flex-col items-center justify-center px-6 z-10">
             <Hero mode={mode} />
           </div>
 
           {/* Fade to white at bottom */}
-          <div className="absolute bottom-0 left-0 right-0 h-24 bg-gradient-to-t from-white via-white/50 to-transparent rounded-b-xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-white via-white/60 to-transparent rounded-b-xl pointer-events-none z-20" />
         </div>
       </div>
 
