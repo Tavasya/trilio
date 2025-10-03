@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 
-const problems = [
+const businessProblems = [
   "It feels cringe… what if people judge me?",
   "I want to post, but I don't even know how to begin",
   "I spend hours editing the post, and it still doesn't feel right",
@@ -9,7 +9,20 @@ const problems = [
   "It's just so hard to stay consistent… how do people do it?"
 ];
 
-export default function ProblemsSection() {
+const studentProblems = [
+  "Recruiters don't even view my profile",
+  "I apply to hundreds of jobs but get no responses",
+  "My LinkedIn looks empty compared to other candidates",
+  "I don't know what keywords recruiters are searching for",
+  "Everyone says 'network' but I don't know how to start"
+];
+
+interface ProblemsSectionProps {
+  mode?: 'business' | 'student';
+}
+
+export default function ProblemsSection({ mode = 'business' }: ProblemsSectionProps) {
+  const problems = mode === 'business' ? businessProblems : studentProblems;
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const headerRef = useRef<HTMLDivElement | null>(null);
@@ -52,11 +65,11 @@ export default function ProblemsSection() {
           headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
-            Posting on LinkedIn is hard.
+            {mode === 'business' ? 'Posting on LinkedIn is hard.' : 'Getting noticed by recruiters is hard.'}
           </h2>
 
           <p className="text-xl text-gray-600 text-center mb-8">
-            Most founders and creators struggle with:
+            {mode === 'business' ? 'Most founders and creators struggle with:' : 'Most students and job seekers struggle with:'}
           </p>
         </div>
 

@@ -10,7 +10,11 @@ import weiLi from '@/lib/pfps/wei_li.jpeg';
 import alexKumar from '@/lib/pfps/alex_kumar.jpeg';
 import emmaDavis from '@/lib/pfps/emma_davis.jpeg';
 
-const testimonials = [
+interface FoundersTestimonialsProps {
+  mode?: 'business' | 'student';
+}
+
+const businessTestimonials = [
   {
     name: "Michael Chen",
     avatar: michaelChen,
@@ -67,11 +71,70 @@ const testimonials = [
   }
 ];
 
-export default function FoundersTestimonials() {
+const studentTestimonials = [
+  {
+    name: "Michael Chen",
+    avatar: michaelChen,
+    rating: 5,
+    experience: "Used Trilio to optimize my LinkedIn during my senior year. Got 3 internship offers and a full-time job offer before graduation. The keyword optimization really works!"
+  },
+  {
+    name: "Sarah Johnson",
+    avatar: sarahJohnson,
+    rating: 5,
+    experience: "As a computer science student, I struggled to present my projects professionally. Trilio helped me showcase my work and I landed my dream job at a tech startup!"
+  },
+  {
+    name: "Ana Rodriguez",
+    avatar: anaRodriguez,
+    rating: 5,
+    experience: "English isn't my first language, so networking was intimidating. Trilio helped me write professional posts and I got recruited by 2 companies through LinkedIn!"
+  },
+  {
+    name: "David Kim",
+    avatar: davidKim,
+    rating: 5,
+    experience: "Went from 50 connections to getting daily recruiter messages. Trilio taught me how to write posts that actually get noticed by hiring managers."
+  },
+  {
+    name: "Rachel Thompson",
+    avatar: rachelThompson,
+    rating: 5,
+    experience: "I was a psychology major worried about job prospects. Trilio helped me pivot my LinkedIn to show my analytical skills and I got hired at a market research firm."
+  },
+  {
+    name: "Robert Garcia",
+    avatar: robertGarcia,
+    rating: 5,
+    experience: "Spent months applying to jobs with no response. After using Trilio for 2 weeks, I had 5 companies reach out to me directly. Game changer!"
+  },
+  {
+    name: "Li Wei",
+    avatar: weiLi,
+    rating: 5,
+    experience: "International student here - was struggling to break into the US job market. Trilio helped me understand what American employers look for and I got hired!"
+  },
+  {
+    name: "Alex Kumar",
+    avatar: alexKumar,
+    rating: 5,
+    experience: "As an engineering student, I thought my projects spoke for themselves. Trilio showed me how to communicate my technical skills to non-technical recruiters."
+  },
+  {
+    name: "Emma Davis",
+    avatar: emmaDavis,
+    rating: 5,
+    experience: "From student council to corporate communications! Trilio helped me translate my leadership experience into recruiter-friendly language. Got 3 job offers!"
+  }
+];
+
+export default function FoundersTestimonials({ mode = 'business' }: FoundersTestimonialsProps) {
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const headerRef = useRef<HTMLHeadingElement | null>(null);
   const [headerVisible, setHeaderVisible] = useState(false);
+
+  const testimonials = mode === 'business' ? businessTestimonials : studentTestimonials;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -109,7 +172,7 @@ export default function FoundersTestimonials() {
         <h2 ref={headerRef} className={`text-4xl md:text-5xl font-bold text-gray-900 mb-10 text-center transition-all duration-700 ${
           headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
-          200+ founders have used Trilio
+          {mode === 'business' ? '200+ founders have used Trilio' : '500+ students got recruited with Trilio'}
         </h2>
 
         <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">

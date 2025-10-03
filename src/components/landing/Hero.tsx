@@ -3,7 +3,11 @@ import { Star, ShieldCheck } from "lucide-react";
 import { SignUpButton } from '@clerk/react-router';
 import productScreenshot from '@/lib/product/3.png';
 
-export default function Hero() {
+interface HeroProps {
+  mode?: 'business' | 'student';
+}
+
+export default function Hero({ mode = 'business' }: HeroProps) {
   const screenshotRef = useRef<HTMLDivElement | null>(null);
   const [tiltAmount, setTiltAmount] = useState(5);
 
@@ -42,21 +46,29 @@ export default function Hero() {
             ))}
           </div>
           <span className="text-base font-medium text-primary">
-            Trusted by 200+ LinkedIn Creators
+            {mode === 'business' ? 'Trusted by 200+ LinkedIn Creators' : '500+ Students Landed Jobs Through LinkedIn'}
           </span>
         </div>
 
         {/* Headline - Made even larger */}
         <h1 className="text-5xl md:text-6xl font-bold text-gray-900">
-          The AI LinkedIn Assistant,
+          {mode === 'business' ?
+            'The AI LinkedIn Assistant,' :
+            <>Get Recruiters to <span className="bg-primary text-white px-2 rounded-md">Message</span> You,</>
+          }
         </h1>
         <h1 className="text-5xl md:text-6xl font-bold text-gray-900 mt-2">
-          Turn Content into <span className="text-primary">Prospects</span>
+          {mode === 'business' ?
+            <>Turn Content into <span className="text-primary">Prospects</span></> :
+            <>Turn Keywords into <span className="text-primary">Job Offers</span></>
+          }
         </h1>
 
         {/* Description */}
         <p className="text-xl text-gray-600 mt-8">
-          Create viral LinkedIn content in seconds with AI that learns your voice and industry
+          {mode === 'business' ?
+            'Create viral LinkedIn content in seconds with AI that learns your voice and industry' :
+            'Optimize your LinkedIn with AI to attract recruiters - it\'s about keywords, not view counts'}
         </p>
 
         {/* Verified Badge - Shield check */}

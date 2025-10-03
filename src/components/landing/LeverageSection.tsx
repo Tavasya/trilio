@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 
-const stats = [
+const businessStats = [
   {
     number: "80%",
     text: "of all B2B social leads drove by LinkedIn, the #1 platform for B2B growth."
@@ -19,7 +19,31 @@ const stats = [
   }
 ];
 
-export default function LeverageSection() {
+const studentStats = [
+  {
+    number: "87%",
+    text: "of recruiters use LinkedIn to find candidates"
+  },
+  {
+    number: "70%",
+    text: "of people get hired at companies where they have a connection"
+  },
+  {
+    number: "40%",
+    text: "higher response rate when you have optimized keywords"
+  },
+  {
+    number: "5x",
+    text: "more likely to get contacted with an active, keyword-rich profile"
+  }
+];
+
+interface LeverageSectionProps {
+  mode?: 'business' | 'student';
+}
+
+export default function LeverageSection({ mode = 'business' }: LeverageSectionProps) {
+  const stats = mode === 'business' ? businessStats : studentStats;
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const headerRef = useRef<HTMLDivElement | null>(null);
@@ -62,11 +86,11 @@ export default function LeverageSection() {
           headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
         }`}>
           <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4 text-center">
-            Posting isn't just for likes, it's leverage.
+            {mode === 'business' ? "Posting isn't just for likes, it's leverage." : "It's not about going viral, it's about being found."}
           </h2>
 
           <p className="text-xl text-gray-600 text-center mb-12">
-            Here's why founders can't afford to stay invisible:
+            {mode === 'business' ? "Here's why founders can't afford to stay invisible:" : "Here's why optimizing your LinkedIn matters for your career:"}
           </p>
         </div>
 
