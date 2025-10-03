@@ -337,16 +337,62 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
     const selectedText = postContent.substring(start, end);
 
     if (selectedText && selectedText.trim()) {
-      // Get the position of the selection
-      const rect = textarea.getBoundingClientRect();
-      const textBeforeSelection = postContent.substring(0, start);
-      const lines = textBeforeSelection.split('\n');
-      const lineHeight = 20; // Approximate line height
-      const currentLine = lines.length - 1;
+      // Get textarea's computed styles
+      const textareaRect = textarea.getBoundingClientRect();
+      const computedStyle = window.getComputedStyle(textarea);
 
-      // Position the button above the selection
-      const top = rect.top + (currentLine * lineHeight) - 40;
-      const left = rect.left + 10;
+      // Create a mirror div to measure text position accurately
+      const mirror = document.createElement('div');
+      const textareaStyle = computedStyle;
+
+      // Copy all relevant styles from textarea to mirror
+      mirror.style.position = 'absolute';
+      mirror.style.visibility = 'hidden';
+      mirror.style.whiteSpace = 'pre-wrap';
+      mirror.style.wordWrap = 'break-word';
+      mirror.style.font = textareaStyle.font;
+      mirror.style.fontSize = textareaStyle.fontSize;
+      mirror.style.fontFamily = textareaStyle.fontFamily;
+      mirror.style.fontWeight = textareaStyle.fontWeight;
+      mirror.style.lineHeight = textareaStyle.lineHeight;
+      mirror.style.letterSpacing = textareaStyle.letterSpacing;
+      mirror.style.padding = textareaStyle.padding;
+      mirror.style.border = textareaStyle.border;
+      mirror.style.boxSizing = textareaStyle.boxSizing;
+      mirror.style.width = textareaStyle.width;
+      mirror.style.maxWidth = textareaStyle.maxWidth;
+      mirror.style.minWidth = textareaStyle.minWidth;
+
+      document.body.appendChild(mirror);
+
+      // Add text up to selection end to measure full position
+      const textUpToSelectionStart = postContent.substring(0, start);
+
+      // Create two spans to measure the start and end positions
+      mirror.innerHTML = '';
+      const beforeSpan = document.createElement('span');
+      beforeSpan.textContent = textUpToSelectionStart;
+      mirror.appendChild(beforeSpan);
+
+      const selectedSpan = document.createElement('span');
+      selectedSpan.textContent = selectedText;
+      mirror.appendChild(selectedSpan);
+
+      // Get dimensions
+      const beforeSpanRect = beforeSpan.getBoundingClientRect();
+      const selectedSpanRect = selectedSpan.getBoundingClientRect();
+      const mirrorRect = mirror.getBoundingClientRect();
+
+      // Calculate position relative to textarea
+      const paddingTop = parseInt(textareaStyle.paddingTop, 10) || 0;
+      const paddingLeft = parseInt(textareaStyle.paddingLeft, 10) || 0;
+
+      // Position button to the right of the selected text
+      const top = textareaRect.top + (beforeSpanRect.bottom - mirrorRect.top) + paddingTop - 45;
+      const left = textareaRect.left + (selectedSpanRect.right - mirrorRect.left) + paddingLeft + 10;
+
+      // Clean up
+      document.body.removeChild(mirror);
 
       setEditButtonPosition({ top, left });
       setShowEditButton(true);
@@ -770,7 +816,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             <button
               ref={editButtonRef}
               onClick={handleShowEditPopover}
-              className="fixed bg-gray-800 text-white px-3 py-1.5 rounded shadow-lg hover:bg-gray-700 transition-colors flex items-center gap-1.5 text-sm z-50"
+              className="fixed bg-white border border-gray-300 text-gray-700 px-2.5 py-1.5 rounded-md hover:bg-gray-50 hover:border-gray-400 transition-colors flex items-center gap-1.5 text-xs shadow-sm z-50"
               style={{
                 top: `${editButtonPosition.top}px`,
                 left: `${editButtonPosition.left}px`,
@@ -782,11 +828,15 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
           )}
 
           {/* Edit Selection Popover */}
-          {showEditPopover && (
+          {showEditPopover && editButtonPosition && (
             <div
               ref={editPopoverRef}
-              className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-white rounded-lg shadow-2xl border border-gray-300 p-4 z-50"
-              style={{ minWidth: '320px' }}
+              className="fixed bg-white rounded-lg shadow-2xl border border-gray-300 p-4 z-50"
+              style={{
+                minWidth: '320px',
+                top: `${editButtonPosition.top + 40}px`,
+                left: `${Math.max(10, editButtonPosition.left - 160)}px`
+              }}
             >
               <div className="mb-3">
                 <label className="block text-sm font-medium text-gray-700 mb-2">
