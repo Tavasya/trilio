@@ -334,30 +334,6 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
 
       {/* Input Area */}
       <div className="p-4 flex-shrink-0 space-y-3">
-        {/* Example prompts - only show when no messages */}
-        {messages.length === 0 && (
-          <div className="flex flex-wrap gap-2 justify-center">
-            <button
-              onClick={() => setInputValue("Analyze trending topics in my industry")}
-              className="px-3 py-1.5 bg-white border border-gray-300 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
-            >
-              Analyze trends
-            </button>
-            <button
-              onClick={() => setInputValue("Edit my LinkedIn post for better engagement")}
-              className="px-3 py-1.5 bg-white border border-gray-300 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
-            >
-              Improve engagement
-            </button>
-            <button
-              onClick={() => setInputValue("Generate hooks for my LinkedIn content")}
-              className="px-3 py-1.5 bg-white border border-gray-300 rounded-full text-sm text-gray-700 hover:bg-gray-50 hover:border-gray-400 transition-colors"
-            >
-              Create hooks
-            </button>
-          </div>
-        )}
-
         <div className="flex gap-2 items-center bg-gray-100 rounded-lg p-2">
           {/* Tool Selector Buttons */}
           <div className="flex gap-2 pl-2">

@@ -882,13 +882,23 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       {/* Schedule Post Button or Connect LinkedIn - Fixed to bottom right of preview container */}
       <div className="absolute bottom-4 right-4 z-10">
         {hasLinkedIn ? (
-          <Button
-            onClick={() => setShowScheduleModal(true)}
-            className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-6 py-3"
-          >
-            <Calendar className="w-4 h-4" />
-            <span className="font-medium">Schedule Post</span>
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              onClick={() => setShowScheduleModal(true)}
+              variant="outline"
+              className="flex items-center gap-2 bg-white text-gray-700 hover:bg-gray-50 shadow-xl rounded-lg px-6 py-3"
+            >
+              <Calendar className="w-4 h-4" />
+              <span className="font-medium">Schedule Post</span>
+            </Button>
+            <Button
+              onClick={handlePostNow}
+              className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-6 py-3"
+            >
+              <Send className="w-4 h-4" />
+              <span className="font-medium">Post Now</span>
+            </Button>
+          </div>
         ) : (
           <ConnectLinkedInButton
             className="shadow-xl rounded-lg px-6 py-3"
@@ -896,13 +906,12 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
           />
         )}
       </div>
-      
+
       {/* Schedule Modal */}
       <ScheduleModal
         isOpen={showScheduleModal}
         onClose={() => setShowScheduleModal(false)}
         onSchedule={handleSchedule}
-        onPostNow={handlePostNow}
       />
     </div>
   );

@@ -357,22 +357,10 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule, onPostNow }
           <Button
             onClick={handleSchedule}
             disabled={!selectedDate || !selectedTime || !!validationError}
-            variant="outline"
             className="flex-1"
           >
             Schedule
           </Button>
-          {onPostNow && (
-            <Button
-              onClick={() => {
-                onPostNow();
-                onClose();
-              }}
-              className="flex-1"
-            >
-              Post Now
-            </Button>
-          )}
         </div>
       </div>
 
