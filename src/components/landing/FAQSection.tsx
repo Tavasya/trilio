@@ -1,7 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 
-const faqs = [
+interface FAQSectionProps {
+  mode?: 'business' | 'student';
+}
+
+const businessFaqs = [
   {
     question: "What is the different between ChatGPT and Trilio?",
     answer: "Use Trilio when you're serious about growing on LinkedIn. We've curated a database of 20,000+ LinkedIn posts and profiles to help you:\n\n• Create content that matches your brand voice, consistently\n• Stay on top of industry trends\n• Generate high-performing posts consistently\n• Save time with a streamlined LinkedIn workflow"
@@ -20,12 +24,33 @@ const faqs = [
   }
 ];
 
-export default function FAQSection() {
+const studentFaqs = [
+  {
+    question: "How is Trilio different from other job search tools?",
+    answer: "Unlike job boards or resume builders, Trilio helps you get found by recruiters on LinkedIn. We analyze what recruiters actually search for and help you:\n\n• Optimize your profile with the right keywords\n• Create posts that demonstrate your expertise\n• Build a professional presence that attracts opportunities\n• Turn your LinkedIn into a recruiter magnet"
+  },
+  {
+    question: "I'm a student with limited work experience. Can Trilio still help me?",
+    answer: "Absolutely! Trilio specializes in helping students translate their academic projects, internships, and extracurricular activities into professional achievements that recruiters value. We show you how to highlight your potential, not just your past."
+  },
+  {
+    question: "How do I know which keywords recruiters are looking for?",
+    answer: "Trilio's AI analyzes thousands of job postings and recruiter searches in your field to identify the exact terms they use. We then help you naturally incorporate these keywords into your profile and posts without sounding robotic."
+  },
+  {
+    question: "How long does it take to start getting recruiter messages?",
+    answer: "Most students start seeing increased profile views within 1-2 weeks of optimizing with Trilio. Recruiter messages typically begin within 3-4 weeks of consistent posting and profile optimization. The key is consistency and using the right strategy."
+  }
+];
+
+export default function FAQSection({ mode = 'business' }: FAQSectionProps) {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
   const headerRef = useRef<HTMLHeadingElement | null>(null);
   const [headerVisible, setHeaderVisible] = useState(false);
+
+  const faqs = mode === 'business' ? businessFaqs : studentFaqs;
 
   const toggleFAQ = (index: number) => {
     setOpenIndex(openIndex === index ? null : index);

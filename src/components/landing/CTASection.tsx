@@ -3,7 +3,11 @@ import { useNavigate } from "react-router";
 import { SignedIn, SignedOut, SignUpButton } from '@clerk/react-router';
 import trilioLogo from "@/lib/logo/trilio-logo.png";
 
-export default function CTASection() {
+interface CTASectionProps {
+  mode?: 'business' | 'student';
+}
+
+export default function CTASection({ mode = 'business' }: CTASectionProps) {
   const navigate = useNavigate();
   // const { user } = useUser();
   const ctaRef = useRef<HTMLDivElement | null>(null);
@@ -47,12 +51,12 @@ export default function CTASection() {
         <h2 className={`text-3xl md:text-4xl font-bold text-gray-900 mb-2 transition-all duration-700 delay-300 ${
           ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
-          Ready to grow your LinkedIn brand?
+          {mode === 'business' ? 'Ready to grow your LinkedIn brand?' : 'Ready to get recruited?'}
         </h2>
         <p className={`text-xl md:text-2xl text-gray-600 transition-all duration-700 delay-400 ${
           ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
-          Try one week on us
+          {mode === 'business' ? 'Try one week on us' : 'Start your job search journey today'}
         </p>
         <div className={`flex justify-center gap-4 transition-all duration-700 delay-500 ${
           ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
@@ -62,12 +66,12 @@ export default function CTASection() {
               <button
                 className="px-6 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium h-12 flex items-center"
               >
-                Try for Free
+                {mode === 'business' ? 'Try for Free' : 'Start Free'}
               </button>
             </SignUpButton>
             <a href="https://calendly.com/jessie-nativespeaking/meet-jessie?month=2025-09" target="_blank" rel="noopener noreferrer">
               <button className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center">
-                Book a Call
+                {mode === 'business' ? 'Book a Call' : 'Get Career Advice'}
               </button>
             </a>
           </SignedOut>

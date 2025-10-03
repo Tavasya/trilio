@@ -19,6 +19,7 @@ export default function Landing() {
   const { loaded } = useClerk();
   const [_scrolledPastPurple, setScrolledPastPurple] = useState(false);
   const [backgroundLoaded, setBackgroundLoaded] = useState(false);
+  const [mode, setMode] = useState<'business' | 'student'>('business');
 
   useEffect(() => {
     const handleScroll = () => {
@@ -48,16 +49,22 @@ export default function Landing() {
             <img src={trilioLogo} alt="Trilio - AI LinkedIn Content Platform" className="h-8 w-auto" />
             <nav className="flex items-center gap-6">
               <Button
-                variant="ghost"
-                className="px-3 py-2 text-gray-700 hover:bg-gray-100/50 transition-colors"
-                onClick={() => navigate("/for-businesses")}
+                variant={mode === 'business' ? 'default' : 'ghost'}
+                className={mode === 'business' ?
+                  "px-3 py-2 bg-primary/10 text-primary hover:bg-primary/20 transition-colors" :
+                  "px-3 py-2 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                }
+                onClick={() => setMode('business')}
               >
                 For businesses
               </Button>
               <Button
-                variant="ghost"
-                className="px-3 py-2 text-gray-700 hover:bg-gray-100/50 transition-colors"
-                onClick={() => navigate("/for-students")}
+                variant={mode === 'student' ? 'default' : 'ghost'}
+                className={mode === 'student' ?
+                  "px-3 py-2 bg-primary/10 text-primary hover:bg-primary/20 transition-colors" :
+                  "px-3 py-2 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                }
+                onClick={() => setMode('student')}
               >
                 For students
               </Button>
@@ -115,7 +122,7 @@ export default function Landing() {
           
           {/* Hero - Centered in middle */}
           <div className="relative flex-1 flex flex-col items-center justify-center px-6 z-10">
-            <Hero />
+            <Hero mode={mode} />
           </div>
 
           {/* Fade to white at bottom */}
@@ -125,13 +132,13 @@ export default function Landing() {
 
       {/* Problems Section, Leverage Section, Sales Section, Testimonials, Pricing and FAQ on white background */}
       <div className="bg-white">
-        <ProblemsSection />
-        <LeverageSection />
-        <SalesSection />
-        <FoundersTestimonials />
+        <ProblemsSection mode={mode} />
+        <LeverageSection mode={mode} />
+        <SalesSection mode={mode} />
+        <FoundersTestimonials mode={mode} />
         <PricingSection />
-        <FAQSection />
-        <CTASection />
+        <FAQSection mode={mode} />
+        <CTASection mode={mode} />
       </div>
 
       <Footer />

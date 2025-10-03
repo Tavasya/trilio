@@ -3,11 +3,15 @@ import product1 from '@/lib/product/1.png';
 import product2 from '@/lib/product/2.png';
 import product3 from '@/lib/product/3.png';
 
-export default function SalesSection() {
+interface SalesSectionProps {
+  mode?: 'business' | 'student';
+}
+
+export default function SalesSection({ mode = 'business' }: SalesSectionProps) {
   const [visibleItems, setVisibleItems] = useState<number[]>([]);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
 
-  const features = [
+  const businessFeatures = [
     {
       title: "Trends Analyzer",
       description: "Trilio scans 20,000+ posts to spot viral content in your niche and recommends what clicks your audience.",
@@ -24,6 +28,26 @@ export default function SalesSection() {
       image: product3
     }
   ];
+
+  const studentFeatures = [
+    {
+      title: "Recruiter Keyword Optimizer",
+      description: "Trilio identifies the exact keywords and skills recruiters search for in your field, helping you optimize your profile to appear in their searches.",
+      image: product1
+    },
+    {
+      title: "Professional Voice Builder",
+      description: "Transform your student experiences into compelling professional stories that showcase your potential and expertise to hiring managers.",
+      image: product2
+    },
+    {
+      title: "Job-Ready Content Strategy",
+      description: "Create posts that demonstrate your knowledge and passion for your field, attracting recruiters who are actively hiring for entry-level positions.",
+      image: product3
+    }
+  ];
+
+  const features = mode === 'business' ? businessFeatures : studentFeatures;
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -52,7 +76,9 @@ export default function SalesSection() {
 
   return (
     <div id="features" className="max-w-6xl mx-auto px-6 py-20">
-      <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-16">Trilio Turns Content Into Prospects</h2>
+      <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-16">
+        {mode === 'business' ? 'Trilio Turns Content Into Prospects' : 'Trilio Gets You Recruited'}
+      </h2>
       
       <div className="space-y-24">
         {features.map((feature, index) => {
