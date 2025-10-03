@@ -42,9 +42,27 @@ export default function Landing() {
   return (
     <div className="min-h-screen bg-white">
       {/* Fixed Header */}
-      <header className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-md">
+      <header className="fixed top-0 left-0 right-0 z-50 bg-white">
         <div className="flex items-center justify-between px-6 py-4">
-          <img src={trilioLogo} alt="Trilio - AI LinkedIn Content Platform" className="h-8 w-auto" />
+          <div className="flex items-center gap-8">
+            <img src={trilioLogo} alt="Trilio - AI LinkedIn Content Platform" className="h-8 w-auto" />
+            <nav className="flex items-center gap-6">
+              <Button
+                variant="ghost"
+                className="px-3 py-2 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                onClick={() => navigate("/for-businesses")}
+              >
+                For businesses
+              </Button>
+              <Button
+                variant="ghost"
+                className="px-3 py-2 text-gray-700 hover:bg-gray-100/50 transition-colors"
+                onClick={() => navigate("/for-students")}
+              >
+                For students
+              </Button>
+            </nav>
+          </div>
 
           <div className={`flex items-center gap-3 ${!loaded ? 'invisible' : 'visible'}`}>
             <SignedOut>
