@@ -16,6 +16,7 @@ const initialState: ChatState = {
   saveStatus: 'saved',
   researchCards: null,
   persistedResearchCards: null,
+  isEditMode: false,
 };
 
 // Async thunk for saving draft to database
@@ -320,6 +321,10 @@ const chatSlice = createSlice({
       }
     },
 
+    toggleEditMode: (state) => {
+      state.isEditMode = !state.isEditMode;
+    },
+
   },
   extraReducers: (builder) => {
     builder
@@ -387,6 +392,7 @@ export const {
   clearResearchCards,
   setPersistedResearchCards,
   loadConversationFromPostResponse,
+  toggleEditMode,
 } = chatSlice.actions;
 
 export default chatSlice.reducer;

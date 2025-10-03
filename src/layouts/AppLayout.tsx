@@ -63,11 +63,11 @@ export default function AppLayout() {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                       asChild
-                      isActive={location.pathname === '/voice'}
+                      isActive={location.pathname === '/research'}
                   >
-                    <Link to="/voice">
-                      <Mic className='h-4 w-4' />
-                      <span>Voice</span>
+                    <Link to="/research">
+                      <Book className='h-4 w-4' />
+                      <span>Trend Analyzer</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -75,11 +75,14 @@ export default function AppLayout() {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                       asChild
-                      isActive={location.pathname === '/research'}
+                      isActive={location.pathname === '/voice'}
                   >
-                    <Link to="/research">
-                      <Book className='h-4 w-4' />
-                      <span>Trend Analyzer</span>
+                    <Link to="/voice" className="flex items-center gap-2">
+                      <Mic className='h-4 w-4' />
+                      <span>Voice</span>
+                      <span className="ml-auto text-xs bg-yellow-100 text-yellow-800 px-2 py-0.5 rounded-full font-medium">
+                        Coming Soon
+                      </span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

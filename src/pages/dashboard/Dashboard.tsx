@@ -156,14 +156,8 @@ const Dashboard = () => {
         {/* Header */}
         <div className="mb-8">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Generate LinkedIn Post Ideas
+            Generate LinkedIn Post
           </h1>
-          <p className="text-gray-600">
-            {chatMode === 'topic'
-              ? 'Tell us what you want to talk about and we\'ll create variations for you'
-              : 'Select a draft and we\'ll create variations to refine it'
-            }
-          </p>
         </div>
 
         {/* Mode Slider */}
