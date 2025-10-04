@@ -28,11 +28,21 @@ export default function InputSection({
     (chatMode === 'topic' && !idea.trim()) ||
     (chatMode === 'draft' && !draftContent.trim());
 
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      if (!isDisabled) {
+        onGenerate();
+      }
+    }
+  };
+
   return (
     <div className="relative bg-white rounded-2xl shadow-lg border border-gray-100">
       <textarea
         value={chatMode === 'topic' ? idea : draftContent}
         onChange={(e) => chatMode === 'topic' ? onIdeaChange(e.target.value) : onDraftChange(e.target.value)}
+        onKeyDown={handleKeyDown}
         placeholder={chatMode === 'topic'
           ? 'e.g., AI in marketing, productivity tips, startup lessons...'
           : 'Paste your existing LinkedIn post or content here to get refined variations...'
@@ -47,18 +57,18 @@ export default function InputSection({
         <div className="flex items-center gap-2">
           <button
             onClick={onModeToggle}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
           >
-            <FileText className="w-4 h-4" />
-            <span className="text-sm font-medium">{chatMode === 'topic' ? 'Draft' : 'Topic'}</span>
+            <FileText className="w-3.5 h-3.5" />
+            <span className="text-sm">{chatMode === 'topic' ? 'Draft' : 'Topic'}</span>
           </button>
 
           <button
             onClick={onHooksClick}
-            className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
           >
-            <Target className="w-4 h-4" />
-            <span className="text-sm font-medium">Hooks</span>
+            <Target className="w-3.5 h-3.5" />
+            <span className="text-sm">Hooks</span>
           </button>
         </div>
 
@@ -66,12 +76,16 @@ export default function InputSection({
         <button
           onClick={onGenerate}
           disabled={isDisabled}
-          className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.1)] hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+          className={`w-8 h-8 rounded-full flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.1)] transition-colors ${
+            isDisabled
+              ? 'bg-gray-200 cursor-not-allowed'
+              : 'bg-primary hover:bg-primary/90'
+          }`}
         >
           {isGenerating ? (
-            <Loader2 className="w-5 h-5 text-gray-700 animate-spin" />
+            <Loader2 className={`w-4 h-4 animate-spin ${isDisabled ? 'text-gray-700' : 'text-white'}`} />
           ) : (
-            <ArrowUp className="w-5 h-5 text-gray-700" />
+            <ArrowUp className={`w-4 h-4 ${isDisabled ? 'text-gray-700' : 'text-white'}`} />
           )}
         </button>
       </div>

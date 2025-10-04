@@ -162,17 +162,23 @@ const Dashboard = () => {
   const userAvatar = user?.imageUrl || "";
 
   return (
-    <div className="h-full overflow-y-auto p-6 bg-gray-50">
-      <div className="max-w-3xl mx-auto pt-8">
+    <div className="h-full overflow-y-auto p-6 bg-gray-50 flex items-center justify-center">
+      <div className="max-w-6xl mx-auto w-full">
         {/* Header Section */}
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Generate LinkedIn Post
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-normal text-gray-900 mb-4">
+            Craft compelling LinkedIn <span className="font-serif italic">posts</span>
           </h1>
+          <p className="text-base font-light text-gray-700 mb-1">
+            Turn your ideas into professional content, in minutes.
+          </p>
+          <p className="text-base font-light text-gray-700">
+            Create posts optimized for your goals by chatting with AI.
+          </p>
         </div>
 
         {/* Input Section */}
-        <div className="mb-8">
+        <div className="mb-8 max-w-3xl mx-auto">
           <InputSection
             chatMode={chatMode}
             idea={idea}

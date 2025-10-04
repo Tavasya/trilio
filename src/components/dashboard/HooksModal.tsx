@@ -119,17 +119,17 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-3xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-10">
+      <div className="relative bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+        <div className="p-8">
           {/* Header */}
           <div className="flex items-start justify-between pb-6 border-b border-gray-200">
-            <div>
-              <h2 className="text-2xl font-bold text-gray-900">
-                {step === 'icp' ? 'Select your ICP' : 'Choose a Hook Type'}
+            <div className="flex-1 pr-4">
+              <h2 className="text-xl font-semibold text-gray-900">
+                {step === 'icp' ? 'Choose Your Persona' : 'Choose a Hook Type'}
               </h2>
-              <p className="text-gray-600 mt-1">
+              <p className="text-gray-600 mt-2 text-sm leading-relaxed">
                 {step === 'icp'
-                  ? 'Select your Ideal Customer Profile to get tailored hook suggestions'
+                  ? 'Select your target audience to get tailored hook suggestions'
                   : 'Select one hook style for your content'
                 }
               </p>
@@ -138,7 +138,7 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
               onClick={handleClose}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <X className="w-5 h-5 text-gray-500" />
+              <X className="w-4 h-4 text-gray-500" />
             </button>
           </div>
 
@@ -153,9 +153,9 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
                 >
                   <div className="flex items-center gap-4 mb-4">
                     <div className="p-3 bg-blue-100 rounded-xl">
-                      <Briefcase className="w-8 h-8 text-blue-600" />
+                      <Briefcase className="w-6 h-6 text-blue-600" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">Job Seekers</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Job Seekers</h3>
                   </div>
                   <p className="text-gray-600">
                     Optimize your content to attract recruiters and land your dream job
@@ -168,9 +168,9 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
                 >
                   <div className="flex items-center gap-4 mb-4">
                     <div className="p-3 bg-purple-100 rounded-xl">
-                      <TrendingUp className="w-8 h-8 text-purple-600" />
+                      <TrendingUp className="w-6 h-6 text-purple-600" />
                     </div>
-                    <h3 className="text-xl font-bold text-gray-900">Engagement</h3>
+                    <h3 className="text-lg font-semibold text-gray-900">Engagement</h3>
                   </div>
                   <p className="text-gray-600">
                     Create viral content that drives comments, shares, and connections
@@ -192,16 +192,16 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
                   >
                     {/* Gradient Preview */}
                     <div className={`h-20 bg-gradient-to-r ${hook.gradient} rounded-xl mb-4 flex items-center justify-center`}>
-                      {hook.id === 'question' && <MessageCircle className="w-8 h-8 text-white" />}
-                      {hook.id === 'story' && <Lightbulb className="w-8 h-8 text-white" />}
-                      {hook.id === 'controversial' && <Target className="w-8 h-8 text-white" />}
-                      {hook.id === 'data-driven' && <BarChart3 className="w-8 h-8 text-white" />}
-                      {hook.id === 'personal' && <Briefcase className="w-8 h-8 text-white" />}
-                      {hook.id === 'how-to' && <Lightbulb className="w-8 h-8 text-white" />}
+                      {hook.id === 'question' && <MessageCircle className="w-6 h-6 text-white" />}
+                      {hook.id === 'story' && <Lightbulb className="w-6 h-6 text-white" />}
+                      {hook.id === 'controversial' && <Target className="w-6 h-6 text-white" />}
+                      {hook.id === 'data-driven' && <BarChart3 className="w-6 h-6 text-white" />}
+                      {hook.id === 'personal' && <Briefcase className="w-6 h-6 text-white" />}
+                      {hook.id === 'how-to' && <Lightbulb className="w-6 h-6 text-white" />}
                     </div>
 
                     {/* Title */}
-                    <h3 className="text-lg font-bold text-gray-900 mb-2">{hook.title}</h3>
+                    <h3 className="text-base font-semibold text-gray-900 mb-2">{hook.title}</h3>
 
                     {/* Description */}
                     <p className="text-sm text-gray-600 mb-4 leading-relaxed">{hook.description}</p>
@@ -227,14 +227,14 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
           <div className="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
             <button
               onClick={step === 'icp' ? handleClose : handleBack}
-              className="px-8 py-3 bg-gray-100 text-gray-700 font-semibold rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-6 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors"
             >
               {step === 'icp' ? 'Cancel' : 'Back'}
             </button>
             <button
               onClick={handleApply}
               disabled={!selectedHook}
-              className="px-8 py-3 bg-gray-900 text-white font-semibold rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-6 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Apply
             </button>

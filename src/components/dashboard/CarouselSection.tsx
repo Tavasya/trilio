@@ -30,6 +30,7 @@ export default function CarouselSection({
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [maxHeight, setMaxHeight] = useState<number>(0);
   const measureRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const [viewMode, setViewMode] = useState<'carousel' | 'grid'>('carousel');
 
   const handlePrevious = () => {
     setCurrentCardIndex((prev) => (prev - 1 + cards.length) % cards.length);
@@ -40,6 +41,9 @@ export default function CarouselSection({
   };
 
   useEffect(() => {
+    // Only recalculate when generation completes, not during streaming
+    if (isGenerating || regeneratingIndex !== null) return;
+
     setMaxHeight(0);
 
     const timer = setTimeout(() => {
@@ -53,14 +57,25 @@ export default function CarouselSection({
     }, 100);
 
     return () => clearTimeout(timer);
-  }, [cards, streamingContents]);
+  }, [cards, isGenerating, regeneratingIndex]);
 
   return (
     <div className="mb-12">
-      <h2 className="text-xl font-semibold text-gray-900 mb-8 text-center">
-        Choose a variation to continue
-      </h2>
+      <div className="flex items-center justify-between mb-8 relative">
+        <div className="w-20"></div>
+        <h2 className="text-xl font-semibold text-gray-900 flex-1 text-center">
+          Choose a variation to continue
+        </h2>
+        <button
+          onClick={() => setViewMode(viewMode === 'carousel' ? 'grid' : 'carousel')}
+          className="text-sm text-gray-600 hover:text-gray-900 transition-colors underline"
+        >
+          {viewMode === 'carousel' ? 'Show All' : 'Show Carousel'}
+        </button>
+      </div>
 
+      {viewMode === 'carousel' ? (
+        <>
       {/* Desktop Carousel - 3D overlap effect */}
       <div className="hidden lg:block relative w-full max-w-4xl mx-auto" style={{ minHeight: maxHeight > 0 ? maxHeight : 600 }}>
         {/* Navigation Arrows - Only show after generation */}
@@ -385,6 +400,118 @@ export default function CarouselSection({
           ))}
         </div>
       </div>
+      </>
+      ) : (
+        /* Grid View */
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 max-w-5xl mx-auto">
+          {cards.map((card, index) => {
+            const isStreaming = streamingContents[index] !== undefined;
+            const displayContent = isStreaming ? streamingContents[index] : card.content;
+            const isRegenerating = regeneratingIndex === index;
+
+            return (
+              <div key={index} className="bg-white rounded-lg border border-gray-200 flex flex-col">
+                {/* Top Right Buttons */}
+                {!isGenerating && card.content && (
+                  <div className="absolute top-3 right-3 flex gap-2 z-10">
+                    {isRegenerating ? (
+                      <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
+                        <Loader2 className="w-4 h-4 text-gray-600 animate-spin" />
+                        <span className="text-sm text-gray-600">Regenerating...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => onRegenerate?.(index, card.content)}
+                          className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                        >
+                          <RefreshCw className="w-4 h-4 text-gray-600" />
+                        </button>
+                        <button
+                          onClick={() => onEdit?.(card)}
+                          className="px-3 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition-colors"
+                        >
+                          Edit
+                        </button>
+                      </>
+                    )}
+                  </div>
+                )}
+
+                {/* Post Header */}
+                <div className="p-4">
+                  <div className="flex items-start justify-between">
+                    <div className="flex gap-3 items-center">
+                      <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+                        {userAvatar ? (
+                          <img src={userAvatar} alt={userName} className="w-full h-full rounded-full object-cover" />
+                        ) : (
+                          <span className="text-gray-600 font-semibold text-lg">
+                            {userName.split(' ').map((n: string) => n[0]).join('')}
+                          </span>
+                        )}
+                      </div>
+                      <div className="flex flex-col">
+                        <h3 className="font-semibold text-gray-900">{userName}</h3>
+                        <p className="text-xs text-gray-500 mt-0.5">Just now • 🌐</p>
+                      </div>
+                    </div>
+                    <button className="p-1 hover:bg-gray-100 rounded">
+                      <MoreHorizontal className="w-5 h-5 text-gray-600" />
+                    </button>
+                  </div>
+                </div>
+
+                {/* Post Content */}
+                <div className="px-4 pb-3 flex-grow">
+                  <div className="text-gray-900 whitespace-pre-wrap text-sm">
+                    {displayContent}
+                    {(isStreaming || !displayContent) && <span className="animate-pulse ml-0.5">▊</span>}
+                  </div>
+                </div>
+
+                {/* Bottom Section */}
+                <div className="mt-auto">
+                  <div className="px-4 py-2 flex items-center justify-between text-xs text-gray-500">
+                    <div className="flex items-center gap-1">
+                      <div className="flex -space-x-1">
+                        <ThumbIcon className="w-4 h-4" />
+                        <HeartIcon className="w-4 h-4" />
+                        <ClapIcon className="w-4 h-4" />
+                      </div>
+                      <span className="ml-1">127</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span>23 comments</span>
+                      <span>•</span>
+                      <span>8 reposts</span>
+                    </div>
+                  </div>
+
+                  <div className="px-2 py-1 flex items-center justify-around border-t border-gray-200">
+                    <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
+                      <ThumbsUp className="w-5 h-5" />
+                      <span className="text-sm font-medium">Like</span>
+                    </button>
+                    <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                      <MessageCircle className="w-5 h-5" />
+                      <span className="text-sm font-medium">Comment</span>
+                    </button>
+                    <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                      <Share2 className="w-5 h-5" />
+                      <span className="text-sm font-medium">Repost</span>
+                    </button>
+                    <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                      <Send className="w-5 h-5" />
+                      <span className="text-sm font-medium">Send</span>
+                    </button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
