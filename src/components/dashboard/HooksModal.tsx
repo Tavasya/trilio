@@ -4,7 +4,7 @@ import { X, Briefcase, TrendingUp, MessageCircle, BarChart3, Lightbulb, Target }
 interface HooksModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onApply: (icp: string, hookType: string) => void;
+  onApply: (icp: string, hookType: string, title: string, gradient: string) => void;
 }
 
 type ICP = 'job-seekers' | 'engagement' | null;
@@ -91,8 +91,11 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
 
   const handleApply = () => {
     if (selectedICP && selectedHook) {
-      onApply(selectedICP, selectedHook);
-      handleClose();
+      const hook = currentHooks.find(h => h.id === selectedHook);
+      if (hook) {
+        onApply(selectedICP, selectedHook, hook.title, hook.gradient);
+        handleClose();
+      }
     }
   };
 
@@ -119,15 +122,15 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-        <div className="p-8">
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto">
+        <div className="p-6">
           {/* Header */}
-          <div className="flex items-start justify-between pb-6 border-b border-gray-200">
+          <div className="flex items-start justify-between pb-4 border-b border-gray-200">
             <div className="flex-1 pr-4">
-              <h2 className="text-xl font-semibold text-gray-900">
+              <h2 className="text-lg font-semibold text-gray-900">
                 {step === 'icp' ? 'Choose Your Persona' : 'Choose a Hook Type'}
               </h2>
-              <p className="text-gray-600 mt-2 text-sm leading-relaxed">
+              <p className="text-gray-600 mt-1 text-sm font-light leading-relaxed">
                 {step === 'icp'
                   ? 'Select your target audience to get tailored hook suggestions'
                   : 'Select one hook style for your content'
@@ -138,80 +141,80 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
               onClick={handleClose}
               className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
             >
-              <X className="w-4 h-4 text-gray-500" />
+              <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
 
           {/* Content */}
-          <div className="mt-8">
+          <div className="mt-6">
             {step === 'icp' ? (
               /* ICP Selection */
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <button
                   onClick={() => handleICPSelect('job-seekers')}
-                  className="group relative bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-primary transition-all duration-200 hover:shadow-xl text-left"
+                  className="group relative bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all duration-200 hover:shadow-lg text-left"
                 >
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="p-3 bg-blue-100 rounded-xl">
-                      <Briefcase className="w-6 h-6 text-blue-600" />
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2.5 bg-blue-100 rounded-lg">
+                      <Briefcase className="w-5 h-5 text-blue-600" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900">Job Seekers</h3>
+                    <h3 className="text-base font-semibold text-gray-900">Job Seekers</h3>
                   </div>
-                  <p className="text-gray-600">
+                  <p className="text-sm text-gray-600">
                     Optimize your content to attract recruiters and land your dream job
                   </p>
                 </button>
 
                 <button
                   onClick={() => handleICPSelect('engagement')}
-                  className="group relative bg-white border-2 border-gray-200 rounded-2xl p-8 hover:border-primary transition-all duration-200 hover:shadow-xl text-left"
+                  className="group relative bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all duration-200 hover:shadow-lg text-left"
                 >
-                  <div className="flex items-center gap-4 mb-4">
-                    <div className="p-3 bg-purple-100 rounded-xl">
-                      <TrendingUp className="w-6 h-6 text-purple-600" />
+                  <div className="flex items-center gap-3 mb-3">
+                    <div className="p-2.5 bg-purple-100 rounded-lg">
+                      <TrendingUp className="w-5 h-5 text-purple-600" />
                     </div>
-                    <h3 className="text-lg font-semibold text-gray-900">Engagement</h3>
+                    <h3 className="text-base font-semibold text-gray-900">Engagement</h3>
                   </div>
-                  <p className="text-gray-600">
+                  <p className="text-sm text-gray-600">
                     Create viral content that drives comments, shares, and connections
                   </p>
                 </button>
               </div>
             ) : (
               /* Hook Categories */
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {currentHooks.map((hook) => (
                   <button
                     key={hook.id}
                     onClick={() => handleHookSelect(hook.id as HookType)}
-                    className={`relative bg-white border-2 rounded-2xl p-6 text-left transition-all duration-200 ${
+                    className={`relative bg-white border-2 rounded-xl p-5 text-left transition-all duration-200 h-full flex flex-col ${
                       selectedHook === hook.id
                         ? 'border-green-500 bg-green-50/50'
                         : 'border-gray-200 hover:border-green-500 hover:shadow-lg'
                     }`}
                   >
                     {/* Gradient Preview */}
-                    <div className={`h-20 bg-gradient-to-r ${hook.gradient} rounded-xl mb-4 flex items-center justify-center`}>
-                      {hook.id === 'question' && <MessageCircle className="w-6 h-6 text-white" />}
-                      {hook.id === 'story' && <Lightbulb className="w-6 h-6 text-white" />}
-                      {hook.id === 'controversial' && <Target className="w-6 h-6 text-white" />}
-                      {hook.id === 'data-driven' && <BarChart3 className="w-6 h-6 text-white" />}
-                      {hook.id === 'personal' && <Briefcase className="w-6 h-6 text-white" />}
-                      {hook.id === 'how-to' && <Lightbulb className="w-6 h-6 text-white" />}
+                    <div className={`h-16 bg-gradient-to-r ${hook.gradient} rounded-lg mb-3 flex items-center justify-center flex-shrink-0`}>
+                      {hook.id === 'question' && <MessageCircle className="w-5 h-5 text-white" />}
+                      {hook.id === 'story' && <Lightbulb className="w-5 h-5 text-white" />}
+                      {hook.id === 'controversial' && <Target className="w-5 h-5 text-white" />}
+                      {hook.id === 'data-driven' && <BarChart3 className="w-5 h-5 text-white" />}
+                      {hook.id === 'personal' && <Briefcase className="w-5 h-5 text-white" />}
+                      {hook.id === 'how-to' && <Lightbulb className="w-5 h-5 text-white" />}
                     </div>
 
                     {/* Title */}
                     <h3 className="text-base font-semibold text-gray-900 mb-2">{hook.title}</h3>
 
                     {/* Description */}
-                    <p className="text-sm text-gray-600 mb-4 leading-relaxed">{hook.description}</p>
+                    <p className="text-sm text-gray-600 mb-3 leading-relaxed flex-grow">{hook.description}</p>
 
                     {/* Used By */}
                     <div className="mt-auto">
                       <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Used By</p>
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5">
                         {hook.usedBy.map((tag, idx) => (
-                          <span key={idx} className="px-3 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                          <span key={idx} className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
                             {tag}
                           </span>
                         ))}
@@ -224,17 +227,17 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
           </div>
 
           {/* Footer */}
-          <div className="mt-8 pt-6 border-t border-gray-200 flex items-center justify-between">
+          <div className="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between">
             <button
               onClick={step === 'icp' ? handleClose : handleBack}
-              className="px-6 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors"
+              className="px-5 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors"
             >
               {step === 'icp' ? 'Cancel' : 'Back'}
             </button>
             <button
               onClick={handleApply}
               disabled={!selectedHook}
-              className="px-6 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="px-5 py-2 bg-gray-900 text-white text-sm rounded-lg hover:bg-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Apply
             </button>

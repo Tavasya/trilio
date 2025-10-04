@@ -2,6 +2,15 @@ import { createSlice } from '@reduxjs/toolkit';
 import type { PayloadAction } from '@reduxjs/toolkit';
 import type { IdeaVariation } from '../post/postTypes';
 
+interface SelectedHook {
+  icp: string;
+  hookType: string;
+  title: string;
+  gradient: string;
+}
+
+type PostLength = 'small' | 'medium' | 'large';
+
 interface DashboardState {
   idea: string;
   draftContent: string;
@@ -10,6 +19,8 @@ interface DashboardState {
   error: string | null;
   streamingContents: Record<number, string>;  // Per-variation streaming text
   chatMode: 'topic' | 'draft';
+  selectedHook: SelectedHook | null;
+  postLength: PostLength;
 }
 
 const initialState: DashboardState = {
@@ -20,6 +31,8 @@ const initialState: DashboardState = {
   error: null,
   streamingContents: {},
   chatMode: 'topic',
+  selectedHook: null,
+  postLength: 'medium',
 };
 
 const dashboardSlice = createSlice({
@@ -75,6 +88,14 @@ const dashboardSlice = createSlice({
       state.streamingContents = {};
     },
 
+    setSelectedHook: (state, action: PayloadAction<SelectedHook | null>) => {
+      state.selectedHook = action.payload;
+    },
+
+    setPostLength: (state, action: PayloadAction<PostLength>) => {
+      state.postLength = action.payload;
+    },
+
     resetDashboard: () => initialState,
   },
 });
@@ -89,6 +110,8 @@ export const {
   appendVariationContent,
   completeVariation,
   setChatMode,
+  setSelectedHook,
+  setPostLength,
   resetDashboard,
 } = dashboardSlice.actions;
 
