@@ -157,30 +157,65 @@ export default function CarouselSection({
                 className="bg-white rounded-lg border border-gray-200 relative flex flex-col"
                 style={{ height: maxHeight > 0 ? maxHeight : 'auto' }}
               >
-                {/* Top Right Buttons - Only show on active card */}
+                {/* Top Bar - Only show on active card */}
                 {isActive && !isGenerating && card.content && (
-                  <div className="absolute top-3 right-3 flex gap-2 z-10">
-                    {isRegenerating ? (
-                      <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
-                        <Loader2 className="w-4 h-4 text-gray-600 animate-spin" />
-                        <span className="text-sm text-gray-600">Regenerating...</span>
-                      </div>
-                    ) : (
-                      <>
-                        <button
+                  <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {isRegenerating ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 text-gray-600 animate-spin" />
+                          <span className="text-sm text-gray-600">Regenerating...</span>
+                        </div>
+                      ) : (
+                        <Button
                           onClick={() => onRegenerate?.(index, card.content)}
-                          className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                          variant="outline"
+                          size="icon"
+                          className="bg-white text-gray-700 hover:bg-gray-50"
                         >
-                          <RefreshCw className="w-4 h-4 text-gray-600" />
-                        </button>
-                        <button
-                          onClick={() => onEdit?.(card)}
-                          className="px-3 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition-colors"
+                          <RefreshCw className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={() => navigator.clipboard.writeText(displayContent).then(() => {
+                          const toast = (window as any).toast;
+                          if (toast) toast.success('Copied to clipboard', { position: 'top-right' });
+                        })}
+                        variant="outline"
+                        size="icon"
+                        className="bg-white text-gray-700 hover:bg-gray-50"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                      {onSchedule && (
+                        <Button
+                          onClick={() => onSchedule(card)}
+                          variant="outline"
+                          size="icon"
+                          className="bg-white text-gray-700 hover:bg-gray-50"
                         >
-                          Edit
-                        </button>
-                      </>
-                    )}
+                          <Calendar className="w-4 h-4" />
+                        </Button>
+                      )}
+                      <Button
+                        onClick={() => onEdit?.(card)}
+                        variant="outline"
+                        className="bg-white text-gray-700 hover:bg-gray-50"
+                      >
+                        Edit
+                      </Button>
+                      {onPostNow && (
+                        <Button
+                          onClick={() => onPostNow(card)}
+                          className="bg-primary text-white hover:bg-primary/90"
+                        >
+                          <Send className="w-4 h-4 mr-2" />
+                          Post Now
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -257,42 +292,6 @@ export default function CarouselSection({
                       <span className="text-sm font-medium">Send</span>
                     </button>
                   </div>
-
-                  {/* Post Actions - Only show on active card */}
-                  {isActive && !isGenerating && card.content && (onSchedule || onPostNow) && (
-                    <div className="p-4 flex gap-3 justify-end border-t border-gray-200 bg-gray-50">
-                      <Button
-                        onClick={() => navigator.clipboard.writeText(displayContent).then(() => {
-                          const toast = (window as any).toast;
-                          if (toast) toast.success('Copied to clipboard', { position: 'top-right' });
-                        })}
-                        variant="outline"
-                        size="icon"
-                        className="bg-white text-gray-700 hover:bg-gray-50 shadow-md rounded-lg"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </Button>
-                      {onSchedule && (
-                        <Button
-                          onClick={() => onSchedule(card)}
-                          variant="outline"
-                          size="icon"
-                          className="bg-white text-gray-700 hover:bg-gray-50 shadow-md rounded-lg"
-                        >
-                          <Calendar className="w-4 h-4" />
-                        </Button>
-                      )}
-                      {onPostNow && (
-                        <Button
-                          onClick={() => onPostNow(card)}
-                          className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-md rounded-lg px-6 py-2"
-                        >
-                          <Send className="w-4 h-4" />
-                          <span className="font-medium">Post Now</span>
-                        </Button>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             </div>
@@ -325,30 +324,65 @@ export default function CarouselSection({
 
         <div className="px-12 flex items-start h-full">
           <div className="bg-white rounded-lg border border-gray-200 relative h-full w-full flex flex-col">
-            {/* Top Right Buttons */}
+            {/* Top Bar - Mobile */}
             {!isGenerating && cards[currentCardIndex]?.content && (
-              <div className="absolute top-3 right-3 flex gap-2 z-10">
-                {regeneratingIndex === currentCardIndex ? (
-                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
-                    <Loader2 className="w-4 h-4 text-gray-600 animate-spin" />
-                    <span className="text-sm text-gray-600">Regenerating...</span>
-                  </div>
-                ) : (
-                  <>
-                    <button
+              <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  {regeneratingIndex === currentCardIndex ? (
+                    <div className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 text-gray-600 animate-spin" />
+                      <span className="text-sm text-gray-600">Regenerating...</span>
+                    </div>
+                  ) : (
+                    <Button
                       onClick={() => onRegenerate?.(currentCardIndex, cards[currentCardIndex].content)}
-                      className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                      variant="outline"
+                      size="icon"
+                      className="bg-white text-gray-700 hover:bg-gray-50"
                     >
-                      <RefreshCw className="w-4 h-4 text-gray-600" />
-                    </button>
-                    <button
-                      onClick={() => onEdit?.(cards[currentCardIndex])}
-                      className="px-3 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition-colors"
+                      <RefreshCw className="w-4 h-4" />
+                    </Button>
+                  )}
+                </div>
+                <div className="flex items-center gap-2">
+                  <Button
+                    onClick={() => navigator.clipboard.writeText(cards[currentCardIndex].content).then(() => {
+                      const toast = (window as any).toast;
+                      if (toast) toast.success('Copied to clipboard', { position: 'top-right' });
+                    })}
+                    variant="outline"
+                    size="icon"
+                    className="bg-white text-gray-700 hover:bg-gray-50"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                  {onSchedule && (
+                    <Button
+                      onClick={() => onSchedule(cards[currentCardIndex])}
+                      variant="outline"
+                      size="icon"
+                      className="bg-white text-gray-700 hover:bg-gray-50"
                     >
-                      Edit
-                    </button>
-                  </>
-                )}
+                      <Calendar className="w-4 h-4" />
+                    </Button>
+                  )}
+                  <Button
+                    onClick={() => onEdit?.(cards[currentCardIndex])}
+                    variant="outline"
+                    className="bg-white text-gray-700 hover:bg-gray-50"
+                  >
+                    Edit
+                  </Button>
+                  {onPostNow && (
+                    <Button
+                      onClick={() => onPostNow(cards[currentCardIndex])}
+                      className="bg-primary text-white hover:bg-primary/90"
+                    >
+                      <Send className="w-4 h-4 mr-2" />
+                      Post Now
+                    </Button>
+                  )}
+                </div>
               </div>
             )}
 
@@ -425,42 +459,6 @@ export default function CarouselSection({
                   <span className="text-sm font-medium">Send</span>
                 </button>
               </div>
-
-              {/* Post Actions - Mobile */}
-              {!isGenerating && cards[currentCardIndex]?.content && (onSchedule || onPostNow) && (
-                <div className="p-4 flex gap-3 justify-end border-t border-gray-200 bg-gray-50">
-                  <Button
-                    onClick={() => navigator.clipboard.writeText(cards[currentCardIndex].content).then(() => {
-                      const toast = (window as any).toast;
-                      if (toast) toast.success('Copied to clipboard', { position: 'top-right' });
-                    })}
-                    variant="outline"
-                    size="icon"
-                    className="bg-white text-gray-700 hover:bg-gray-50 shadow-md rounded-lg"
-                  >
-                    <Copy className="w-4 h-4" />
-                  </Button>
-                  {onSchedule && (
-                    <Button
-                      onClick={() => onSchedule(cards[currentCardIndex])}
-                      variant="outline"
-                      size="icon"
-                      className="bg-white text-gray-700 hover:bg-gray-50 shadow-md rounded-lg"
-                    >
-                      <Calendar className="w-4 h-4" />
-                    </Button>
-                  )}
-                  {onPostNow && (
-                    <Button
-                      onClick={() => onPostNow(cards[currentCardIndex])}
-                      className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-md rounded-lg px-6 py-2"
-                    >
-                      <Send className="w-4 h-4" />
-                      <span className="font-medium">Post Now</span>
-                    </Button>
-                  )}
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -490,31 +488,66 @@ export default function CarouselSection({
             const isLastAndOdd = index === cards.length - 1 && cards.length % 2 !== 0;
 
             return (
-              <div key={index} className={`bg-white rounded-lg border border-gray-200 flex flex-col relative ${isLastAndOdd ? 'lg:col-span-2 lg:max-w-[calc(50%-12px)] lg:mx-auto' : ''}`}>
-                {/* Top Right Buttons */}
+              <div key={index} className={`bg-white rounded-lg border border-gray-200 flex flex-col ${isLastAndOdd ? 'lg:col-span-2 lg:max-w-[calc(50%-12px)] lg:mx-auto' : ''}`}>
+                {/* Top Bar - Grid View */}
                 {!isGenerating && card.content && (
-                  <div className="absolute top-3 right-3 flex gap-2 z-10">
-                    {isRegenerating ? (
-                      <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
-                        <Loader2 className="w-4 h-4 text-gray-600 animate-spin" />
-                        <span className="text-sm text-gray-600">Regenerating...</span>
-                      </div>
-                    ) : (
-                      <>
-                        <button
+                  <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      {isRegenerating ? (
+                        <div className="flex items-center gap-2">
+                          <Loader2 className="w-4 h-4 text-gray-600 animate-spin" />
+                          <span className="text-sm text-gray-600">Regenerating...</span>
+                        </div>
+                      ) : (
+                        <Button
                           onClick={() => onRegenerate?.(index, card.content)}
-                          className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                          variant="outline"
+                          size="icon"
+                          className="bg-white text-gray-700 hover:bg-gray-50"
                         >
-                          <RefreshCw className="w-4 h-4 text-gray-600" />
-                        </button>
-                        <button
-                          onClick={() => onEdit?.(card)}
-                          className="px-3 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition-colors"
+                          <RefreshCw className="w-4 h-4" />
+                        </Button>
+                      )}
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        onClick={() => navigator.clipboard.writeText(displayContent).then(() => {
+                          const toast = (window as any).toast;
+                          if (toast) toast.success('Copied to clipboard', { position: 'top-right' });
+                        })}
+                        variant="outline"
+                        size="icon"
+                        className="bg-white text-gray-700 hover:bg-gray-50"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                      {onSchedule && (
+                        <Button
+                          onClick={() => onSchedule(card)}
+                          variant="outline"
+                          size="icon"
+                          className="bg-white text-gray-700 hover:bg-gray-50"
                         >
-                          Edit
-                        </button>
-                      </>
-                    )}
+                          <Calendar className="w-4 h-4" />
+                        </Button>
+                      )}
+                      <Button
+                        onClick={() => onEdit?.(card)}
+                        variant="outline"
+                        className="bg-white text-gray-700 hover:bg-gray-50"
+                      >
+                        Edit
+                      </Button>
+                      {onPostNow && (
+                        <Button
+                          onClick={() => onPostNow(card)}
+                          className="bg-primary text-white hover:bg-primary/90"
+                        >
+                          <Send className="w-4 h-4 mr-2" />
+                          Post Now
+                        </Button>
+                      )}
+                    </div>
                   </div>
                 )}
 
@@ -586,42 +619,6 @@ export default function CarouselSection({
                       <span className="text-sm font-medium">Send</span>
                     </button>
                   </div>
-
-                  {/* Post Actions - Grid View */}
-                  {!isGenerating && card.content && (onSchedule || onPostNow) && (
-                    <div className="p-4 flex gap-3 justify-end border-t border-gray-200 bg-gray-50">
-                      <Button
-                        onClick={() => navigator.clipboard.writeText(displayContent).then(() => {
-                          const toast = (window as any).toast;
-                          if (toast) toast.success('Copied to clipboard', { position: 'top-right' });
-                        })}
-                        variant="outline"
-                        size="icon"
-                        className="bg-white text-gray-700 hover:bg-gray-50 shadow-md rounded-lg"
-                      >
-                        <Copy className="w-4 h-4" />
-                      </Button>
-                      {onSchedule && (
-                        <Button
-                          onClick={() => onSchedule(card)}
-                          variant="outline"
-                          size="icon"
-                          className="bg-white text-gray-700 hover:bg-gray-50 shadow-md rounded-lg"
-                        >
-                          <Calendar className="w-4 h-4" />
-                        </Button>
-                      )}
-                      {onPostNow && (
-                        <Button
-                          onClick={() => onPostNow(card)}
-                          className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-md rounded-lg px-6 py-2"
-                        >
-                          <Send className="w-4 h-4" />
-                          <span className="font-medium">Post Now</span>
-                        </Button>
-                      )}
-                    </div>
-                  )}
                 </div>
               </div>
             );
