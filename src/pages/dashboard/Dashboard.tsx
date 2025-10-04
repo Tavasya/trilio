@@ -151,14 +151,17 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="h-full overflow-y-auto bg-gradient-to-br from-gray-50 via-white to-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Generate LinkedIn Post Ideas
+    <div className="h-full overflow-y-auto p-6">
+      {/* Subtle gradient background */}
+      <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-pink-50/30 to-white pointer-events-none" />
+
+      <div className="relative max-w-4xl mx-auto">
+        {/* Header with serif font and italic emphasis */}
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-serif text-gray-900 mb-4">
+            Chat it into <span className="italic">existence</span>
           </h1>
-          <p className="text-gray-600">
+          <p className="text-lg text-gray-600 font-sans">
             {chatMode === 'topic'
               ? 'Tell us what you want to talk about and we\'ll create variations for you'
               : 'Select a draft and we\'ll create variations to refine it'
@@ -167,18 +170,18 @@ const Dashboard = () => {
         </div>
 
         {/* Mode Slider */}
-        <div className="mb-3">
+        <div className="mb-6 flex justify-center">
           <ModeSlider
             mode={chatMode}
             onModeChange={(mode) => dispatch(setChatMode(mode))}
           />
         </div>
 
-        {/* Input Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        {/* Input Section - Elevated card with soft shadow */}
+        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-8">
           {chatMode === 'topic' ? (
             <>
-              <label htmlFor="idea-input" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="idea-input" className="block text-sm font-medium text-gray-700 mb-3">
                 What do you want to talk about?
               </label>
               <textarea
@@ -186,13 +189,13 @@ const Dashboard = () => {
                 value={idea}
                 onChange={(e) => dispatch(setIdea(e.target.value))}
                 placeholder="e.g., AI in marketing, productivity tips, startup lessons..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-                rows={3}
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all duration-200 hover:border-gray-400"
+                rows={4}
               />
             </>
           ) : (
             <>
-              <label htmlFor="draft-input" className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="draft-input" className="block text-sm font-medium text-gray-700 mb-3">
                 Paste your draft content
               </label>
               <textarea
@@ -200,7 +203,7 @@ const Dashboard = () => {
                 value={draftContent}
                 onChange={(e) => dispatch(setDraftContent(e.target.value))}
                 placeholder="Paste your existing LinkedIn post or content here to get refined variations..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
+                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all duration-200 hover:border-gray-400"
                 rows={6}
               />
             </>
@@ -212,7 +215,7 @@ const Dashboard = () => {
               (chatMode === 'topic' && !idea.trim()) ||
               (chatMode === 'draft' && !draftContent.trim())
             }
-            className="mt-4 w-full sm:w-auto px-6 py-2.5 text-sm font-medium bg-primary hover:bg-primary/90 transition-all duration-200 disabled:opacity-50"
+            className="mt-6 w-full sm:w-auto px-8 py-3 text-sm font-medium bg-primary hover:bg-primary/90 transition-all duration-200 disabled:opacity-50 rounded-lg"
           >
             {isGenerating ? (
               <>
