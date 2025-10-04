@@ -41,7 +41,9 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   const [viewSize, setViewSize] = useState<ViewSize>('desktop');
   const [showFullContent, setShowFullContent] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
-  const [postImage, setPostImage] = useState<string | null>(null);
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
+  const [imagesChanged, setImagesChanged] = useState(false);
   const [isEditingContent, setIsEditingContent] = useState(false);
   const [showEditPopover, setShowEditPopover] = useState(false);
   const [editInstruction, setEditInstruction] = useState('');
@@ -57,10 +59,13 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   const postContent = generatedPost?.content || "Your LinkedIn post content will appear here as you generate it...";
   const postId = generatedPost?.id;
 
-  // Initialize postImage from Redux when component mounts or generatedPost changes
+  // Initialize image preview URLs from Redux when component mounts or generatedPost changes
   useEffect(() => {
     if (generatedPost?.imageUrls && generatedPost.imageUrls.length > 0) {
-      setPostImage(generatedPost.imageUrls[0]);
+      setImagePreviewUrls(generatedPost.imageUrls);
+      // Clear file objects since these are already-uploaded URLs
+      setImageFiles([]);
+      setImagesChanged(false);
     }
   }, [generatedPost?.imageUrls]);
 
@@ -96,14 +101,14 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       // Format the scheduled date/time in ISO format
       const scheduledFor = date.toISOString();
 
-      // Dispatch the schedule action
+      // Use imagePreviewUrls (now contains real Supabase URLs after immediate upload)
       await dispatch(schedulePost({
         scheduleData: {
           content: postContent,
           scheduled_for: scheduledFor,
           timezone: timezone,
           visibility: 'PUBLIC',
-          image_urls: postImage ? [postImage] : undefined,
+          image_urls: imagePreviewUrls.length > 0 ? imagePreviewUrls : undefined,
           draft_id: postId  // Include the draft post ID if it exists
         },
         token
@@ -131,7 +136,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
         post: {
           content: postContent,
           visibility: 'PUBLIC',
-          image_urls: postImage ? [postImage] : undefined,
+          image_urls: imagePreviewUrls.length > 0 ? imagePreviewUrls : undefined,
           draft_id: postId  // Include the draft post ID if it exists
         },
         token
@@ -148,62 +153,65 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
+    input.multiple = true; // Allow multiple selection
+
     input.onchange = async (e) => {
-      const file = (e.target as HTMLInputElement).files?.[0];
-      if (file) {
-        try {
-          // Get auth token
-          const token = await getToken();
-          if (!token) {
-            toast.error('Authentication required', { position: 'top-right' });
-            return;
+      const files = (e.target as HTMLInputElement).files;
+      if (!files || files.length === 0) return;
+
+      // LinkedIn supports up to 9 images
+      const maxImages = 9;
+      const currentImageCount = imagePreviewUrls.length;
+      const availableSlots = maxImages - currentImageCount;
+
+      if (files.length > availableSlots) {
+        toast.error(`You can only upload ${availableSlots} more image(s). LinkedIn allows up to ${maxImages} images per post.`, { position: 'top-right' });
+        return;
+      }
+
+      // Store only NEW files
+      const newFiles = Array.from(files);
+
+      // Get auth token
+      const token = await getToken();
+      if (!token) {
+        toast.error('Authentication required', { position: 'top-right' });
+        return;
+      }
+
+      // Show uploading toast
+      toast.info(`Uploading ${newFiles.length} image(s)...`, { position: 'top-right' });
+
+      try {
+        // Upload images immediately by saving draft
+        if (postId) {
+          const response = await dispatch(saveDraftToDatabase({
+            postId,
+            content: postContent,
+            imageFiles: newFiles, // Only send NEW files - backend will append to existing
+            token
+          })).unwrap();
+
+          // Update state with ALL uploaded URLs from backend response (existing + new)
+          if (response.post?.image_urls) {
+            setImagePreviewUrls(response.post.image_urls);
+            setImageFiles([]);
+            setImagesChanged(false);
+            toast.success(`${newFiles.length} image(s) uploaded successfully!`, { position: 'top-right' });
           }
-
-          // Store old image URL before uploading new one
-          const oldImageUrl = postImage;
-
-          // Upload image to backend
-          const formData = new FormData();
-          formData.append('file', file);
-
-          // If there's an old image, include it for deletion
-          if (oldImageUrl) {
-            formData.append('old_image_url', oldImageUrl);
-          }
-
-          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://0.0.0.0:8080'}/api/posting/upload-image`, {
-            method: 'POST',
-            headers: {
-              'Authorization': `Bearer ${token}`,
-            },
-            body: formData,
-          });
-
-          const data = await response.json();
-
-          if (!response.ok || !data.success) {
-            throw new Error(data.error || 'Failed to upload image');
-          }
-
-          // Store the new image URL
-          setPostImage(data.image_url);
-
-          // Immediately save draft with the new image
-          if (postId) {
-            await dispatch(saveDraftToDatabase({
-              postId,
-              content: postContent,
-              imageUrl: data.image_url,
-              token
-            })).unwrap();
-          }
-
-          toast.success('Image uploaded successfully', { position: 'top-right' });
-        } catch (error) {
-          toast.error(error instanceof Error ? error.message : 'Failed to upload image', { position: 'top-right' });
+        } else {
+          // No post ID yet - just show preview for now
+          const newPreviewUrls = newFiles.map(file => URL.createObjectURL(file));
+          setImagePreviewUrls([...imagePreviewUrls, ...newPreviewUrls]);
+          setImageFiles(newFiles);
+          setImagesChanged(true);
+          toast.warning('Images will upload when draft is created.', { position: 'top-right' });
         }
+      } catch (error) {
+        toast.error('Failed to upload images. Please try again.', { position: 'top-right' });
       }
     };
+
     input.click();
   };
   
@@ -242,8 +250,8 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
     // Expand content when exiting edit mode
     setShowFullContent(true);
 
-    // Only save if we have a post ID and the content has been edited
-    if (postId && generatedPost?.isEdited && saveStatus === 'unsaved') {
+    // Save if we have a post ID and (content edited OR images changed)
+    if (postId && (generatedPost?.isEdited || imagesChanged)) {
       try {
         const token = await getToken();
         if (!token) {
@@ -254,9 +262,14 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
         await dispatch(saveDraftToDatabase({
           postId,
           content: postContent,
-          imageUrl: postImage || undefined,
+          imageFiles: imagesChanged ? imageFiles : undefined,
           token
         })).unwrap();
+
+        // Reset imagesChanged flag after successful save
+        if (imagesChanged) {
+          setImagesChanged(false);
+        }
       } catch {
         // Auto-save errors are silent
       }
@@ -770,19 +783,44 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
               )}
 
               {/* Image Display Area */}
-              {postImage && (
-                <div className="mt-3 relative group">
-                  <img
-                    src={postImage}
-                    alt="Post attachment"
-                    className="w-full rounded-lg object-cover"
-                  />
-                  <button
-                    onClick={() => setPostImage(null)}
-                    className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                  >
-                    <X className="w-4 h-4" />
-                  </button>
+              {imagePreviewUrls.length > 0 && (
+                <div className={`mt-3 ${
+                  imagePreviewUrls.length === 1
+                    ? 'grid grid-cols-1'
+                    : imagePreviewUrls.length === 2
+                    ? 'grid grid-cols-2 gap-1'
+                    : imagePreviewUrls.length === 3
+                    ? 'grid grid-cols-3 gap-1'
+                    : imagePreviewUrls.length === 4
+                    ? 'grid grid-cols-2 gap-1'
+                    : 'grid grid-cols-3 gap-1'
+                }`}>
+                  {imagePreviewUrls.map((imageUrl, index) => (
+                    <div key={index} className="relative group">
+                      <img
+                        src={imageUrl}
+                        alt={`Post attachment ${index + 1}`}
+                        className={`w-full rounded-lg object-cover ${
+                          imagePreviewUrls.length === 1 ? 'max-h-[500px]' : 'h-48'
+                        }`}
+                      />
+                      <button
+                        onClick={async () => {
+                          // Remove from preview immediately
+                          const newPreviewUrls = imagePreviewUrls.filter((_, i) => i !== index);
+                          setImagePreviewUrls(newPreviewUrls);
+
+                          // Since images are already uploaded, just update local state
+                          // The next autosave will handle cleanup if needed
+                          setImagesChanged(true);
+                          toast.success('Image removed', { position: 'top-right' });
+                        }}
+                        className="absolute top-2 right-2 p-1.5 bg-black/50 text-white rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  ))}
                 </div>
               )}
             </div>

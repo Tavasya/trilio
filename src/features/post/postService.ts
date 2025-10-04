@@ -40,13 +40,22 @@ export class PostService {
   }
 
   async saveDraft(draft: DraftPostRequest, token: string): Promise<DraftPostResponse> {
+    // Backend now expects FormData instead of JSON
+    const formData = new FormData();
+    formData.append('content', draft.content);
+    formData.append('visibility', draft.visibility || 'PUBLIC');
+
+    if (draft.media_url) {
+      formData.append('media_url', draft.media_url);
+    }
+
     const response = await fetch(`${API_CONFIG.BASE_URL}/api/posting/draft`, {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        // Don't set Content-Type - browser will set it with boundary for multipart/form-data
       },
-      body: JSON.stringify(draft),
+      body: formData,
     });
 
     const data = await response.json();
@@ -76,14 +85,24 @@ export class PostService {
     return data;
   }
 
-  async updateDraft(postId: string, draft: UpdateDraftRequest, token: string): Promise<UpdateDraftResponse> {
+  async updateDraft(postId: string, content: string, imageFiles?: File[], token?: string): Promise<UpdateDraftResponse> {
+    const formData = new FormData();
+    formData.append('content', content);
+
+    // Only append files if they were changed
+    if (imageFiles && imageFiles.length > 0) {
+      imageFiles.forEach(file => {
+        formData.append('files', file);
+      });
+    }
+
     const response = await fetch(`${API_CONFIG.BASE_URL}/api/posting/draft/${postId}`, {
       method: 'PUT',
       headers: {
         'Authorization': `Bearer ${token}`,
-        'Content-Type': 'application/json',
+        // Don't set Content-Type - browser will set it with boundary for multipart/form-data
       },
-      body: JSON.stringify(draft),
+      body: formData,
     });
 
     const data = await response.json();
