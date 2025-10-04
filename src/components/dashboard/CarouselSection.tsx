@@ -18,6 +18,8 @@ interface CarouselSectionProps {
   onRegenerate?: (index: number, previousContent: string) => void;
   onSchedule?: (variation: IdeaVariation) => void;
   onPostNow?: (variation: IdeaVariation) => void;
+  isPosting?: boolean;
+  isScheduling?: boolean;
 }
 
 export default function CarouselSection({
@@ -30,7 +32,9 @@ export default function CarouselSection({
   onEdit,
   onRegenerate,
   onSchedule,
-  onPostNow
+  onPostNow,
+  isPosting = false,
+  isScheduling = false
 }: CarouselSectionProps) {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [maxHeight, setMaxHeight] = useState<number>(0);
@@ -196,11 +200,16 @@ export default function CarouselSection({
                       {onSchedule && (
                         <Button
                           onClick={() => onSchedule(card)}
+                          disabled={isScheduling}
                           variant="outline"
                           size="icon"
-                          className="bg-white text-gray-700 hover:bg-gray-50"
+                          className="bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                         >
-                          <Calendar className="w-4 h-4" />
+                          {isScheduling ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Calendar className="w-4 h-4" />
+                          )}
                         </Button>
                       )}
                       <Button
@@ -213,10 +222,20 @@ export default function CarouselSection({
                       {onPostNow && (
                         <Button
                           onClick={() => onPostNow(card)}
-                          className="bg-primary text-white hover:bg-primary/90"
+                          disabled={isPosting}
+                          className="bg-primary text-white hover:bg-primary/90 disabled:opacity-50"
                         >
-                          <Send className="w-4 h-4 mr-2" />
-                          Post Now
+                          {isPosting ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Posting...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4 mr-2" />
+                              Post Now
+                            </>
+                          )}
                         </Button>
                       )}
                     </div>
@@ -243,10 +262,6 @@ export default function CarouselSection({
                         <p className="text-xs text-gray-500 mt-0.5">Just now • 🌐</p>
                       </div>
                     </div>
-                    {/* More Options */}
-                    <button className="p-1 hover:bg-gray-100 rounded">
-                      <MoreHorizontal className="w-5 h-5 text-gray-600" />
-                    </button>
                   </div>
                 </div>
 
@@ -528,11 +543,16 @@ export default function CarouselSection({
                       {onSchedule && (
                         <Button
                           onClick={() => onSchedule(card)}
+                          disabled={isScheduling}
                           variant="outline"
                           size="icon"
-                          className="bg-white text-gray-700 hover:bg-gray-50"
+                          className="bg-white text-gray-700 hover:bg-gray-50 disabled:opacity-50"
                         >
-                          <Calendar className="w-4 h-4" />
+                          {isScheduling ? (
+                            <Loader2 className="w-4 h-4 animate-spin" />
+                          ) : (
+                            <Calendar className="w-4 h-4" />
+                          )}
                         </Button>
                       )}
                       <Button
@@ -545,10 +565,20 @@ export default function CarouselSection({
                       {onPostNow && (
                         <Button
                           onClick={() => onPostNow(card)}
-                          className="bg-primary text-white hover:bg-primary/90"
+                          disabled={isPosting}
+                          className="bg-primary text-white hover:bg-primary/90 disabled:opacity-50"
                         >
-                          <Send className="w-4 h-4 mr-2" />
-                          Post Now
+                          {isPosting ? (
+                            <>
+                              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              Posting...
+                            </>
+                          ) : (
+                            <>
+                              <Send className="w-4 h-4 mr-2" />
+                              Post Now
+                            </>
+                          )}
                         </Button>
                       )}
                     </div>

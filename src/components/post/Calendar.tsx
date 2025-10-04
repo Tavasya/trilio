@@ -65,6 +65,9 @@ const Calendar: React.FC = () => {
                        post.created_at ? new Date(post.created_at) : null;
       if (!postDate) return false;
 
+      // Only show scheduled and published posts
+      if (post.status !== 'scheduled' && post.status !== 'published') return false;
+
       return postDate.getDate() === date.getDate() &&
         postDate.getMonth() === date.getMonth() &&
         postDate.getFullYear() === date.getFullYear() &&
@@ -462,10 +465,12 @@ const Calendar: React.FC = () => {
                             return (
                               <div
                                 key={post.id}
-                                className="absolute inset-x-2 bg-[#0077b5]/10 border border-[#0077b5]/20 rounded-lg p-2 cursor-move hover:bg-[#0077b5]/15 transition-colors"
+                                className={`absolute inset-x-2 bg-[#0077b5]/10 border border-[#0077b5]/20 rounded-lg p-2 transition-colors ${
+                                  post.status === 'scheduled' ? 'cursor-move hover:bg-[#0077b5]/15' : 'cursor-pointer'
+                                }`}
                                 style={{ top: `${12 + postIndex * 40}px` }}
                                 draggable={post.status === 'scheduled'}
-                                onDragStart={(e) => handleDragStart(e, post)}
+                                onDragStart={(e) => post.status === 'scheduled' && handleDragStart(e, post)}
                                 onClick={() => setSelectedPost(post)}
                               >
                                 <div className="flex items-start justify-between">
@@ -483,26 +488,28 @@ const Calendar: React.FC = () => {
                                       {post.content.substring(0, 50)}...
                                     </p>
                                   </div>
-                                  <div className="flex gap-1 ml-2">
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleEditPost(post);
-                                      }}
-                                      className="p-1 hover:bg-[#0077b5]/20 rounded transition-colors"
-                                    >
-                                      <Edit2 className="w-3 h-3 text-[#0077b5]" />
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteClick(post.id);
-                                      }}
-                                      className="p-1 hover:bg-red-100 rounded transition-colors"
-                                    >
-                                      <Trash2 className="w-3 h-3 text-red-500" />
-                                    </button>
-                                  </div>
+                                  {post.status === 'scheduled' && (
+                                    <div className="flex gap-1 ml-2">
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleEditPost(post);
+                                        }}
+                                        className="p-1 hover:bg-[#0077b5]/20 rounded transition-colors"
+                                      >
+                                        <Edit2 className="w-3 h-3 text-[#0077b5]" />
+                                      </button>
+                                      <button
+                                        onClick={(e) => {
+                                          e.stopPropagation();
+                                          handleDeleteClick(post.id);
+                                        }}
+                                        className="p-1 hover:bg-red-100 rounded transition-colors"
+                                      >
+                                        <Trash2 className="w-3 h-3 text-red-500" />
+                                      </button>
+                                    </div>
+                                  )}
                                 </div>
                               </div>
                             );

@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Calendar, Clock, AlertCircle, ChevronDown } from 'lucide-react';
+import { X, Calendar, Clock, AlertCircle, ChevronDown, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 
 interface ScheduleModalProps {
@@ -8,9 +8,10 @@ interface ScheduleModalProps {
   onClose: () => void;
   onSchedule: (date: Date, time: string) => void;
   onPostNow?: () => void;
+  isScheduling?: boolean;
 }
 
-export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleModalProps) {
+export default function ScheduleModal({ isOpen, onClose, onSchedule, isScheduling = false }: ScheduleModalProps) {
   const [selectedDate, setSelectedDate] = useState<string>('');
   const [selectedTime, setSelectedTime] = useState<string>('');
   const [validationError, setValidationError] = useState<string>('');
@@ -350,16 +351,24 @@ export default function ScheduleModal({ isOpen, onClose, onSchedule }: ScheduleM
           <Button
             variant="outline"
             onClick={onClose}
+            disabled={isScheduling}
             className="flex-1"
           >
             Cancel
           </Button>
           <Button
             onClick={handleSchedule}
-            disabled={!selectedDate || !selectedTime || !!validationError}
+            disabled={!selectedDate || !selectedTime || !!validationError || isScheduling}
             className="flex-1"
           >
-            Schedule
+            {isScheduling ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Scheduling...
+              </>
+            ) : (
+              'Schedule'
+            )}
           </Button>
         </div>
       </div>
