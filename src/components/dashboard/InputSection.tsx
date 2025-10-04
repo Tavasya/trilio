@@ -18,7 +18,6 @@ interface InputSectionProps {
   postLength: PostLength;
   onIdeaChange: (value: string) => void;
   onDraftChange: (value: string) => void;
-  onModeToggle: () => void;
   onHooksClick: () => void;
   onHookRemove: () => void;
   onPostLengthClick: () => void;
@@ -34,7 +33,6 @@ export default function InputSection({
   postLength,
   onIdeaChange,
   onDraftChange,
-  onModeToggle,
   onHooksClick,
   onHookRemove,
   onPostLengthClick,

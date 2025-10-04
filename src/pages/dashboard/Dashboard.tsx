@@ -13,7 +13,6 @@ import {
   appendVariationContent,
   completeVariation,
   selectDashboardState,
-  setChatMode,
   setSelectedHook,
   setPostLength
 } from '../../features/dashboard/dashboardSlice';
@@ -306,7 +305,6 @@ const Dashboard = () => {
             postLength={postLength}
             onIdeaChange={(value) => dispatch(setIdea(value))}
             onDraftChange={(value) => dispatch(setDraftContent(value))}
-            onModeToggle={() => dispatch(setChatMode(chatMode === 'topic' ? 'draft' : 'topic'))}
             onHooksClick={() => setIsHooksModalOpen(true)}
             onHookRemove={handleHookRemove}
             onPostLengthClick={handlePostLengthClick}
