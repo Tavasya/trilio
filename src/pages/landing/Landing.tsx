@@ -7,7 +7,7 @@ import ProblemsSection from "@/components/landing/ProblemsSection";
 import LeverageSection from "@/components/landing/LeverageSection";
 import FoundersTestimonials from "@/components/landing/FoundersTestimonials";
 import SalesSection from "@/components/landing/SalesSection";
-import PricingSection from "@/components/landing/PricingSection";
+// import PricingSection from "@/components/landing/PricingSection";
 import FAQSection from "@/components/landing/FAQSection";
 import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/Footer";
