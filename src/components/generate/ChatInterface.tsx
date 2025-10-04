@@ -56,6 +56,7 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
     isEditMode,
     isLoadingPost
   } = useAppSelector((state) => state.chat);
+  const isPublishing = useAppSelector((state) => state.post.isLoading);
 
 
   const currentConversation = activeConversationId
@@ -158,6 +159,10 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
     if (!inputValue.trim()) return;
     if (isStreaming) {
       toast.error('Please wait for the current response to complete', { position: 'top-right' });
+      return;
+    }
+    if (isPublishing) {
+      toast.error('Please wait for post to finish publishing', { position: 'top-right' });
       return;
     }
 
@@ -436,19 +441,20 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message here..."
-            className="flex-1 min-h-[32px] max-h-[120px] p-1.5 bg-transparent border-none resize-none focus:outline-none overflow-y-auto"
+            placeholder={isPublishing ? "Publishing post..." : "Type your message here..."}
+            className="flex-1 min-h-[32px] max-h-[120px] p-1.5 bg-transparent border-none resize-none focus:outline-none overflow-y-auto disabled:opacity-50 disabled:cursor-not-allowed"
             rows={1}
             style={{ lineHeight: '1.25rem' }}
+            disabled={isPublishing}
           />
           <button
             onClick={handleSend}
             className={`h-8 w-8 flex items-center justify-center rounded transition-colors ${
-              (!inputValue.trim() || isStreaming)
+              (!inputValue.trim() || isStreaming || isPublishing)
                 ? 'text-gray-400'
                 : 'text-primary hover:text-primary/80'
             }`}
-            disabled={false}
+            disabled={isPublishing}
           >
             <Send className="w-5 h-5" />
           </button>
