@@ -146,7 +146,9 @@ export default function CarouselSection({
                 }}
               >
               <div
-                ref={(el) => (measureRefs.current[index] = el)}
+                ref={(el) => {
+                  measureRefs.current[index] = el;
+                }}
                 className="bg-white rounded-lg border border-gray-200 relative flex flex-col"
                 style={{ height: maxHeight > 0 ? maxHeight : 'auto' }}
               >

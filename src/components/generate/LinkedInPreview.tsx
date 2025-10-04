@@ -27,7 +27,6 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   const { getToken } = useAuth();
   const { user } = useUser();
   const generatedPost = useAppSelector(state => state.chat.generatedPost);
-  const saveStatus = useAppSelector(state => state.chat.saveStatus);
 
   // Use Clerk user data with fallbacks
   const userName = user?.fullName || user?.firstName || "Your Name";

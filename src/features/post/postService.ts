@@ -1,6 +1,6 @@
 import { API_CONFIG } from '@/shared/config/api';
 import { handleSSEStream } from '@/shared/utils/sse';
-import type { FetchPostsResponse, LinkedInPost, LinkedInPostResponse, DraftPostRequest, DraftPostResponse, GetPostResponse, UpdateDraftRequest, UpdateDraftResponse, SchedulePostRequest, SchedulePostResponse, GenerateIdeasRequest, RegenerateVariationRequest, EditSelectionRequest } from './postTypes';
+import type { FetchPostsResponse, LinkedInPost, LinkedInPostResponse, DraftPostRequest, DraftPostResponse, GetPostResponse, UpdateDraftResponse, SchedulePostRequest, SchedulePostResponse, GenerateIdeasRequest, RegenerateVariationRequest, EditSelectionRequest } from './postTypes';
 
 export class PostService {
   async fetchUserPosts(token: string): Promise<FetchPostsResponse> {
