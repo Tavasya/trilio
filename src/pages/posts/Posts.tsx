@@ -129,8 +129,31 @@ export default function Posts() {
   return (
     <div className="h-full bg-white overflow-y-auto">
       <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Create Post Card */}
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6 max-w-2xl mx-auto">
+          <div className="flex gap-3">
+            {user?.imageUrl ? (
+              <img
+                src={user.imageUrl}
+                alt={`${user.firstName} ${user.lastName}`}
+                className="w-12 h-12 rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
+                {user?.firstName?.[0]}{user?.lastName?.[0]}
+              </div>
+            )}
+            <Link
+              to="/dashboard"
+              className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors text-left text-gray-500 text-sm font-medium"
+            >
+              Start a post
+            </Link>
+          </div>
+        </div>
+
         {/* Filter Buttons */}
-        <div className="flex gap-2 mb-6 max-w-2xl mx-auto">
+        <div className="flex gap-2 mb-6">
           <Button
             onClick={() => dispatch(setFilter('all'))}
             variant={filter === 'all' ? 'default' : 'outline'}
@@ -159,29 +182,6 @@ export default function Posts() {
           >
             Draft
           </Button>
-        </div>
-
-        {/* Create Post Card */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6 max-w-2xl mx-auto">
-          <div className="flex gap-3">
-            {user?.imageUrl ? (
-              <img
-                src={user.imageUrl}
-                alt={`${user.firstName} ${user.lastName}`}
-                className="w-12 h-12 rounded-full object-cover"
-              />
-            ) : (
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white font-semibold">
-                {user?.firstName?.[0]}{user?.lastName?.[0]}
-              </div>
-            )}
-            <Link
-              to="/dashboard"
-              className="flex-1 px-4 py-3 bg-white border border-gray-300 rounded-full hover:bg-gray-50 transition-colors text-left text-gray-500 text-sm font-medium"
-            >
-              Start a post
-            </Link>
-          </div>
         </div>
 
         {filteredPosts.length === 0 ? (
