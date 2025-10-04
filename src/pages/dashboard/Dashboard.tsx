@@ -15,11 +15,13 @@ import {
   selectDashboardState,
   setChatMode
 } from '../../features/dashboard/dashboardSlice';
+import { schedulePost, publishToLinkedIn } from '@/features/post/postSlice';
 import type { IdeaVariation } from '@/features/post/postTypes';
 import { useState } from 'react';
 import HooksModal from '@/components/dashboard/HooksModal';
 import InputSection from '@/components/dashboard/InputSection';
 import CarouselSection from '@/components/dashboard/CarouselSection';
+import ScheduleModal from '@/components/generate/ScheduleModal';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -36,6 +38,13 @@ const Dashboard = () => {
   } = useAppSelector(selectDashboardState);
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
   const [isHooksModalOpen, setIsHooksModalOpen] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [selectedVariation, setSelectedVariation] = useState<IdeaVariation | null>(null);
+
+  // Check if LinkedIn is connected via Clerk external accounts
+  const hasLinkedIn = user?.externalAccounts?.some(
+    account => account.provider === 'linkedin_oidc'
+  ) || false;
 
 
   const handleGenerateIdeas = async () => {
@@ -157,6 +166,68 @@ const Dashboard = () => {
     toast.success(`Applied ${hookType} hook for ${icp}`, { position: 'top-right' });
   };
 
+  const handleSchedulePost = (variation: IdeaVariation) => {
+    setSelectedVariation(variation);
+    setShowScheduleModal(true);
+  };
+
+  const handleSchedule = async (date: Date) => {
+    if (!selectedVariation) return;
+
+    const token = await getToken();
+    if (!token) {
+      toast.error('Authentication required', { position: 'top-right' });
+      return;
+    }
+
+    try {
+      // Get user's timezone
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      // Format the scheduled date/time in ISO format
+      const scheduledFor = date.toISOString();
+
+      await dispatch(schedulePost({
+        scheduleData: {
+          content: selectedVariation.content,
+          scheduled_for: scheduledFor,
+          timezone: timezone,
+          visibility: 'PUBLIC'
+        },
+        token
+      })).unwrap();
+
+      setShowScheduleModal(false);
+      toast.success('Post scheduled successfully!', { position: 'top-right' });
+      navigate('/scheduler');
+    } catch {
+      toast.error('Failed to schedule post', { position: 'top-right' });
+    }
+  };
+
+  const handlePostNow = async (variation: IdeaVariation) => {
+    const token = await getToken();
+    if (!token) {
+      toast.error('Authentication required', { position: 'top-right' });
+      return;
+    }
+
+    try {
+      await dispatch(publishToLinkedIn({
+        post: {
+          content: variation.content,
+          visibility: 'PUBLIC'
+        },
+        token
+      })).unwrap();
+
+      toast.success('Posted to LinkedIn successfully!', { position: 'top-right' });
+      navigate('/posts');
+    } catch {
+      toast.error('Failed to post to LinkedIn', { position: 'top-right' });
+    }
+  };
+
   // Use Clerk user data with fallbacks (same as LinkedInPreview component)
   const userName = user?.fullName || user?.firstName || "Your Name";
   const userAvatar = user?.imageUrl || "";
@@ -219,9 +290,18 @@ const Dashboard = () => {
               regeneratingIndex={regeneratingIndex}
               onEdit={handleSelectVariation}
               onRegenerate={handleRegenerateVariation}
+              onSchedule={hasLinkedIn ? handleSchedulePost : undefined}
+              onPostNow={hasLinkedIn ? handlePostNow : undefined}
             />
           </div>
         )}
+
+        {/* Schedule Modal */}
+        <ScheduleModal
+          isOpen={showScheduleModal}
+          onClose={() => setShowScheduleModal(false)}
+          onSchedule={handleSchedule}
+        />
       </div>
     </div>
   );

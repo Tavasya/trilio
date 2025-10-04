@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import { RefreshCw, MoreHorizontal, ThumbsUp, MessageCircle, Share2, Send, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
+import { RefreshCw, MoreHorizontal, ThumbsUp, MessageCircle, Share2, Send, ChevronLeft, ChevronRight, Loader2, Calendar, Copy } from 'lucide-react';
+import { Button } from '../ui/button';
 import ThumbIcon from '@/lib/icons/thumb.svg?react';
 import HeartIcon from '@/lib/icons/heart.svg?react';
 import ClapIcon from '@/lib/icons/clap.svg?react';
@@ -15,6 +16,8 @@ interface CarouselSectionProps {
   regeneratingIndex?: number | null;
   onEdit?: (variation: IdeaVariation) => void;
   onRegenerate?: (index: number, previousContent: string) => void;
+  onSchedule?: (variation: IdeaVariation) => void;
+  onPostNow?: (variation: IdeaVariation) => void;
 }
 
 export default function CarouselSection({
@@ -25,7 +28,9 @@ export default function CarouselSection({
   streamingContents = {},
   regeneratingIndex = null,
   onEdit,
-  onRegenerate
+  onRegenerate,
+  onSchedule,
+  onPostNow
 }: CarouselSectionProps) {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [maxHeight, setMaxHeight] = useState<number>(0);
@@ -252,6 +257,42 @@ export default function CarouselSection({
                       <span className="text-sm font-medium">Send</span>
                     </button>
                   </div>
+
+                  {/* Post Actions - Only show on active card */}
+                  {isActive && !isGenerating && card.content && (onSchedule || onPostNow) && (
+                    <div className="p-4 flex gap-3 justify-end border-t border-gray-200 bg-gray-50">
+                      <Button
+                        onClick={() => navigator.clipboard.writeText(displayContent).then(() => {
+                          const toast = (window as any).toast;
+                          if (toast) toast.success('Copied to clipboard', { position: 'top-right' });
+                        })}
+                        variant="outline"
+                        size="icon"
+                        className="bg-white text-gray-700 hover:bg-gray-50 shadow-md rounded-lg"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                      {onSchedule && (
+                        <Button
+                          onClick={() => onSchedule(card)}
+                          variant="outline"
+                          size="icon"
+                          className="bg-white text-gray-700 hover:bg-gray-50 shadow-md rounded-lg"
+                        >
+                          <Calendar className="w-4 h-4" />
+                        </Button>
+                      )}
+                      {onPostNow && (
+                        <Button
+                          onClick={() => onPostNow(card)}
+                          className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-md rounded-lg px-6 py-2"
+                        >
+                          <Send className="w-4 h-4" />
+                          <span className="font-medium">Post Now</span>
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -384,6 +425,42 @@ export default function CarouselSection({
                   <span className="text-sm font-medium">Send</span>
                 </button>
               </div>
+
+              {/* Post Actions - Mobile */}
+              {!isGenerating && cards[currentCardIndex]?.content && (onSchedule || onPostNow) && (
+                <div className="p-4 flex gap-3 justify-end border-t border-gray-200 bg-gray-50">
+                  <Button
+                    onClick={() => navigator.clipboard.writeText(cards[currentCardIndex].content).then(() => {
+                      const toast = (window as any).toast;
+                      if (toast) toast.success('Copied to clipboard', { position: 'top-right' });
+                    })}
+                    variant="outline"
+                    size="icon"
+                    className="bg-white text-gray-700 hover:bg-gray-50 shadow-md rounded-lg"
+                  >
+                    <Copy className="w-4 h-4" />
+                  </Button>
+                  {onSchedule && (
+                    <Button
+                      onClick={() => onSchedule(cards[currentCardIndex])}
+                      variant="outline"
+                      size="icon"
+                      className="bg-white text-gray-700 hover:bg-gray-50 shadow-md rounded-lg"
+                    >
+                      <Calendar className="w-4 h-4" />
+                    </Button>
+                  )}
+                  {onPostNow && (
+                    <Button
+                      onClick={() => onPostNow(cards[currentCardIndex])}
+                      className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-md rounded-lg px-6 py-2"
+                    >
+                      <Send className="w-4 h-4" />
+                      <span className="font-medium">Post Now</span>
+                    </Button>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -509,6 +586,42 @@ export default function CarouselSection({
                       <span className="text-sm font-medium">Send</span>
                     </button>
                   </div>
+
+                  {/* Post Actions - Grid View */}
+                  {!isGenerating && card.content && (onSchedule || onPostNow) && (
+                    <div className="p-4 flex gap-3 justify-end border-t border-gray-200 bg-gray-50">
+                      <Button
+                        onClick={() => navigator.clipboard.writeText(displayContent).then(() => {
+                          const toast = (window as any).toast;
+                          if (toast) toast.success('Copied to clipboard', { position: 'top-right' });
+                        })}
+                        variant="outline"
+                        size="icon"
+                        className="bg-white text-gray-700 hover:bg-gray-50 shadow-md rounded-lg"
+                      >
+                        <Copy className="w-4 h-4" />
+                      </Button>
+                      {onSchedule && (
+                        <Button
+                          onClick={() => onSchedule(card)}
+                          variant="outline"
+                          size="icon"
+                          className="bg-white text-gray-700 hover:bg-gray-50 shadow-md rounded-lg"
+                        >
+                          <Calendar className="w-4 h-4" />
+                        </Button>
+                      )}
+                      {onPostNow && (
+                        <Button
+                          onClick={() => onPostNow(card)}
+                          className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-md rounded-lg px-6 py-2"
+                        >
+                          <Send className="w-4 h-4" />
+                          <span className="font-medium">Post Now</span>
+                        </Button>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             );
