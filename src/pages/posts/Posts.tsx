@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchUserPosts, selectShouldFetchPosts, deletePost } from '@/features/post/postSlice';
+import { fetchUserPosts, selectShouldFetchPosts, deletePost, setFilter } from '@/features/post/postSlice';
 import type { Post } from '@/features/post/postTypes';
 
 import { useAuth } from '@clerk/react-router';
@@ -21,11 +21,26 @@ export default function Posts() {
   const navigate = useNavigate();
   const { getToken } = useAuth();
   const { user } = useUser();
-  const { posts, isLoading } = useAppSelector(state => state.post);
+  const { posts, isLoading, filter } = useAppSelector(state => state.post);
   const shouldFetch = useAppSelector(selectShouldFetchPosts);
   const [expandedPosts, setExpandedPosts] = React.useState<Set<string>>(new Set());
   const [deleteDialogOpen, setDeleteDialogOpen] = React.useState(false);
   const [postToDelete, setPostToDelete] = React.useState<string | null>(null);
+
+  const getPostStatus = (post: Post) => {
+    if (post.linkedin_post_id && post.linkedin_post_url) {
+      return 'published';
+    }
+    if (post.scheduled_for) {
+      return 'scheduled';
+    }
+    return 'draft';
+  };
+
+  const filteredPosts = useMemo(() => {
+    if (filter === 'all') return posts;
+    return posts.filter(post => getPostStatus(post) === filter);
+  }, [posts, filter]);
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -83,19 +98,6 @@ export default function Posts() {
     }
   };
 
-  const getPostStatus = (post: Post) => {
-    if (post.linkedin_post_id && post.linkedin_post_url) {
-      return 'published';
-    }
-    if (post.scheduled_for) {
-      return 'scheduled';
-    }
-    return 'draft';
-  };
-
-
-
-
   const handleEditPost = (postId: string) => {
     navigate(`/generate?postId=${postId}`);
   };
@@ -150,7 +152,39 @@ export default function Posts() {
           </div>
         </div>
 
-        {posts.length === 0 ? (
+        {/* Filter Buttons */}
+        <div className="flex gap-2 mb-6">
+          <Button
+            onClick={() => dispatch(setFilter('all'))}
+            variant={filter === 'all' ? 'default' : 'outline'}
+            size="sm"
+          >
+            All
+          </Button>
+          <Button
+            onClick={() => dispatch(setFilter('published'))}
+            variant={filter === 'published' ? 'default' : 'outline'}
+            size="sm"
+          >
+            Published
+          </Button>
+          <Button
+            onClick={() => dispatch(setFilter('scheduled'))}
+            variant={filter === 'scheduled' ? 'default' : 'outline'}
+            size="sm"
+          >
+            Scheduled
+          </Button>
+          <Button
+            onClick={() => dispatch(setFilter('draft'))}
+            variant={filter === 'draft' ? 'default' : 'outline'}
+            size="sm"
+          >
+            Draft
+          </Button>
+        </div>
+
+        {filteredPosts.length === 0 ? (
           <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
             <div className="max-w-sm mx-auto">
               <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -158,15 +192,20 @@ export default function Posts() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z" />
                 </svg>
               </div>
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">No posts yet</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {posts.length === 0 ? 'No posts yet' : `No ${filter} posts`}
+              </h3>
               <p className="text-sm text-gray-600 mb-6">
-                Start building your LinkedIn presence by creating your first post.
+                {posts.length === 0
+                  ? 'Start building your LinkedIn presence by creating your first post.'
+                  : `You don't have any ${filter} posts yet.`
+                }
               </p>
             </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-min">
-            {posts.map((post) => {
+            {filteredPosts.map((post) => {
               const MAX_CONTENT_LENGTH = 280;
               const truncatedContent = post.content.length > MAX_CONTENT_LENGTH
                 ? post.content.substring(0, MAX_CONTENT_LENGTH)

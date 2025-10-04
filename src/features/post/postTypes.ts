@@ -104,6 +104,7 @@ export interface PostState {
   isLoading: boolean;
   error: string | null;
   lastPostId: string | null;
+  filter: 'all' | 'published' | 'scheduled' | 'draft';
 }
 
 export interface IdeaVariation {

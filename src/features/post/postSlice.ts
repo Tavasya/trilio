@@ -15,6 +15,7 @@ const initialState: PostState = {
   isLoading: false,
   error: null,
   lastPostId: null,
+  filter: 'all',
 };
 
 // Async thunk for fetching user posts
@@ -79,6 +80,9 @@ const postSlice = createSlice({
     clearPostsCache: (state) => {
       state.posts = [];
       state.lastFetched = null;
+    },
+    setFilter: (state, action: PayloadAction<'all' | 'published' | 'scheduled' | 'draft'>) => {
+      state.filter = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -191,6 +195,7 @@ export const {
   updateCurrentPost,
   clearError,
   clearPostsCache,
+  setFilter,
 } = postSlice.actions;
 
 // Selector to check if cache is stale

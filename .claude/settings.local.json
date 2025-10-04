@@ -5,7 +5,8 @@
       "Bash(npx tsc:*)",
       "Bash(npm run lint)",
       "Bash(npm run build:*)",
-      "mcp__trilio__schedule_post_api_posts_schedule_post"
+      "mcp__trilio__schedule_post_api_posts_schedule_post",
+      "WebFetch(domain:clerk.com)"
     ],
     "deny": [],
     "ask": []
