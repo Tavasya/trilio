@@ -13,7 +13,6 @@ import {
   appendVariationContent,
   completeVariation,
   selectDashboardState,
-  setChatMode,
   setSelectedHook,
   setPostLength
 } from '../../features/dashboard/dashboardSlice';
