@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, X, MessageSquare, Bold, Italic, List, ImagePlus, Edit3, Copy } from 'lucide-react';
 import { Button } from '../ui/button';
+import { Skeleton } from '../ui/skeleton';
 import ScheduleModal from './ScheduleModal';
 import ConnectLinkedInButton from '@/components/linkedin/ConnectLinkedInButton';
 import ThumbIcon from '@/lib/icons/thumb.svg?react';
@@ -27,6 +28,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   const { getToken } = useAuth();
   const { user } = useUser();
   const generatedPost = useAppSelector(state => state.chat.generatedPost);
+  const isLoadingPost = useAppSelector(state => state.chat.isLoadingPost);
 
   // Use Clerk user data with fallbacks
   const userName = user?.fullName || user?.firstName || "Your Name";
@@ -592,11 +594,99 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   }, [showEditButton]);
   
   const { text: displayContent, truncated } = getTruncatedContent();
-  
+
   // Fixed engagement numbers
   const reactions = 127;
   const comments = 23;
   const reposts = 8;
+
+  // Skeleton loading state
+  if (isLoadingPost) {
+    return (
+      <div className="h-full flex flex-col overflow-hidden bg-gray-100 rounded-lg border border-gray-300">
+        {/* Preview Header */}
+        <div className="p-4">
+          <div className="bg-transparent rounded-lg p-2 min-h-[48px] flex items-center">
+            <div className="flex items-center justify-between w-full relative">
+              {showToggle && (
+                <Button
+                  onClick={onToggleView}
+                  variant="outline"
+                  size="sm"
+                  className="lg:hidden"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Chat
+                </Button>
+              )}
+
+              {/* Desktop/Mobile Toggle - Centered */}
+              <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-4">
+                <button className="p-2 text-primary">
+                  <Monitor className="w-5 h-5" />
+                </button>
+                <button className="p-2 text-gray-400">
+                  <Smartphone className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton LinkedIn Post */}
+        <div className="flex-1 overflow-y-auto bg-gray-100 relative">
+          <div className="p-4 flex justify-center items-start">
+            <div className="bg-white border border-gray-200 rounded-lg w-[700px]">
+              {/* Post Header Skeleton */}
+              <div className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex gap-3">
+                    <Skeleton className="w-12 h-12 rounded-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                  </div>
+                  <Skeleton className="w-6 h-6 rounded" />
+                </div>
+              </div>
+
+              {/* Post Content Skeleton */}
+              <div className="px-4 pb-3 space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-11/12" />
+                <Skeleton className="h-4 w-4/5" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+
+              {/* Engagement Stats Skeleton */}
+              <div className="px-4 py-2 flex items-center justify-between">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+
+              {/* Action Buttons Skeleton */}
+              <div className="px-2 py-1 flex items-center justify-around border-t border-gray-200">
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-8 w-16" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Buttons Skeleton */}
+        <div className="absolute bottom-4 right-4 z-10 p-2">
+          <div className="flex gap-3">
+            <Skeleton className="h-10 w-10 rounded-lg" />
+            <Skeleton className="h-10 w-10 rounded-lg" />
+            <Skeleton className="h-10 w-32 rounded-lg" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col overflow-hidden bg-gray-100 rounded-lg border border-gray-300">

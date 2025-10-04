@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Send, Loader2, Eye, Edit3 } from 'lucide-react';
 import { Button } from '../ui/button';
+import { Skeleton } from '../ui/skeleton';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { sendMessage, startNewConversation, clearResearchCards, toggleEditMode } from '@/features/chat/chatSlice';
 import { useAuth } from '@clerk/react-router';
@@ -52,7 +53,8 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
     generatedPost,
     researchCards,
     persistedResearchCards,
-    isEditMode
+    isEditMode,
+    isLoadingPost
   } = useAppSelector((state) => state.chat);
 
 
@@ -213,6 +215,64 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
   //       : [...prev, toolId]
   //   );
   // };
+
+  // Skeleton loading state
+  if (isLoadingPost) {
+    return (
+      <div className="h-full flex flex-col overflow-hidden rounded-lg">
+        {/* Chat Header */}
+        <div className="p-4 flex-shrink-0 min-h-[60px]">
+          <div className="flex justify-between items-center h-full">
+            <div></div>
+            {showToggle && (
+              <Button
+                onClick={onToggleView}
+                variant="outline"
+                size="sm"
+                className="lg:hidden"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Preview
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Skeleton Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+          {/* Assistant message skeleton */}
+          <div className="flex justify-start">
+            <div className="max-w-[80%] space-y-2">
+              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-4 w-64" />
+              <Skeleton className="h-3 w-16 mt-1" />
+            </div>
+          </div>
+          {/* User message skeleton */}
+          <div className="flex justify-end">
+            <div className="max-w-[80%] space-y-2">
+              <Skeleton className="h-4 w-56" />
+              <Skeleton className="h-3 w-16 mt-1" />
+            </div>
+          </div>
+          {/* Assistant message skeleton */}
+          <div className="flex justify-start">
+            <div className="max-w-[80%] space-y-2">
+              <Skeleton className="h-4 w-52" />
+              <Skeleton className="h-4 w-60" />
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-16 mt-1" />
+            </div>
+          </div>
+        </div>
+
+        {/* Input Area Skeleton */}
+        <div className="p-4 flex-shrink-0">
+          <Skeleton className="h-12 w-full rounded-lg" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col overflow-hidden rounded-lg">
