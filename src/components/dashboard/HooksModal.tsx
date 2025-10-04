@@ -4,7 +4,7 @@ import { X, Briefcase, TrendingUp, MessageCircle, BarChart3, Lightbulb, Target }
 interface HooksModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onApply: (icp: string, hookType: string) => void;
+  onApply: (icp: string, hookType: string, title: string, gradient: string) => void;
 }
 
 type ICP = 'job-seekers' | 'engagement' | null;
@@ -91,8 +91,11 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
 
   const handleApply = () => {
     if (selectedICP && selectedHook) {
-      onApply(selectedICP, selectedHook);
-      handleClose();
+      const hook = currentHooks.find(h => h.id === selectedHook);
+      if (hook) {
+        onApply(selectedICP, selectedHook, hook.title, hook.gradient);
+        handleClose();
+      }
     }
   };
 

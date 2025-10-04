@@ -13,7 +13,9 @@ import {
   appendVariationContent,
   completeVariation,
   selectDashboardState,
-  setChatMode
+  setChatMode,
+  setSelectedHook,
+  setPostLength
 } from '../../features/dashboard/dashboardSlice';
 import { schedulePost, publishToLinkedIn } from '@/features/post/postSlice';
 import type { IdeaVariation } from '@/features/post/postTypes';
@@ -34,7 +36,9 @@ const Dashboard = () => {
     variations,
     isGenerating,
     streamingContents,
-    chatMode
+    chatMode,
+    selectedHook,
+    postLength
   } = useAppSelector(selectDashboardState);
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
   const [isHooksModalOpen, setIsHooksModalOpen] = useState(false);
@@ -50,14 +54,9 @@ const Dashboard = () => {
 
 
   const handleGenerateIdeas = async () => {
-    // Validation based on mode
-    if (chatMode === 'topic' && !idea.trim()) {
+    // Validation - always require idea for topic mode
+    if (!idea.trim()) {
       toast.error('Please enter an idea or topic', { position: 'top-right' });
-      return;
-    }
-
-    if (chatMode === 'draft' && !draftContent.trim()) {
-      toast.error('Please enter your draft content', { position: 'top-right' });
       return;
     }
 
@@ -71,11 +70,25 @@ const Dashboard = () => {
     dispatch(setError(null));
     dispatch(setVariations([{title: '', content: ''}, {title: '', content: ''}, {title: '', content: ''}]));
 
+    // Build request with character limit instruction
+    const charLimits = {
+      small: 300,
+      medium: 800,
+      large: 1500
+    };
+
+    const charLimitText = `Keep the post under ${charLimits[postLength]} characters. `;
+    const request: { topic?: string; draft_content?: string; hook_style?: string } = {
+      topic: charLimitText + idea
+    };
+
+    if (selectedHook) {
+      request.hook_style = selectedHook.title;
+    }
+
     try {
       await postService.streamGenerateIdeas(
-        chatMode === 'topic'
-          ? { topic: idea }
-          : { draft_content: draftContent },
+        request,
         token,
         (index, title) => {
           dispatch(startVariation({ index, title }));
@@ -164,8 +177,24 @@ const Dashboard = () => {
     }
   };
 
-  const handleHooksApply = (icp: string, hookType: string) => {
-    toast.success(`Applied ${hookType} hook for ${icp}`, { position: 'top-right' });
+  const handleHooksApply = (icp: string, hookType: string, title: string, gradient: string) => {
+    dispatch(setSelectedHook({ icp, hookType, title, gradient }));
+    toast.success(`Applied ${title}`, { position: 'top-right' });
+  };
+
+  const handleHookRemove = () => {
+    dispatch(setSelectedHook(null));
+    toast.success('Hook removed', { position: 'top-right' });
+  };
+
+  const handlePostLengthClick = () => {
+    const cycle: Record<string, 'small' | 'medium' | 'large'> = {
+      small: 'medium',
+      medium: 'large',
+      large: 'small'
+    };
+    const newLength = cycle[postLength];
+    dispatch(setPostLength(newLength));
   };
 
   const handleSchedulePost = (variation: IdeaVariation) => {
@@ -273,10 +302,14 @@ const Dashboard = () => {
             idea={idea}
             draftContent={draftContent}
             isGenerating={isGenerating}
+            selectedHook={selectedHook}
+            postLength={postLength}
             onIdeaChange={(value) => dispatch(setIdea(value))}
             onDraftChange={(value) => dispatch(setDraftContent(value))}
             onModeToggle={() => dispatch(setChatMode(chatMode === 'topic' ? 'draft' : 'topic'))}
             onHooksClick={() => setIsHooksModalOpen(true)}
+            onHookRemove={handleHookRemove}
+            onPostLengthClick={handlePostLengthClick}
             onGenerate={handleGenerateIdeas}
           />
         </div>

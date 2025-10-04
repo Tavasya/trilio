@@ -115,6 +115,7 @@ export interface IdeaVariation {
 export interface GenerateIdeasRequest {
   topic?: string;
   draft_content?: string;
+  hook_style?: string;
 }
 
 export interface RegenerateVariationRequest {

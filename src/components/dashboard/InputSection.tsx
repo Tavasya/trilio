@@ -1,14 +1,27 @@
-import { Loader2, FileText, Target, ArrowUp } from 'lucide-react';
+import { Loader2, Target, ArrowUp, X, AlignLeft } from 'lucide-react';
+
+interface SelectedHook {
+  icp: string;
+  hookType: string;
+  title: string;
+  gradient: string;
+}
+
+type PostLength = 'small' | 'medium' | 'large';
 
 interface InputSectionProps {
   chatMode: 'topic' | 'draft';
   idea: string;
   draftContent: string;
   isGenerating: boolean;
+  selectedHook: SelectedHook | null;
+  postLength: PostLength;
   onIdeaChange: (value: string) => void;
   onDraftChange: (value: string) => void;
   onModeToggle: () => void;
   onHooksClick: () => void;
+  onHookRemove: () => void;
+  onPostLengthClick: () => void;
   onGenerate: () => void;
 }
 
@@ -17,12 +30,21 @@ export default function InputSection({
   idea,
   draftContent,
   isGenerating,
+  selectedHook,
+  postLength,
   onIdeaChange,
   onDraftChange,
   onModeToggle,
   onHooksClick,
+  onHookRemove,
+  onPostLengthClick,
   onGenerate
 }: InputSectionProps) {
+  const lengthLabels = {
+    small: 'Small',
+    medium: 'Medium',
+    large: 'Large'
+  };
   const isDisabled =
     isGenerating ||
     (chatMode === 'topic' && !idea.trim()) ||
@@ -56,20 +78,36 @@ export default function InputSection({
         {/* Left Side Buttons */}
         <div className="flex items-center gap-2">
           <button
-            onClick={onModeToggle}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-          >
-            <FileText className="w-3.5 h-3.5" />
-            <span className="text-sm">{chatMode === 'topic' ? 'Draft' : 'Topic'}</span>
-          </button>
-
-          <button
             onClick={onHooksClick}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
           >
             <Target className="w-3.5 h-3.5" />
             <span className="text-sm">Hooks</span>
           </button>
+
+          <button
+            onClick={onPostLengthClick}
+            className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+          >
+            <AlignLeft className="w-3.5 h-3.5" />
+            <span className="text-sm">Post Length</span>
+          </button>
+
+          {selectedHook && (
+            <div className={`flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r ${selectedHook.gradient} rounded-lg`}>
+              <span className="text-sm text-white font-medium">{selectedHook.title}</span>
+              <button
+                onClick={onHookRemove}
+                className="hover:bg-white/20 rounded transition-colors p-0.5"
+              >
+                <X className="w-3.5 h-3.5 text-white" />
+              </button>
+            </div>
+          )}
+
+          <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-indigo-400 to-indigo-600 rounded-lg">
+            <span className="text-sm text-white font-medium">{lengthLabels[postLength]}</span>
+          </div>
         </div>
 
         {/* Right Side - Send Button */}
