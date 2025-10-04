@@ -16,7 +16,7 @@ import {
   selectDashboardState,
   setChatMode
 } from '../../features/dashboard/dashboardSlice';
-import { Loader2, RefreshCw, FileText, Target, ArrowUp, ChevronLeft, ChevronRight, MoreHorizontal, ThumbsUp, MessageCircle, Share2, Send } from 'lucide-react';
+import { Loader2, RefreshCw, FileText, Target, ArrowUp, MoreHorizontal, ThumbsUp, MessageCircle, Share2, Send } from 'lucide-react';
 import ThumbIcon from '@/lib/icons/thumb.svg?react';
 import HeartIcon from '@/lib/icons/heart.svg?react';
 import ClapIcon from '@/lib/icons/clap.svg?react';
@@ -57,13 +57,6 @@ const Dashboard = () => {
     }
   ];
 
-  const handleNextCard = () => {
-    setCurrentCardIndex((prev) => (prev + 1) % mockCards.length);
-  };
-
-  const handlePrevCard = () => {
-    setCurrentCardIndex((prev) => (prev - 1 + mockCards.length) % mockCards.length);
-  };
 
   const handleGenerateIdeas = async () => {
     // Validation based on mode
