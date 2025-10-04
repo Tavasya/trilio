@@ -1,30 +1,35 @@
-import { useState } from 'react';
-import { RefreshCw, MoreHorizontal, ThumbsUp, MessageCircle, Share2, Send, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useState, useEffect, useRef } from 'react';
+import { RefreshCw, MoreHorizontal, ThumbsUp, MessageCircle, Share2, Send, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import ThumbIcon from '@/lib/icons/thumb.svg?react';
 import HeartIcon from '@/lib/icons/heart.svg?react';
 import ClapIcon from '@/lib/icons/clap.svg?react';
 
-interface CarouselCard {
-  title: string;
-  content: string;
-}
+import type { IdeaVariation } from '@/features/post/postTypes';
 
 interface CarouselSectionProps {
-  cards: CarouselCard[];
+  cards: IdeaVariation[];
   userName: string;
   userAvatar: string;
-  onEdit?: (index: number) => void;
-  onRegenerate?: (index: number) => void;
+  isGenerating?: boolean;
+  streamingContents?: Record<number, string>;
+  regeneratingIndex?: number | null;
+  onEdit?: (variation: IdeaVariation) => void;
+  onRegenerate?: (index: number, previousContent: string) => void;
 }
 
 export default function CarouselSection({
   cards,
   userName,
   userAvatar,
+  isGenerating = false,
+  streamingContents = {},
+  regeneratingIndex = null,
   onEdit,
   onRegenerate
 }: CarouselSectionProps) {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
+  const [maxHeight, setMaxHeight] = useState<number>(0);
+  const measureRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const handlePrevious = () => {
     setCurrentCardIndex((prev) => (prev - 1 + cards.length) % cards.length);
@@ -34,6 +39,30 @@ export default function CarouselSection({
     setCurrentCardIndex((prev) => (prev + 1) % cards.length);
   };
 
+  // Measure natural heights and get max
+  useEffect(() => {
+    // Reset and remeasure when content changes
+    setMaxHeight(0);
+
+    const timer = setTimeout(() => {
+      const heights = measureRefs.current
+        .filter(ref => ref !== null)
+        .map(ref => {
+          const height = ref.offsetHeight;
+          console.log('Measured card height:', height);
+          return height;
+        });
+
+      if (heights.length > 0) {
+        const max = Math.max(...heights);
+        console.log('Setting max height to:', max);
+        setMaxHeight(max);
+      }
+    }, 100);
+
+    return () => clearTimeout(timer);
+  }, [cards, streamingContents]);
+
   return (
     <div className="mb-12">
       <h2 className="text-xl font-semibold text-gray-900 mb-8 text-center">
@@ -41,24 +70,28 @@ export default function CarouselSection({
       </h2>
 
       {/* Desktop Carousel - 3D overlap effect */}
-      <div className="hidden lg:block relative w-full max-w-4xl mx-auto min-h-[600px]">
-        {/* Navigation Arrows */}
-        <button
-          onClick={handlePrevious}
-          className="absolute left-2 top-1/2 -translate-y-1/2 z-40 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
-          aria-label="Previous"
-        >
-          <ChevronLeft className="w-5 h-5 text-gray-700" />
-        </button>
-        <button
-          onClick={handleNext}
-          className="absolute right-2 top-1/2 -translate-y-1/2 z-40 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
-          aria-label="Next"
-        >
-          <ChevronRight className="w-5 h-5 text-gray-700" />
-        </button>
+      <div className="hidden lg:block relative w-full max-w-4xl mx-auto" style={{ minHeight: maxHeight > 0 ? maxHeight : 600 }}>
+        {/* Navigation Arrows - Only show after generation */}
+        {!isGenerating && (
+          <>
+            <button
+              onClick={handlePrevious}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-40 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+              aria-label="Previous"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-700" />
+            </button>
+            <button
+              onClick={handleNext}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-40 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+              aria-label="Next"
+            >
+              <ChevronRight className="w-5 h-5 text-gray-700" />
+            </button>
+          </>
+        )}
 
-        <div className="flex items-start justify-center">
+        <div className="flex items-start justify-center h-full">
           {cards.map((card, index) => {
             const position = (index - currentCardIndex + cards.length) % cards.length;
 
@@ -66,6 +99,10 @@ export default function CarouselSection({
             if (position > 2) return null;
 
             const isActive = position === 0;
+            const isStreaming = streamingContents[index] !== undefined;
+            const displayContent = isStreaming ? streamingContents[index] : card.content;
+            const isRegenerating = regeneratingIndex === index;
+
             let translateX = 0;
             let scale = 0.85;
             let opacity = 0.5;
@@ -92,7 +129,8 @@ export default function CarouselSection({
             return (
               <div
                 key={index}
-                className={`absolute top-0 left-1/2 w-[550px] h-full transition-all duration-500 ease-out ${!isActive ? 'pointer-events-none' : ''}`}
+                onClick={() => !isActive && setCurrentCardIndex(index)}
+                className={`absolute top-0 left-1/2 w-[550px] h-full transition-all duration-500 ease-out ${!isActive ? 'cursor-pointer' : ''}`}
                 style={{
                   zIndex,
                   transform: `translate(calc(-50% + ${translateX}px), 0) scale(${scale})`,
@@ -100,22 +138,35 @@ export default function CarouselSection({
                   filter
                 }}
               >
-              <div className="bg-white rounded-lg border border-gray-200 relative h-full flex flex-col">
+              <div
+                ref={(el) => (measureRefs.current[index] = el)}
+                className="bg-white rounded-lg border border-gray-200 relative flex flex-col"
+                style={{ height: maxHeight > 0 ? maxHeight : 'auto' }}
+              >
                 {/* Top Right Buttons - Only show on active card */}
-                {isActive && (
+                {isActive && !isGenerating && card.content && (
                   <div className="absolute top-3 right-3 flex gap-2 z-10">
-                    <button
-                      onClick={() => onRegenerate?.(index)}
-                      className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-                    >
-                      <RefreshCw className="w-4 h-4 text-gray-600" />
-                    </button>
-                    <button
-                      onClick={() => onEdit?.(index)}
-                      className="px-3 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition-colors"
-                    >
-                      Edit
-                    </button>
+                    {isRegenerating ? (
+                      <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
+                        <Loader2 className="w-4 h-4 text-gray-600 animate-spin" />
+                        <span className="text-sm text-gray-600">Regenerating...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <button
+                          onClick={() => onRegenerate?.(index, card.content)}
+                          className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                        >
+                          <RefreshCw className="w-4 h-4 text-gray-600" />
+                        </button>
+                        <button
+                          onClick={() => onEdit?.(card)}
+                          className="px-3 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition-colors"
+                        >
+                          Edit
+                        </button>
+                      </>
+                    )}
                   </div>
                 )}
 
@@ -149,7 +200,8 @@ export default function CarouselSection({
                 {/* Post Content */}
                 <div className="px-4 pb-3 flex-grow">
                   <div className="text-gray-900 whitespace-pre-wrap text-sm">
-                    {card.content}
+                    {displayContent}
+                    {(isStreaming || !displayContent) && <span className="animate-pulse ml-0.5">▊</span>}
                   </div>
                 </div>
 
@@ -200,41 +252,55 @@ export default function CarouselSection({
       </div>
 
       {/* Mobile Carousel - Simple left/right navigation */}
-      <div className="lg:hidden relative w-full">
-        <div className="h-[600px] relative">
-          {/* Navigation Arrows */}
-          <button
-            onClick={handlePrevious}
-            className="absolute left-2 top-1/2 -translate-y-1/2 z-40 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
-            aria-label="Previous"
-          >
-            <ChevronLeft className="w-5 h-5 text-gray-700" />
-          </button>
-          <button
-            onClick={handleNext}
-            className="absolute right-2 top-1/2 -translate-y-1/2 z-40 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
-            aria-label="Next"
-          >
-            <ChevronRight className="w-5 h-5 text-gray-700" />
-          </button>
+      <div className="lg:hidden relative w-full" style={{ minHeight: maxHeight > 0 ? maxHeight : 600 }}>
+        {/* Navigation Arrows - Only show after generation */}
+        {!isGenerating && (
+          <>
+            <button
+              onClick={handlePrevious}
+              className="absolute left-0 top-1/2 -translate-y-1/2 z-40 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+              aria-label="Previous"
+            >
+              <ChevronLeft className="w-5 h-5 text-gray-700" />
+            </button>
+            <button
+              onClick={handleNext}
+              className="absolute right-0 top-1/2 -translate-y-1/2 z-40 p-2 bg-white rounded-full shadow-md hover:shadow-lg transition-shadow"
+              aria-label="Next"
+            >
+              <ChevronRight className="w-5 h-5 text-gray-700" />
+            </button>
+          </>
+        )}
 
-          <div className="px-12 h-full flex items-start">
-            <div className="bg-white rounded-lg border border-gray-200 relative h-full w-full flex flex-col">
+        <div className="px-12 flex items-start h-full">
+          <div className="bg-white rounded-lg border border-gray-200 relative h-full w-full flex flex-col">
             {/* Top Right Buttons */}
-            <div className="absolute top-3 right-3 flex gap-2 z-10">
-              <button
-                onClick={() => onRegenerate?.(currentCardIndex)}
-                className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
-              >
-                <RefreshCw className="w-4 h-4 text-gray-600" />
-              </button>
-              <button
-                onClick={() => onEdit?.(currentCardIndex)}
-                className="px-3 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition-colors"
-              >
-                Edit
-              </button>
-            </div>
+            {!isGenerating && cards[currentCardIndex]?.content && (
+              <div className="absolute top-3 right-3 flex gap-2 z-10">
+                {regeneratingIndex === currentCardIndex ? (
+                  <div className="flex items-center gap-2 px-3 py-2 bg-gray-100 rounded-lg">
+                    <Loader2 className="w-4 h-4 text-gray-600 animate-spin" />
+                    <span className="text-sm text-gray-600">Regenerating...</span>
+                  </div>
+                ) : (
+                  <>
+                    <button
+                      onClick={() => onRegenerate?.(currentCardIndex, cards[currentCardIndex].content)}
+                      className="p-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                    >
+                      <RefreshCw className="w-4 h-4 text-gray-600" />
+                    </button>
+                    <button
+                      onClick={() => onEdit?.(cards[currentCardIndex])}
+                      className="px-3 py-2 bg-primary hover:bg-primary/90 text-white text-sm font-medium rounded-lg transition-colors"
+                    >
+                      Edit
+                    </button>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* Post Header */}
             <div className="p-4">
@@ -266,7 +332,8 @@ export default function CarouselSection({
             {/* Post Content */}
             <div className="px-4 pb-3 flex-grow">
               <div className="text-gray-900 whitespace-pre-wrap text-sm">
-                {cards[currentCardIndex].content}
+                {streamingContents[currentCardIndex] ?? cards[currentCardIndex]?.content}
+                {(streamingContents[currentCardIndex] !== undefined || !cards[currentCardIndex]?.content) && <span className="animate-pulse ml-0.5">▊</span>}
               </div>
             </div>
 
@@ -309,7 +376,6 @@ export default function CarouselSection({
                 </button>
               </div>
             </div>
-          </div>
           </div>
         </div>
 

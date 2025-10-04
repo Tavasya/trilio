@@ -20,7 +20,6 @@ import { useState } from 'react';
 import HooksModal from '@/components/dashboard/HooksModal';
 import InputSection from '@/components/dashboard/InputSection';
 import CarouselSection from '@/components/dashboard/CarouselSection';
-import VariationsGrid from '@/components/dashboard/VariationsGrid';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -38,21 +37,6 @@ const Dashboard = () => {
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
   const [isHooksModalOpen, setIsHooksModalOpen] = useState(false);
 
-  // Mockup data for carousel - different content sizes
-  const mockCards = [
-    {
-      title: 'Growth Mindset Hook',
-      content: 'Most people think success is about talent.\n\nBut here\'s what I learned after 10 years in the industry: it\'s actually about consistency and learning from failures.\n\nHere\'s my story and the 3 key lessons that changed everything for me:\n\n1. Small wins compound into massive results\n2. Failure is just feedback in disguise\n3. Your network determines your net worth\n\nWhat\'s been your biggest lesson in your career journey?'
-    },
-    {
-      title: 'Data-Driven Approach',
-      content: '73% of professionals struggle with imposter syndrome.\n\nI was one of them.\n\nHere\'s how I turned self-doubt into my biggest competitive advantage in just 6 months.'
-    },
-    {
-      title: 'Personal Experience',
-      content: 'I failed 12 times before my first success.\n\nEach failure taught me something crucial. Today, I want to share the 3 lessons that changed everything for me:\n\n→ Embrace the process, not just the outcome\n→ Build in public, learn in public\n→ Consistency beats perfection every single time\n\nThe path to success is rarely a straight line. It\'s messy, it\'s uncomfortable, and it\'s absolutely worth it.\n\nDrop a 💪 if you\'re on this journey too.'
-    }
-  ];
 
   const handleGenerateIdeas = async () => {
     // Validation based on mode
@@ -215,25 +199,18 @@ const Dashboard = () => {
           onApply={handleHooksApply}
         />
 
-        {/* Carousel Section */}
-        <div className="mt-12">
-          <CarouselSection
-            cards={mockCards}
-            userName={userName}
-            userAvatar={userAvatar}
-          />
-        </div>
-
-        {/* Variations Grid Section */}
+        {/* Carousel Section - Show when variations are generated */}
         {(isGenerating || variations.length > 0) && (
           <div className="mt-12">
-            <VariationsGrid
-              variations={variations}
-              streamingContents={streamingContents}
+            <CarouselSection
+              cards={variations}
+              userName={userName}
+              userAvatar={userAvatar}
               isGenerating={isGenerating}
+              streamingContents={streamingContents}
               regeneratingIndex={regeneratingIndex}
-              onSelectVariation={handleSelectVariation}
-              onRegenerateVariation={handleRegenerateVariation}
+              onEdit={handleSelectVariation}
+              onRegenerate={handleRegenerateVariation}
             />
           </div>
         )}
