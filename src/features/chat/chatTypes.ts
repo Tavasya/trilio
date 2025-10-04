@@ -57,12 +57,14 @@ export interface ChatState {
   saveStatus: SaveStatus;
   researchCards: ResearchCardsData | null;  // Current SSE research cards
   persistedResearchCards: ResearchCardBatch[] | null;  // Historical cards from DB
+  isEditMode: boolean;  // Toggle for explicit edit mode
 }
 
 // API Request Types
 export interface MessageContext {
   post_id?: string;   // Post ID to fetch from database
   content?: string;   // Current live content from frontend
+  edit_mode?: boolean; // Explicit flag to control whether AI should edit content
 }
 
 export interface SendMessageRequest {

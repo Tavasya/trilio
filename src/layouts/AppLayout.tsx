@@ -63,11 +63,11 @@ export default function AppLayout() {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                       asChild
-                      isActive={location.pathname === '/voice'}
+                      isActive={location.pathname === '/research'}
                   >
-                    <Link to="/voice">
-                      <Mic className='h-4 w-4' />
-                      <span>Voice</span>
+                    <Link to="/research">
+                      <Book className='h-4 w-4' />
+                      <span>Trend Analyzer</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -75,11 +75,14 @@ export default function AppLayout() {
                 <SidebarMenuItem>
                   <SidebarMenuButton
                       asChild
-                      isActive={location.pathname === '/research'}
+                      isActive={location.pathname === '/voice'}
                   >
-                    <Link to="/research">
-                      <Book className='h-4 w-4' />
-                      <span>Trend Analyzer</span>
+                    <Link to="/voice" className="flex items-center gap-2 pointer-events-none">
+                      <Mic className='h-4 w-4' />
+                      <span>Voice</span>
+                      <span className="ml-auto text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded-full font-medium">
+                        Coming Soon
+                      </span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
@@ -121,10 +124,13 @@ export default function AppLayout() {
               {/* LinkedIn Connection Status & User Profile */}
               <div className="ml-auto flex items-center gap-3">
                 {hasLinkedIn ? (
-                  <div className="flex items-center gap-2 px-3 py-1.5 bg-green-50 text-green-700 rounded-lg border border-green-200">
-                    <Linkedin className="w-4 h-4" />
-                    <span className="text-sm font-medium">LinkedIn Connected</span>
-                  </div>
+                  <button
+                    onClick={() => window.open('https://www.linkedin.com/in/me', '_blank')}
+                    className="flex items-center gap-2 p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                    title="Go to LinkedIn"
+                  >
+                    <Linkedin className="w-4 h-4 text-gray-600" />
+                  </button>
                 ) : (
                   <ConnectLinkedInButton size="sm" variant="outline" />
                 )}
