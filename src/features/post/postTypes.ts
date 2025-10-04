@@ -1,6 +1,7 @@
 export interface LinkedInPost {
   content: string;
   media_url?: string;
+  image_urls?: string[];
   visibility?: 'PUBLIC' | 'CONNECTIONS';
   draft_id?: string;
 }
@@ -10,6 +11,7 @@ export interface Post {
   user_id: string;
   content: string;
   media_url: string | null;
+  image_urls?: string[] | null;
   visibility: 'PUBLIC' | 'CONNECTIONS';
   linkedin_post_id: string | null;
   linkedin_post_url: string | null;
@@ -36,6 +38,7 @@ export interface FetchPostsResponse {
 export interface DraftPostRequest {
   content: string;
   media_url?: string;
+  image_urls?: string[];
   visibility?: 'PUBLIC' | 'CONNECTIONS';
 }
 
@@ -68,6 +71,7 @@ export interface GetPostResponse {
 export interface UpdateDraftRequest {
   content: string;
   media_url?: string;
+  image_urls?: string[];
   visibility?: 'PUBLIC' | 'CONNECTIONS';
 }
 
@@ -82,6 +86,7 @@ export interface SchedulePostRequest {
   scheduled_for: string;
   timezone: string;
   media_url?: string;
+  image_urls?: string[];
   visibility?: 'PUBLIC' | 'CONNECTIONS';
   draft_id?: string;
 }

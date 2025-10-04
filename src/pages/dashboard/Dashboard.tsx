@@ -1,6 +1,5 @@
-import { Button } from '../../components/ui/button';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@clerk/react-router';
+import { useAuth, useUser } from '@clerk/react-router';
 import { toast } from 'sonner';
 import { postService } from '@/features/post/postService';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
@@ -16,14 +15,18 @@ import {
   selectDashboardState,
   setChatMode
 } from '../../features/dashboard/dashboardSlice';
-import { Sparkles, Loader2, RefreshCw } from 'lucide-react';
+import { schedulePost, publishToLinkedIn } from '@/features/post/postSlice';
 import type { IdeaVariation } from '@/features/post/postTypes';
 import { useState } from 'react';
-import ModeSlider from '@/components/dashboard/ModeSlider';
+import HooksModal from '@/components/dashboard/HooksModal';
+import InputSection from '@/components/dashboard/InputSection';
+import CarouselSection from '@/components/dashboard/CarouselSection';
+import ScheduleModal from '@/components/generate/ScheduleModal';
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { getToken } = useAuth();
+  const { user } = useUser();
   const dispatch = useAppDispatch();
   const {
     idea,
@@ -34,6 +37,15 @@ const Dashboard = () => {
     chatMode
   } = useAppSelector(selectDashboardState);
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
+  const [isHooksModalOpen, setIsHooksModalOpen] = useState(false);
+  const [showScheduleModal, setShowScheduleModal] = useState(false);
+  const [selectedVariation, setSelectedVariation] = useState<IdeaVariation | null>(null);
+
+  // Check if LinkedIn is connected via Clerk external accounts
+  const hasLinkedIn = user?.externalAccounts?.some(
+    account => account.provider === 'linkedin_oidc'
+  ) || false;
+
 
   const handleGenerateIdeas = async () => {
     // Validation based on mode
@@ -150,150 +162,146 @@ const Dashboard = () => {
     }
   };
 
-  return (
-    <div className="h-full overflow-y-auto bg-gradient-to-br from-gray-50 via-white to-gray-50 p-6">
-      <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">
-            Generate LinkedIn Post
-          </h1>
-        </div>
+  const handleHooksApply = (icp: string, hookType: string) => {
+    toast.success(`Applied ${hookType} hook for ${icp}`, { position: 'top-right' });
+  };
 
-        {/* Mode Slider */}
-        <div className="mb-3">
-          <ModeSlider
-            mode={chatMode}
-            onModeChange={(mode) => dispatch(setChatMode(mode))}
-          />
+  const handleSchedulePost = (variation: IdeaVariation) => {
+    setSelectedVariation(variation);
+    setShowScheduleModal(true);
+  };
+
+  const handleSchedule = async (date: Date) => {
+    if (!selectedVariation) return;
+
+    const token = await getToken();
+    if (!token) {
+      toast.error('Authentication required', { position: 'top-right' });
+      return;
+    }
+
+    try {
+      // Get user's timezone
+      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+      // Format the scheduled date/time in ISO format
+      const scheduledFor = date.toISOString();
+
+      await dispatch(schedulePost({
+        scheduleData: {
+          content: selectedVariation.content,
+          scheduled_for: scheduledFor,
+          timezone: timezone,
+          visibility: 'PUBLIC'
+        },
+        token
+      })).unwrap();
+
+      setShowScheduleModal(false);
+      toast.success('Post scheduled successfully!', { position: 'top-right' });
+      navigate('/scheduler');
+    } catch {
+      toast.error('Failed to schedule post', { position: 'top-right' });
+    }
+  };
+
+  const handlePostNow = async (variation: IdeaVariation) => {
+    const token = await getToken();
+    if (!token) {
+      toast.error('Authentication required', { position: 'top-right' });
+      return;
+    }
+
+    try {
+      await dispatch(publishToLinkedIn({
+        post: {
+          content: variation.content,
+          visibility: 'PUBLIC'
+        },
+        token
+      })).unwrap();
+
+      toast.success('Posted to LinkedIn successfully!', { position: 'top-right' });
+      navigate('/posts');
+    } catch {
+      toast.error('Failed to post to LinkedIn', { position: 'top-right' });
+    }
+  };
+
+  // Use Clerk user data with fallbacks (same as LinkedInPreview component)
+  const userName = user?.fullName || user?.firstName || "Your Name";
+  const userAvatar = user?.imageUrl || "";
+
+  return (
+    <div className={`h-full overflow-y-auto p-6 bg-gray-50 relative ${!isGenerating && variations.length === 0 ? 'flex items-center justify-center' : ''}`}>
+      {/* Animated Watercolor Background */}
+      <div className={`absolute inset-0 overflow-hidden pointer-events-none transition-opacity duration-1000 ${isGenerating || variations.length > 0 ? 'opacity-0' : 'opacity-100 animate-fade-in'}`}>
+        <div className="absolute top-[10%] left-[15%] w-96 h-96 bg-blue-400/30 rounded-full blur-3xl animate-watercolor-1" />
+        <div className="absolute top-[60%] right-[20%] w-80 h-80 bg-purple-400/30 rounded-full blur-3xl animate-watercolor-2" />
+        <div className="absolute bottom-[20%] left-[25%] w-72 h-72 bg-pink-400/30 rounded-full blur-3xl animate-watercolor-3" />
+        <div className="absolute top-[40%] right-[10%] w-64 h-64 bg-indigo-400/30 rounded-full blur-3xl animate-watercolor-4" />
+      </div>
+
+      <div className={`max-w-6xl mx-auto w-full relative z-10 ${!isGenerating && variations.length === 0 ? '' : 'pt-8'}`}>
+        {/* Header Section */}
+        <div className="mb-12 text-center">
+          <h1 className="text-4xl md:text-5xl font-normal text-gray-900 mb-4">
+            Craft compelling LinkedIn <span className="font-serif italic">posts</span>
+          </h1>
+          <p className="text-base font-light text-gray-700 mb-1">
+            Turn your ideas into professional content, in minutes.
+          </p>
+          <p className="text-base font-light text-gray-700">
+            Create posts optimized for your goals by chatting with AI.
+          </p>
         </div>
 
         {/* Input Section */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
-          {chatMode === 'topic' ? (
-            <>
-              <label htmlFor="idea-input" className="block text-sm font-medium text-gray-700 mb-2">
-                What do you want to talk about?
-              </label>
-              <textarea
-                id="idea-input"
-                value={idea}
-                onChange={(e) => dispatch(setIdea(e.target.value))}
-                placeholder="e.g., AI in marketing, productivity tips, startup lessons..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-                rows={3}
-              />
-            </>
-          ) : (
-            <>
-              <label htmlFor="draft-input" className="block text-sm font-medium text-gray-700 mb-2">
-                Paste your draft content
-              </label>
-              <textarea
-                id="draft-input"
-                value={draftContent}
-                onChange={(e) => dispatch(setDraftContent(e.target.value))}
-                placeholder="Paste your existing LinkedIn post or content here to get refined variations..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none"
-                rows={6}
-              />
-            </>
-          )}
-          <Button
-            onClick={handleGenerateIdeas}
-            disabled={
-              isGenerating ||
-              (chatMode === 'topic' && !idea.trim()) ||
-              (chatMode === 'draft' && !draftContent.trim())
-            }
-            className="mt-4 w-full sm:w-auto px-6 py-2.5 text-sm font-medium bg-primary hover:bg-primary/90 transition-all duration-200 disabled:opacity-50"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Generating Variations...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4 mr-2" />
-                Generate Variations
-              </>
-            )}
-          </Button>
+        <div className="mb-8 max-w-3xl mx-auto">
+          <InputSection
+            chatMode={chatMode}
+            idea={idea}
+            draftContent={draftContent}
+            isGenerating={isGenerating}
+            onIdeaChange={(value) => dispatch(setIdea(value))}
+            onDraftChange={(value) => dispatch(setDraftContent(value))}
+            onModeToggle={() => dispatch(setChatMode(chatMode === 'topic' ? 'draft' : 'topic'))}
+            onHooksClick={() => setIsHooksModalOpen(true)}
+            onGenerate={handleGenerateIdeas}
+          />
         </div>
 
-        {/* Variations Grid */}
-        {(isGenerating || variations.length > 0) && (
-          <div>
-            <h2 className="text-xl font-semibold text-gray-900 mb-4">
-              {isGenerating ? 'Generating variations...' : 'Choose a variation to continue'}
-            </h2>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
-              {variations.map((variation, index) => {
-                const isStreaming = streamingContents[index] !== undefined;
-                const displayContent = isStreaming ? streamingContents[index] : variation.content;
-                const hasContent = variation.title || displayContent;
-                const isRegenerating = regeneratingIndex === index;
+        {/* Hooks Modal */}
+        <HooksModal
+          isOpen={isHooksModalOpen}
+          onClose={() => setIsHooksModalOpen(false)}
+          onApply={handleHooksApply}
+        />
 
-                return (
-                  <div
-                    key={index}
-                    className={`bg-white rounded-lg shadow-sm border border-gray-200 p-5 transition-all duration-200 h-fit ${
-                      isStreaming ? 'ring-2 ring-primary/30' : ''
-                    }`}
-                  >
-                    {hasContent ? (
-                      <>
-                        <h3 className="text-lg font-semibold text-gray-900 mb-3">
-                          {variation.title || 'Generating...'}
-                        </h3>
-                        <p className="text-sm text-gray-600 whitespace-pre-wrap mb-4">
-                          {displayContent}
-                          {isStreaming && <span className="animate-pulse ml-0.5">▊</span>}
-                        </p>
-                        {!isGenerating && !isRegenerating && variation.content && (
-                          <div className="flex gap-2">
-                            <Button
-                              onClick={() => handleSelectVariation(variation)}
-                              className="flex-1 bg-primary hover:bg-primary/90 text-white"
-                            >
-                              Select & Edit →
-                            </Button>
-                            <Button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleRegenerateVariation(index, variation.content);
-                              }}
-                              variant="outline"
-                              className="px-3"
-                            >
-                              <RefreshCw className="w-4 h-4" />
-                            </Button>
-                          </div>
-                        )}
-                        {isRegenerating && (
-                          <div className="flex items-center justify-center gap-2 text-sm text-gray-600">
-                            <Loader2 className="w-4 h-4 animate-spin" />
-                            Regenerating...
-                          </div>
-                        )}
-                      </>
-                    ) : (
-                      <div className="animate-pulse">
-                        <div className="h-6 bg-gray-200 rounded w-3/4 mb-3"></div>
-                        <div className="space-y-2">
-                          <div className="h-4 bg-gray-200 rounded"></div>
-                          <div className="h-4 bg-gray-200 rounded"></div>
-                          <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
+        {/* Carousel Section - Show when variations are generated */}
+        {(isGenerating || variations.length > 0) && (
+          <div className="mt-12">
+            <CarouselSection
+              cards={variations}
+              userName={userName}
+              userAvatar={userAvatar}
+              isGenerating={isGenerating}
+              streamingContents={streamingContents}
+              regeneratingIndex={regeneratingIndex}
+              onEdit={handleSelectVariation}
+              onRegenerate={handleRegenerateVariation}
+              onSchedule={hasLinkedIn ? handleSchedulePost : undefined}
+              onPostNow={hasLinkedIn ? handlePostNow : undefined}
+            />
           </div>
         )}
+
+        {/* Schedule Modal */}
+        <ScheduleModal
+          isOpen={showScheduleModal}
+          onClose={() => setShowScheduleModal(false)}
+          onSchedule={handleSchedule}
+        />
       </div>
     </div>
   );

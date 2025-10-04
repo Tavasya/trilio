@@ -143,6 +143,83 @@
   }
 }
 
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 1.5s ease-in;
+}
+
+@keyframes watercolor-1 {
+  0%, 100% {
+    opacity: 0.6;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.8;
+    transform: translate3d(20px, -20px, 0) scale(1.1);
+  }
+}
+
+@keyframes watercolor-2 {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translate3d(-30px, 30px, 0) scale(1.15);
+  }
+}
+
+@keyframes watercolor-3 {
+  0%, 100% {
+    opacity: 0.55;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.75;
+    transform: translate3d(25px, -15px, 0) scale(1.08);
+  }
+}
+
+@keyframes watercolor-4 {
+  0%, 100% {
+    opacity: 0.5;
+    transform: translate3d(0, 0, 0) scale(1);
+  }
+  50% {
+    opacity: 0.7;
+    transform: translate3d(-20px, 20px, 0) scale(1.12);
+  }
+}
+
+.animate-watercolor-1 {
+  animation: watercolor-1 8s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+
+.animate-watercolor-2 {
+  animation: watercolor-2 10s ease-in-out infinite 2s;
+  will-change: transform, opacity;
+}
+
+.animate-watercolor-3 {
+  animation: watercolor-3 12s ease-in-out infinite 4s;
+  will-change: transform, opacity;
+}
+
+.animate-watercolor-4 {
+  animation: watercolor-4 9s ease-in-out infinite 1s;
+  will-change: transform, opacity;
+}
+
 @theme inline {
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);

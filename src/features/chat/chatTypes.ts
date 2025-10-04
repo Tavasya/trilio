@@ -24,6 +24,7 @@ export interface GeneratedPost {
   id?: string;        // Real DB ID if saved
   content: string;    // Current live content
   isEdited: boolean;  // Track if manually edited
+  imageUrls?: string[]; // Array of image URLs
 }
 
 export type SaveStatus = 'saved' | 'saving' | 'unsaved' | 'error';

@@ -50,7 +50,8 @@ export default function Generate() {
             dispatch(setGeneratedPost({
               id: response.post.id,
               content: response.post.content || '',
-              isEdited: false
+              isEdited: false,
+              imageUrls: response.post.image_urls || undefined
             }));
 
             // Load conversation data if it exists

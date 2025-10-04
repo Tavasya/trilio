@@ -89,22 +89,39 @@ const notifications: Notification[] = [
 
 export default function RecruiterNotifications() {
   const [visibleNotifications, setVisibleNotifications] = useState<number[]>([]);
+  const [hiddenNotifications, setHiddenNotifications] = useState<number[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHiding, setIsHiding] = useState(false);
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (currentIndex < notifications.length) {
+      if (!isHiding && currentIndex < notifications.length) {
+        // Pop in notifications
         setVisibleNotifications(prev => [...prev, currentIndex]);
         setCurrentIndex(prev => prev + 1);
-      } else {
-        // Reset and cycle
-        setVisibleNotifications([]);
-        setCurrentIndex(0);
+      } else if (!isHiding && currentIndex >= notifications.length) {
+        // Start hiding phase - wait a bit before starting to pop out
+        setTimeout(() => {
+          setIsHiding(true);
+          setCurrentIndex(notifications.length - 1); // Start from last index
+        }, 500);
+      } else if (isHiding && currentIndex >= 0) {
+        // Pop out notifications in reverse order (last in, first out)
+        setHiddenNotifications(prev => [...prev, currentIndex]);
+        setCurrentIndex(prev => prev - 1);
+      } else if (isHiding && currentIndex < 0) {
+        // Reset everything after a short delay
+        setTimeout(() => {
+          setVisibleNotifications([]);
+          setHiddenNotifications([]);
+          setCurrentIndex(0);
+          setIsHiding(false);
+        }, 300);
       }
-    }, 1500);
+    }, 600); // Medium speed interval
 
     return () => clearInterval(interval);
-  }, [currentIndex]);
+  }, [currentIndex, isHiding]);
 
   return (
     <div className="relative w-full h-[550px] bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden">
@@ -119,12 +136,14 @@ export default function RecruiterNotifications() {
           <div
             key={notification.id}
             className={`bg-white rounded-lg hover:shadow-md transition-all duration-300 transform ${
-              visibleNotifications.includes(index)
+              hiddenNotifications.includes(index)
+                ? 'opacity-0 scale-0'
+                : visibleNotifications.includes(index)
                 ? 'opacity-100 scale-100'
                 : 'opacity-0 scale-0'
             }`}
             style={{
-              transitionDelay: `${index * 50}ms`
+              transitionDelay: `${index * 40}ms`
             }}
           >
             <div className="p-3">
@@ -140,15 +159,15 @@ export default function RecruiterNotifications() {
                 {/* Content */}
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-1">
-                    <div>
-                      <p className="text-sm font-semibold text-gray-900">
+                    <div className="text-left">
+                      <p className="text-sm font-semibold text-gray-900 text-left">
                         {notification.recruiter}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="text-xs text-gray-500 text-left">
                         {notification.role} at {notification.company}
                       </p>
                     </div>
-                    <span className="text-xs text-gray-400 flex-shrink-0">
+                    <span className="text-xs text-gray-400 flex-shrink-0 ml-2">
                       {notification.time}
                     </span>
                   </div>
