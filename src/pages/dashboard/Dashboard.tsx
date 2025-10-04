@@ -16,10 +16,10 @@ import {
   selectDashboardState,
   setChatMode
 } from '../../features/dashboard/dashboardSlice';
-import { Sparkles, Loader2, RefreshCw } from 'lucide-react';
+import { Loader2, RefreshCw, FileText, Target, ArrowUp } from 'lucide-react';
 import type { IdeaVariation } from '@/features/post/postTypes';
 import { useState } from 'react';
-import ModeSlider from '@/components/dashboard/ModeSlider';
+import HooksModal from '@/components/dashboard/HooksModal';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -34,6 +34,7 @@ const Dashboard = () => {
     chatMode
   } = useAppSelector(selectDashboardState);
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
+  const [isHooksModalOpen, setIsHooksModalOpen] = useState(false);
 
   const handleGenerateIdeas = async () => {
     // Validation based on mode
@@ -150,18 +151,19 @@ const Dashboard = () => {
     }
   };
 
-  return (
-    <div className="h-full overflow-y-auto p-6">
-      {/* Subtle gradient background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-50 via-pink-50/30 to-white pointer-events-none" />
+  const handleHooksApply = (icp: string, hookType: string) => {
+    toast.success(`Applied ${hookType} hook for ${icp}`, { position: 'top-right' });
+  };
 
-      <div className="relative max-w-4xl mx-auto">
-        {/* Header with serif font and italic emphasis */}
-        <div className="mb-12 text-center">
-          <h1 className="text-4xl md:text-5xl font-serif text-gray-900 mb-4">
-            Chat it into <span className="italic">existence</span>
+  return (
+    <div className="h-full overflow-y-auto p-6 bg-gray-50">
+      <div className="max-w-3xl mx-auto pt-8">
+        {/* Header */}
+        <div className="mb-8 text-center">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2">
+            Generate LinkedIn Post Ideas
           </h1>
-          <p className="text-lg text-gray-600 font-sans">
+          <p className="text-gray-600">
             {chatMode === 'topic'
               ? 'Tell us what you want to talk about and we\'ll create variations for you'
               : 'Select a draft and we\'ll create variations to refine it'
@@ -169,67 +171,65 @@ const Dashboard = () => {
           </p>
         </div>
 
-        {/* Mode Slider */}
-        <div className="mb-6 flex justify-center">
-          <ModeSlider
-            mode={chatMode}
-            onModeChange={(mode) => dispatch(setChatMode(mode))}
+        {/* Input Section with embedded controls */}
+        <div className="relative bg-white rounded-2xl shadow-lg border border-gray-100 mb-8">
+          <textarea
+            value={chatMode === 'topic' ? idea : draftContent}
+            onChange={(e) => chatMode === 'topic' ? dispatch(setIdea(e.target.value)) : dispatch(setDraftContent(e.target.value))}
+            placeholder={chatMode === 'topic'
+              ? 'e.g., AI in marketing, productivity tips, startup lessons...'
+              : 'Paste your existing LinkedIn post or content here to get refined variations...'
+            }
+            className="w-full px-6 py-6 pb-16 bg-transparent border-0 rounded-2xl resize-none focus:ring-0 focus:outline-none text-base leading-relaxed"
+            rows={6}
           />
+
+          {/* Bottom Controls - Inside textarea */}
+          <div className="absolute bottom-4 left-6 right-6 flex items-center justify-between">
+            {/* Left Side Buttons */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => dispatch(setChatMode(chatMode === 'topic' ? 'draft' : 'topic'))}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                <FileText className="w-4 h-4" />
+                <span className="text-sm font-medium">{chatMode === 'topic' ? 'Draft' : 'Topic'}</span>
+              </button>
+
+              <button
+                onClick={() => setIsHooksModalOpen(true)}
+                className="flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+              >
+                <Target className="w-4 h-4" />
+                <span className="text-sm font-medium">Hooks</span>
+              </button>
+            </div>
+
+            {/* Right Side - Send Button */}
+            <button
+              onClick={handleGenerateIdeas}
+              disabled={
+                isGenerating ||
+                (chatMode === 'topic' && !idea.trim()) ||
+                (chatMode === 'draft' && !draftContent.trim())
+              }
+              className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center shadow-[0_2px_8px_rgba(0,0,0,0.1)] hover:bg-gray-300 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {isGenerating ? (
+                <Loader2 className="w-5 h-5 text-gray-700 animate-spin" />
+              ) : (
+                <ArrowUp className="w-5 h-5 text-gray-700" />
+              )}
+            </button>
+          </div>
         </div>
 
-        {/* Input Section - Elevated card with soft shadow */}
-        <div className="bg-white rounded-2xl shadow-lg border border-gray-100 p-8 mb-8">
-          {chatMode === 'topic' ? (
-            <>
-              <label htmlFor="idea-input" className="block text-sm font-medium text-gray-700 mb-3">
-                What do you want to talk about?
-              </label>
-              <textarea
-                id="idea-input"
-                value={idea}
-                onChange={(e) => dispatch(setIdea(e.target.value))}
-                placeholder="e.g., AI in marketing, productivity tips, startup lessons..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all duration-200 hover:border-gray-400"
-                rows={4}
-              />
-            </>
-          ) : (
-            <>
-              <label htmlFor="draft-input" className="block text-sm font-medium text-gray-700 mb-3">
-                Paste your draft content
-              </label>
-              <textarea
-                id="draft-input"
-                value={draftContent}
-                onChange={(e) => dispatch(setDraftContent(e.target.value))}
-                placeholder="Paste your existing LinkedIn post or content here to get refined variations..."
-                className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent resize-none transition-all duration-200 hover:border-gray-400"
-                rows={6}
-              />
-            </>
-          )}
-          <Button
-            onClick={handleGenerateIdeas}
-            disabled={
-              isGenerating ||
-              (chatMode === 'topic' && !idea.trim()) ||
-              (chatMode === 'draft' && !draftContent.trim())
-            }
-            className="mt-6 w-full sm:w-auto px-8 py-3 text-sm font-medium bg-primary hover:bg-primary/90 transition-all duration-200 disabled:opacity-50 rounded-lg"
-          >
-            {isGenerating ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Generating Variations...
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4 mr-2" />
-                Generate Variations
-              </>
-            )}
-          </Button>
-        </div>
+        {/* Hooks Modal */}
+        <HooksModal
+          isOpen={isHooksModalOpen}
+          onClose={() => setIsHooksModalOpen(false)}
+          onApply={handleHooksApply}
+        />
 
         {/* Variations Grid */}
         {(isGenerating || variations.length > 0) && (
