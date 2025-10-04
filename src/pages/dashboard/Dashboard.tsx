@@ -162,8 +162,16 @@ const Dashboard = () => {
   const userAvatar = user?.imageUrl || "";
 
   return (
-    <div className="h-full overflow-y-auto p-6 bg-gray-50 flex items-center justify-center">
-      <div className="max-w-6xl mx-auto w-full">
+    <div className="h-full overflow-y-auto p-6 bg-gray-50 flex items-center justify-center relative">
+      {/* Animated Watercolor Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-[10%] left-[15%] w-96 h-96 bg-blue-400/30 rounded-full blur-3xl animate-watercolor-1" />
+        <div className="absolute top-[60%] right-[20%] w-80 h-80 bg-purple-400/30 rounded-full blur-3xl animate-watercolor-2" />
+        <div className="absolute bottom-[20%] left-[25%] w-72 h-72 bg-pink-400/30 rounded-full blur-3xl animate-watercolor-3" />
+        <div className="absolute top-[40%] right-[10%] w-64 h-64 bg-indigo-400/30 rounded-full blur-3xl animate-watercolor-4" />
+      </div>
+
+      <div className="max-w-6xl mx-auto w-full relative z-10">
         {/* Header Section */}
         <div className="mb-12 text-center">
           <h1 className="text-4xl md:text-5xl font-normal text-gray-900 mb-4">
