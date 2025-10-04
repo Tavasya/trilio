@@ -202,10 +202,14 @@ export class PostService {
             onVariationStart(data.index, data.title);
             break;
           case 'variation_chunk':
-            onVariationChunk(data.index, data.content);
+            // Replace em dashes with regular hyphens
+            const cleanedChunk = data.content.replace(/—/g, '-');
+            onVariationChunk(data.index, cleanedChunk);
             break;
           case 'variation_complete':
-            onVariationComplete(data.index, data.content);
+            // Replace em dashes with regular hyphens
+            const cleanedContent = data.content.replace(/—/g, '-');
+            onVariationComplete(data.index, cleanedContent);
             break;
           case 'done':
             onComplete();
@@ -244,10 +248,14 @@ export class PostService {
             onVariationStart(data.index, data.title);
             break;
           case 'variation_chunk':
-            onVariationChunk(data.index, data.content);
+            // Replace em dashes with regular hyphens
+            const cleanedChunk = data.content.replace(/—/g, '-');
+            onVariationChunk(data.index, cleanedChunk);
             break;
           case 'variation_complete':
-            onVariationComplete(data.index, data.content);
+            // Replace em dashes with regular hyphens
+            const cleanedContent = data.content.replace(/—/g, '-');
+            onVariationComplete(data.index, cleanedContent);
             break;
           case 'done':
             onComplete();

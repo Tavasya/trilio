@@ -190,7 +190,7 @@ const predefinedStyles = [
     label: 'Creative',
     category: 'Artistic',
     description: 'Unique, imaginative expression',
-    example: 'Innovation isn\'t just thinking outside the box—it\'s realizing there is no box...'
+    example: 'Innovation isn\'t just thinking outside the box - it\'s realizing there is no box...'
   },
   {
     id: 'poetic',
