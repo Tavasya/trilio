@@ -408,9 +408,10 @@ export default function CarouselSection({
             const isStreaming = streamingContents[index] !== undefined;
             const displayContent = isStreaming ? streamingContents[index] : card.content;
             const isRegenerating = regeneratingIndex === index;
+            const isLastAndOdd = index === cards.length - 1 && cards.length % 2 !== 0;
 
             return (
-              <div key={index} className="bg-white rounded-lg border border-gray-200 flex flex-col">
+              <div key={index} className={`bg-white rounded-lg border border-gray-200 flex flex-col relative ${isLastAndOdd ? 'lg:col-span-2 lg:max-w-[calc(50%-12px)] lg:mx-auto' : ''}`}>
                 {/* Top Right Buttons */}
                 {!isGenerating && card.content && (
                   <div className="absolute top-3 right-3 flex gap-2 z-10">

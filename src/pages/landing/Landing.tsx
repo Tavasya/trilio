@@ -170,7 +170,7 @@ export default function Landing() {
         <LeverageSection mode={mode} />
         <SalesSection mode={mode} />
         <FoundersTestimonials mode={mode} />
-        <PricingSection />
+        {/* <PricingSection /> */}
         <FAQSection mode={mode} />
         <CTASection mode={mode} />
       </div>

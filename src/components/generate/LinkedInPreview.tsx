@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, X, MessageSquare, Bold, Italic, List, ImagePlus, Edit3 } from 'lucide-react';
+import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, X, MessageSquare, Bold, Italic, List, ImagePlus, Edit3, Copy } from 'lucide-react';
 import { Button } from '../ui/button';
 import ScheduleModal from './ScheduleModal';
 import ConnectLinkedInButton from '@/components/linkedin/ConnectLinkedInButton';
@@ -880,31 +880,44 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       </div>
 
       {/* Schedule Post Button or Connect LinkedIn - Fixed to bottom right of preview container */}
-      <div className="absolute bottom-4 right-4 z-10">
-        {hasLinkedIn ? (
-          <div className="flex gap-3">
-            <Button
-              onClick={() => setShowScheduleModal(true)}
-              variant="outline"
-              className="flex items-center gap-2 bg-white text-gray-700 hover:bg-gray-50 shadow-xl rounded-lg px-6 py-3"
-            >
-              <Calendar className="w-4 h-4" />
-              <span className="font-medium">Schedule Post</span>
-            </Button>
-            <Button
-              onClick={handlePostNow}
-              className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-6 py-3"
-            >
-              <Send className="w-4 h-4" />
-              <span className="font-medium">Post Now</span>
-            </Button>
-          </div>
-        ) : (
-          <ConnectLinkedInButton
-            className="shadow-xl rounded-lg px-6 py-3"
-            onSuccess={() => window.location.reload()}
-          />
-        )}
+      <div className="absolute bottom-4 right-4 z-10 p-2">
+        <div className="flex gap-3">
+          <Button
+            onClick={() => {
+              navigator.clipboard.writeText(postContent);
+              toast.success('Copied to clipboard', { position: 'top-right' });
+            }}
+            variant="outline"
+            size="icon"
+            className="bg-white text-gray-700 hover:bg-gray-50 shadow-xl rounded-lg"
+          >
+            <Copy className="w-4 h-4" />
+          </Button>
+          {hasLinkedIn ? (
+            <>
+              <Button
+                onClick={() => setShowScheduleModal(true)}
+                variant="outline"
+                size="icon"
+                className="bg-white text-gray-700 hover:bg-gray-50 shadow-xl rounded-lg"
+              >
+                <Calendar className="w-4 h-4" />
+              </Button>
+              <Button
+                onClick={handlePostNow}
+                className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-6 py-3"
+              >
+                <Send className="w-4 h-4" />
+                <span className="font-medium">Post Now</span>
+              </Button>
+            </>
+          ) : (
+            <ConnectLinkedInButton
+              className="shadow-xl rounded-lg px-6 py-3"
+              onSuccess={() => window.location.reload()}
+            />
+          )}
+        </div>
       </div>
 
       {/* Schedule Modal */}
