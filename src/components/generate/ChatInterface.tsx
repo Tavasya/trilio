@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Send, Loader2, Eye, Edit3 } from 'lucide-react';
 import { Button } from '../ui/button';
+import { Skeleton } from '../ui/skeleton';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { sendMessage, startNewConversation, clearResearchCards, toggleEditMode } from '@/features/chat/chatSlice';
 import { useAuth } from '@clerk/react-router';
@@ -52,8 +53,10 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
     generatedPost,
     researchCards,
     persistedResearchCards,
-    isEditMode
+    isEditMode,
+    isLoadingPost
   } = useAppSelector((state) => state.chat);
+  const isPublishing = useAppSelector((state) => state.post.isLoading);
 
 
   const currentConversation = activeConversationId
@@ -158,6 +161,10 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       toast.error('Please wait for the current response to complete', { position: 'top-right' });
       return;
     }
+    if (isPublishing) {
+      toast.error('Please wait for post to finish publishing', { position: 'top-right' });
+      return;
+    }
 
     try {
       const token = await getToken();
@@ -213,6 +220,64 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
   //       : [...prev, toolId]
   //   );
   // };
+
+  // Skeleton loading state
+  if (isLoadingPost) {
+    return (
+      <div className="h-full flex flex-col overflow-hidden rounded-lg">
+        {/* Chat Header */}
+        <div className="p-4 flex-shrink-0 min-h-[60px]">
+          <div className="flex justify-between items-center h-full">
+            <div></div>
+            {showToggle && (
+              <Button
+                onClick={onToggleView}
+                variant="outline"
+                size="sm"
+                className="lg:hidden"
+              >
+                <Eye className="w-4 h-4 mr-2" />
+                Preview
+              </Button>
+            )}
+          </div>
+        </div>
+
+        {/* Skeleton Messages */}
+        <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
+          {/* Assistant message skeleton */}
+          <div className="flex justify-start">
+            <div className="max-w-[80%] space-y-2">
+              <Skeleton className="h-4 w-48" />
+              <Skeleton className="h-4 w-64" />
+              <Skeleton className="h-3 w-16 mt-1" />
+            </div>
+          </div>
+          {/* User message skeleton */}
+          <div className="flex justify-end">
+            <div className="max-w-[80%] space-y-2">
+              <Skeleton className="h-4 w-56" />
+              <Skeleton className="h-3 w-16 mt-1" />
+            </div>
+          </div>
+          {/* Assistant message skeleton */}
+          <div className="flex justify-start">
+            <div className="max-w-[80%] space-y-2">
+              <Skeleton className="h-4 w-52" />
+              <Skeleton className="h-4 w-60" />
+              <Skeleton className="h-4 w-40" />
+              <Skeleton className="h-3 w-16 mt-1" />
+            </div>
+          </div>
+        </div>
+
+        {/* Input Area Skeleton */}
+        <div className="p-4 flex-shrink-0">
+          <Skeleton className="h-12 w-full rounded-lg" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col overflow-hidden rounded-lg">
@@ -376,19 +441,20 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
             value={inputValue}
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="Type your message here..."
-            className="flex-1 min-h-[32px] max-h-[120px] p-1.5 bg-transparent border-none resize-none focus:outline-none overflow-y-auto"
+            placeholder={isPublishing ? "Publishing post..." : "Type your message here..."}
+            className="flex-1 min-h-[32px] max-h-[120px] p-1.5 bg-transparent border-none resize-none focus:outline-none overflow-y-auto disabled:opacity-50 disabled:cursor-not-allowed"
             rows={1}
             style={{ lineHeight: '1.25rem' }}
+            disabled={isPublishing}
           />
           <button
             onClick={handleSend}
             className={`h-8 w-8 flex items-center justify-center rounded transition-colors ${
-              (!inputValue.trim() || isStreaming)
+              (!inputValue.trim() || isStreaming || isPublishing)
                 ? 'text-gray-400'
                 : 'text-primary hover:text-primary/80'
             }`}
-            disabled={false}
+            disabled={isPublishing}
           >
             <Send className="w-5 h-5" />
           </button>

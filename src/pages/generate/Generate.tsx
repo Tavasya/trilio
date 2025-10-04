@@ -2,12 +2,10 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import ChatInterface from '../../components/generate/ChatInterface';
 import LinkedInPreview from '../../components/generate/LinkedInPreview';
-import { postService } from '../../features/post/postService';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
 import { useAppDispatch } from '@/store/hooks';
-import { setGeneratedPost, loadConversationFromPostResponse, startNewConversation } from '@/features/chat/chatSlice';
-import { LogoLoader } from '@/components/ui/logo-loader';
+import { loadPostData, startNewConversation } from '@/features/chat/chatSlice';
 
 export default function Generate() {
   const [searchParams] = useSearchParams();
@@ -16,18 +14,14 @@ export default function Generate() {
   const dispatch = useAppDispatch();
   const postId = searchParams.get('postId');
   const [mobileView, setMobileView] = useState<'chat' | 'preview'>('chat');
-  const [isLoading, setIsLoading] = useState(true);
   const [currentPostId, setCurrentPostId] = useState<string | null>(postId);
 
   useEffect(() => {
     const initializePage = async () => {
       // Skip if we don't have a postId
       if (!postId) {
-        setIsLoading(false);
         return;
       }
-
-      setIsLoading(true);
 
       // Clear any existing conversation state
       dispatch(startNewConversation());
@@ -36,55 +30,28 @@ export default function Generate() {
         const token = await getToken();
         if (!token) {
           toast.error('Authentication required', { position: 'top-right' });
-          setIsLoading(false);
           return;
         }
 
-        // Handle post loading (always expect a postId now)
+        // Load post data using Redux thunk
         if (postId) {
           setCurrentPostId(postId);
-
-          // Fetch post data and conversation history in one call
-          const response = await postService.fetchPostById(postId, token);
-          if (response.success && response.post) {
-            dispatch(setGeneratedPost({
-              id: response.post.id,
-              content: response.post.content || '',
-              isEdited: false,
-              imageUrls: response.post.image_urls || undefined
-            }));
-
-            // Load conversation data if it exists
-            if (response.conversation) {
-              dispatch(loadConversationFromPostResponse(response.conversation));
-            }
-          }
+          dispatch(loadPostData({ postId, token }));
         } else {
           // No postId provided - this shouldn't happen with the new flow
           toast.error('No post ID provided. Please start from the dashboard.', { position: 'top-right' });
           navigate('/dashboard');
           return;
         }
-
-        setIsLoading(false);
       } catch (error) {
         if (error instanceof Error && !error.message.includes('conversation')) {
           toast.error('Failed to load post', { position: 'top-right' });
         }
-        setIsLoading(false);
       }
     };
 
     initializePage();
   }, [postId, getToken, dispatch, navigate]);
-
-  if (isLoading) {
-    return (
-      <div className="h-full bg-gray-50 flex items-center justify-center">
-        <LogoLoader size="lg" />
-      </div>
-    );
-  }
 
   return (
     <div className="h-full bg-white flex flex-col">

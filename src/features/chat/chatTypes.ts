@@ -59,6 +59,7 @@ export interface ChatState {
   researchCards: ResearchCardsData | null;  // Current SSE research cards
   persistedResearchCards: ResearchCardBatch[] | null;  // Historical cards from DB
   isEditMode: boolean;  // Toggle for explicit edit mode
+  isLoadingPost: boolean;  // Loading state for fetching post data
 }
 
 // API Request Types

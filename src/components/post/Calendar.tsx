@@ -7,11 +7,12 @@ import {
   nextWeek,
   previousWeek
 } from '../../store/slices/calendarSlice';
-import { ChevronLeft, ChevronRight, Edit2, Trash2, Clock, Calendar as CalendarIcon } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Edit2, Trash2, Clock, Calendar as CalendarIcon, X } from 'lucide-react';
 import { fetchUserPosts, updateScheduledPost, deletePost } from '../../features/post/postSlice';
 import type { Post } from '../../features/post/postTypes';
 import ScheduleModal from '../generate/ScheduleModal';
 import { DeleteConfirmationDialog } from '../ui/delete-confirmation-dialog';
+import { Button } from '../ui/button';
 import { useAuth } from '@clerk/react-router';
 
 const Calendar: React.FC = () => {
@@ -26,6 +27,8 @@ const Calendar: React.FC = () => {
   const [postToDelete, setPostToDelete] = useState<string | null>(null);
   const [draggedPost, setDraggedPost] = useState<Post | null>(null);
   const [dragOverSlot, setDragOverSlot] = useState<{ date: Date; hour: number } | null>(null);
+  const [showPostsListModal, setShowPostsListModal] = useState(false);
+  const [postsListForModal, setPostsListForModal] = useState<Post[]>([]);
 
   // Fetch posts on component mount
   useEffect(() => {
@@ -64,6 +67,9 @@ const Calendar: React.FC = () => {
       const postDate = post.scheduled_for ? new Date(post.scheduled_for) :
                        post.created_at ? new Date(post.created_at) : null;
       if (!postDate) return false;
+
+      // Only show scheduled and published posts
+      if (post.status !== 'scheduled' && post.status !== 'published') return false;
 
       return postDate.getDate() === date.getDate() &&
         postDate.getMonth() === date.getMonth() &&
@@ -450,63 +456,83 @@ const Calendar: React.FC = () => {
                           onDragLeave={handleDragLeave}
                           onDrop={(e) => handleDrop(e, date, hour)}
                         >
-                          {postsAtTime.map((post, postIndex) => {
-                            const postDate = post.scheduled_for ? new Date(post.scheduled_for) :
-                                           post.created_at ? new Date(post.created_at) : new Date();
-                            const postTime = postDate.toLocaleTimeString('en-US', {
-                              hour: 'numeric',
-                              minute: '2-digit',
-                              hour12: true
-                            });
+                          {postsAtTime.length === 1 ? (
+                            // Show individual post if only 1
+                            postsAtTime.map((post, postIndex) => {
+                              const postDate = post.scheduled_for ? new Date(post.scheduled_for) :
+                                             post.created_at ? new Date(post.created_at) : new Date();
+                              const postTime = postDate.toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true
+                              });
 
-                            return (
-                              <div
-                                key={post.id}
-                                className="absolute inset-x-2 bg-[#0077b5]/10 border border-[#0077b5]/20 rounded-lg p-2 cursor-move hover:bg-[#0077b5]/15 transition-colors"
-                                style={{ top: `${12 + postIndex * 40}px` }}
-                                draggable={post.status === 'scheduled'}
-                                onDragStart={(e) => handleDragStart(e, post)}
-                                onClick={() => setSelectedPost(post)}
-                              >
-                                <div className="flex items-start justify-between">
-                                  <div className="flex-1 min-w-0">
-                                    <div className="flex items-center gap-1 mb-1">
-                                      <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="#0077b5">
-                                        <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
-                                      </svg>
-                                      <span className="text-[10px] text-[#0077b5] font-medium">{postTime}</span>
-                                      {post.status === 'scheduled' && (
-                                        <Clock className="w-3 h-3 text-[#0077b5]" />
-                                      )}
+                              return (
+                                <div
+                                  key={post.id}
+                                  className={`absolute inset-x-2 bg-[#0077b5]/10 border border-[#0077b5]/20 rounded-lg p-2 transition-colors ${
+                                    post.status === 'scheduled' ? 'cursor-move hover:bg-[#0077b5]/15' : 'cursor-pointer'
+                                  }`}
+                                  style={{ top: `${12 + postIndex * 40}px` }}
+                                  draggable={post.status === 'scheduled'}
+                                  onDragStart={(e) => post.status === 'scheduled' && handleDragStart(e, post)}
+                                  onClick={() => setSelectedPost(post)}
+                                >
+                                  <div className="flex items-start justify-between">
+                                    <div className="flex-1 min-w-0">
+                                      <div className="flex items-center gap-1 mb-1">
+                                        <svg className="w-4 h-4 flex-shrink-0" viewBox="0 0 24 24" fill="#0077b5">
+                                          <path d="M19 3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14m-.5 15.5v-5.3a3.26 3.26 0 0 0-3.26-3.26c-.85 0-1.84.52-2.32 1.3v-1.11h-2.79v8.37h2.79v-4.93c0-.77.62-1.4 1.39-1.4a1.4 1.4 0 0 1 1.4 1.4v4.93h2.79M6.88 8.56a1.68 1.68 0 0 0 1.68-1.68c0-.93-.75-1.69-1.68-1.69a1.69 1.69 0 0 0-1.69 1.69c0 .93.76 1.68 1.69 1.68m1.39 9.94v-8.37H5.5v8.37h2.77z"/>
+                                        </svg>
+                                        <span className="text-[10px] text-[#0077b5] font-medium">{postTime}</span>
+                                        {post.status === 'scheduled' && (
+                                          <Clock className="w-3 h-3 text-[#0077b5]" />
+                                        )}
+                                      </div>
+                                      <p className="text-[10px] text-gray-700 line-clamp-2">
+                                        {post.content.substring(0, 50)}...
+                                      </p>
                                     </div>
-                                    <p className="text-[10px] text-gray-700 line-clamp-2">
-                                      {post.content.substring(0, 50)}...
-                                    </p>
-                                  </div>
-                                  <div className="flex gap-1 ml-2">
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleEditPost(post);
-                                      }}
-                                      className="p-1 hover:bg-[#0077b5]/20 rounded transition-colors"
-                                    >
-                                      <Edit2 className="w-3 h-3 text-[#0077b5]" />
-                                    </button>
-                                    <button
-                                      onClick={(e) => {
-                                        e.stopPropagation();
-                                        handleDeleteClick(post.id);
-                                      }}
-                                      className="p-1 hover:bg-red-100 rounded transition-colors"
-                                    >
-                                      <Trash2 className="w-3 h-3 text-red-500" />
-                                    </button>
+                                    {post.status === 'scheduled' && (
+                                      <div className="flex gap-1 ml-2">
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleEditPost(post);
+                                          }}
+                                          className="p-1 hover:bg-[#0077b5]/20 rounded transition-colors"
+                                        >
+                                          <Edit2 className="w-3 h-3 text-[#0077b5]" />
+                                        </button>
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            handleDeleteClick(post.id);
+                                          }}
+                                          className="p-1 hover:bg-red-100 rounded transition-colors"
+                                        >
+                                          <Trash2 className="w-3 h-3 text-red-500" />
+                                        </button>
+                                      </div>
+                                    )}
                                   </div>
                                 </div>
-                              </div>
-                            );
-                          })}
+                              );
+                            })
+                          ) : postsAtTime.length >= 2 ? (
+                            // Show count badge if 2 or more
+                            <div
+                              className="absolute inset-x-2 top-1/2 -translate-y-1/2 bg-white border-2 border-[#0077b5] rounded-lg py-3 px-4 cursor-pointer hover:bg-[#0077b5] hover:shadow-md transition-all group flex items-center justify-center"
+                              onClick={() => {
+                                setPostsListForModal(postsAtTime);
+                                setShowPostsListModal(true);
+                              }}
+                            >
+                              <span className="text-sm font-semibold text-[#0077b5] group-hover:text-white transition-colors">
+                                {postsAtTime.length} posts
+                              </span>
+                            </div>
+                          ) : null}
                         </div>
                       );
                     })}
@@ -634,6 +660,101 @@ const Calendar: React.FC = () => {
         onConfirm={handleConfirmDelete}
         itemType="post"
       />
+
+      {/* Posts List Modal */}
+      {showPostsListModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 bg-black/50"
+            onClick={() => setShowPostsListModal(false)}
+          />
+          <div className="relative bg-white rounded-lg shadow-xl p-6 w-full max-w-2xl max-h-[80vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Posts ({postsListForModal.length})</h3>
+              <button
+                onClick={() => setShowPostsListModal(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg transition-colors"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <div className="space-y-3">
+              {postsListForModal.map((post) => {
+                const postDate = post.scheduled_for ? new Date(post.scheduled_for) :
+                               post.created_at ? new Date(post.created_at) : new Date();
+                const postTime = postDate.toLocaleTimeString('en-US', {
+                  hour: 'numeric',
+                  minute: '2-digit',
+                  hour12: true
+                });
+
+                return (
+                  <div
+                    key={post.id}
+                    className="border border-gray-200 rounded-lg p-4 hover:bg-gray-50 transition-colors"
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-4 h-4 text-[#0077b5]" />
+                        <span className="text-sm font-medium text-[#0077b5]">{postTime}</span>
+                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                          post.status === 'scheduled' ? 'bg-yellow-100 text-yellow-800' :
+                          post.status === 'published' ? 'bg-green-100 text-green-800' :
+                          'bg-gray-100 text-gray-800'
+                        }`}>
+                          {post.status}
+                        </span>
+                      </div>
+                      {post.status === 'scheduled' && (
+                        <div className="flex gap-1">
+                          <button
+                            onClick={() => {
+                              setShowPostsListModal(false);
+                              handleEditPost(post);
+                            }}
+                            className="p-1 hover:bg-[#0077b5]/20 rounded transition-colors"
+                          >
+                            <Edit2 className="w-4 h-4 text-[#0077b5]" />
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowPostsListModal(false);
+                              handleDeleteClick(post.id);
+                            }}
+                            className="p-1 hover:bg-red-100 rounded transition-colors"
+                          >
+                            <Trash2 className="w-4 h-4 text-red-500" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    <p
+                      className="text-sm text-gray-700 line-clamp-2 cursor-pointer hover:text-gray-900"
+                      onClick={() => {
+                        setShowPostsListModal(false);
+                        setSelectedPost(post);
+                      }}
+                    >
+                      {post.content}
+                    </p>
+                  </div>
+                );
+              })}
+            </div>
+
+            <div className="mt-4 pt-4 border-t border-gray-200">
+              <Button
+                onClick={() => setShowPostsListModal(false)}
+                variant="outline"
+                className="w-full"
+              >
+                Close
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

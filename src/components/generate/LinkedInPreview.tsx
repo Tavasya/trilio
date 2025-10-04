@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, X, MessageSquare, Bold, Italic, List, ImagePlus, Edit3, Copy } from 'lucide-react';
+import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, X, MessageSquare, Bold, Italic, List, ImagePlus, Edit3, Copy, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
+import { Skeleton } from '../ui/skeleton';
 import ScheduleModal from './ScheduleModal';
 import ConnectLinkedInButton from '@/components/linkedin/ConnectLinkedInButton';
 import ThumbIcon from '@/lib/icons/thumb.svg?react';
@@ -27,6 +28,8 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   const { getToken } = useAuth();
   const { user } = useUser();
   const generatedPost = useAppSelector(state => state.chat.generatedPost);
+  const isLoadingPost = useAppSelector(state => state.chat.isLoadingPost);
+  const isPublishing = useAppSelector(state => state.post.isLoading);
 
   // Use Clerk user data with fallbacks
   const userName = user?.fullName || user?.firstName || "Your Name";
@@ -592,11 +595,99 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   }, [showEditButton]);
   
   const { text: displayContent, truncated } = getTruncatedContent();
-  
+
   // Fixed engagement numbers
   const reactions = 127;
   const comments = 23;
   const reposts = 8;
+
+  // Skeleton loading state
+  if (isLoadingPost) {
+    return (
+      <div className="h-full flex flex-col overflow-hidden bg-gray-100 rounded-lg border border-gray-300">
+        {/* Preview Header */}
+        <div className="p-4">
+          <div className="bg-transparent rounded-lg p-2 min-h-[48px] flex items-center">
+            <div className="flex items-center justify-between w-full relative">
+              {showToggle && (
+                <Button
+                  onClick={onToggleView}
+                  variant="outline"
+                  size="sm"
+                  className="lg:hidden"
+                >
+                  <MessageSquare className="w-4 h-4 mr-2" />
+                  Chat
+                </Button>
+              )}
+
+              {/* Desktop/Mobile Toggle - Centered */}
+              <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-4">
+                <button className="p-2 text-primary">
+                  <Monitor className="w-5 h-5" />
+                </button>
+                <button className="p-2 text-gray-400">
+                  <Smartphone className="w-5 h-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Skeleton LinkedIn Post */}
+        <div className="flex-1 overflow-y-auto bg-gray-100 relative">
+          <div className="p-4 flex justify-center items-start">
+            <div className="bg-white border border-gray-200 rounded-lg w-[700px]">
+              {/* Post Header Skeleton */}
+              <div className="p-4">
+                <div className="flex items-start justify-between">
+                  <div className="flex gap-3">
+                    <Skeleton className="w-12 h-12 rounded-full" />
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-32" />
+                      <Skeleton className="h-3 w-24" />
+                    </div>
+                  </div>
+                  <Skeleton className="w-6 h-6 rounded" />
+                </div>
+              </div>
+
+              {/* Post Content Skeleton */}
+              <div className="px-4 pb-3 space-y-2">
+                <Skeleton className="h-4 w-full" />
+                <Skeleton className="h-4 w-11/12" />
+                <Skeleton className="h-4 w-4/5" />
+                <Skeleton className="h-4 w-3/4" />
+              </div>
+
+              {/* Engagement Stats Skeleton */}
+              <div className="px-4 py-2 flex items-center justify-between">
+                <Skeleton className="h-4 w-16" />
+                <Skeleton className="h-4 w-32" />
+              </div>
+
+              {/* Action Buttons Skeleton */}
+              <div className="px-2 py-1 flex items-center justify-around border-t border-gray-200">
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-20" />
+                <Skeleton className="h-8 w-16" />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Buttons Skeleton */}
+        <div className="absolute bottom-4 right-4 z-10 p-2">
+          <div className="flex gap-3">
+            <Skeleton className="h-10 w-10 rounded-lg" />
+            <Skeleton className="h-10 w-10 rounded-lg" />
+            <Skeleton className="h-10 w-32 rounded-lg" />
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full flex flex-col overflow-hidden bg-gray-100 rounded-lg border border-gray-300">
@@ -719,8 +810,9 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                   onBlur={handleContentBlur}
                   onSelect={handleTextSelection}
                   onMouseUp={handleTextSelection}
-                  className="w-full p-2 border-2 border-dashed border-gray-300 rounded resize-none focus:outline-none focus:border-gray-400 text-gray-900 whitespace-pre-wrap bg-transparent"
+                  className="w-full p-2 border-2 border-dashed border-gray-300 rounded resize-none focus:outline-none focus:border-gray-400 text-gray-900 whitespace-pre-wrap bg-transparent disabled:opacity-50 disabled:cursor-not-allowed"
                   autoFocus
+                  disabled={isPublishing}
                   style={{
                     minHeight: 'auto',
                     height: 'auto',
@@ -737,12 +829,15 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                 />
               ) : (
                 <div
-                  className="text-gray-900 whitespace-pre-wrap cursor-pointer hover:bg-gray-50 p-2 rounded transition-colors"
+                  className={`text-gray-900 whitespace-pre-wrap p-2 rounded transition-colors ${
+                    isPublishing ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:bg-gray-50'
+                  }`}
                   onClick={(e) => {
+                    if (isPublishing) return;
                     e.stopPropagation();
                     setIsEditingContent(true);
                   }}
-                  title="Click to edit"
+                  title={isPublishing ? 'Publishing...' : 'Click to edit'}
                   style={{
                     fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif',
                     fontSize: '14px',
@@ -869,16 +964,18 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={applyBoldFormatting}
-              className="p-2 hover:bg-gray-200 rounded transition-colors"
+              className="p-2 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
               title="Bold (Unicode characters)"
+              disabled={isPublishing}
             >
               <Bold className="w-4 h-4 text-gray-700" />
             </button>
             <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={applyItalicFormatting}
-              className="p-2 hover:bg-gray-200 rounded transition-colors"
+              className="p-2 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
               title="Italic (Unicode characters)"
+              disabled={isPublishing}
             >
               <Italic className="w-4 h-4 text-gray-700" />
             </button>
@@ -886,8 +983,9 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={insertBulletList}
-              className="p-2 hover:bg-gray-200 rounded transition-colors"
+              className="p-2 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
               title="Bullet list"
+              disabled={isPublishing}
             >
               <List className="w-4 h-4 text-gray-700" />
             </button>
@@ -895,8 +993,9 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={handleImageUpload}
-              className="p-2 hover:bg-gray-200 rounded transition-colors"
+              className="p-2 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
               title="Add image"
+              disabled={isPublishing}
             >
               <ImagePlus className="w-4 h-4 text-gray-700" />
             </button>
@@ -991,15 +1090,26 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                 variant="outline"
                 size="icon"
                 className="bg-white text-gray-700 hover:bg-gray-50 shadow-xl rounded-lg"
+                disabled={isPublishing}
               >
                 <Calendar className="w-4 h-4" />
               </Button>
               <Button
                 onClick={handlePostNow}
                 className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-6 py-3"
+                disabled={isPublishing}
               >
-                <Send className="w-4 h-4" />
-                <span className="font-medium">Post Now</span>
+                {isPublishing ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span className="font-medium">Publishing...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-4 h-4" />
+                    <span className="font-medium">Post Now</span>
+                  </>
+                )}
               </Button>
             </>
           ) : (

@@ -17,6 +17,7 @@ const initialState: ChatState = {
   researchCards: null,
   persistedResearchCards: null,
   isEditMode: false,
+  isLoadingPost: false,
 };
 
 // Async thunk for saving draft to database
@@ -29,6 +30,15 @@ export const saveDraftToDatabase = createAsyncThunk(
       imageFiles,
       token
     );
+    return response;
+  }
+);
+
+// Async thunk for loading post data (post content + conversation history)
+export const loadPostData = createAsyncThunk(
+  'chat/loadPostData',
+  async ({ postId, token }: { postId: string; token: string }) => {
+    const response = await postService.fetchPostById(postId, token);
     return response;
   }
 );
@@ -343,6 +353,46 @@ const chatSlice = createSlice({
       .addCase(saveDraftToDatabase.rejected, (state) => {
         state.saveStatus = 'error';
         toast.error('Failed to save draft', { position: 'top-right' });
+      })
+      .addCase(loadPostData.pending, (state) => {
+        state.isLoadingPost = true;
+      })
+      .addCase(loadPostData.fulfilled, (state, action) => {
+        state.isLoadingPost = false;
+        if (action.payload.success && action.payload.post) {
+          // Set the post content
+          state.generatedPost = {
+            id: action.payload.post.id,
+            content: action.payload.post.content || '',
+            isEdited: false,
+            imageUrls: action.payload.post.image_urls || undefined
+          };
+
+          // Load conversation data if it exists
+          if (action.payload.conversation) {
+            const { conversation_id, messages, research_cards } = action.payload.conversation;
+            state.conversations[conversation_id] = {
+              conversation_id,
+              messages: messages.map((msg) => ({
+                id: msg.id,
+                role: msg.role as 'user' | 'assistant',
+                content: msg.content,
+                timestamp: msg.created_at,
+              })),
+              createdAt: new Date().toISOString(),
+              updatedAt: new Date().toISOString(),
+            };
+            state.activeConversationId = conversation_id;
+
+            if (research_cards && research_cards.length > 0) {
+              state.persistedResearchCards = research_cards;
+            }
+          }
+        }
+      })
+      .addCase(loadPostData.rejected, (state) => {
+        state.isLoadingPost = false;
+        toast.error('Failed to load post', { position: 'top-right' });
       })
       .addCase(loadConversationHistory.fulfilled, (state, action) => {
         if (action.payload) {

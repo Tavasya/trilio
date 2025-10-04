@@ -40,6 +40,8 @@ const Dashboard = () => {
   const [isHooksModalOpen, setIsHooksModalOpen] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [selectedVariation, setSelectedVariation] = useState<IdeaVariation | null>(null);
+  const [isScheduling, setIsScheduling] = useState(false);
+  const [isPosting, setIsPosting] = useState(false);
 
   // Check if LinkedIn is connected via Clerk external accounts
   const hasLinkedIn = user?.externalAccounts?.some(
@@ -172,7 +174,7 @@ const Dashboard = () => {
   };
 
   const handleSchedule = async (date: Date) => {
-    if (!selectedVariation) return;
+    if (!selectedVariation || isScheduling) return;
 
     const token = await getToken();
     if (!token) {
@@ -180,6 +182,7 @@ const Dashboard = () => {
       return;
     }
 
+    setIsScheduling(true);
     try {
       // Get user's timezone
       const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -202,16 +205,21 @@ const Dashboard = () => {
       navigate('/scheduler');
     } catch {
       toast.error('Failed to schedule post', { position: 'top-right' });
+    } finally {
+      setIsScheduling(false);
     }
   };
 
   const handlePostNow = async (variation: IdeaVariation) => {
+    if (isPosting) return;
+
     const token = await getToken();
     if (!token) {
       toast.error('Authentication required', { position: 'top-right' });
       return;
     }
 
+    setIsPosting(true);
     try {
       await dispatch(publishToLinkedIn({
         post: {
@@ -225,6 +233,8 @@ const Dashboard = () => {
       navigate('/posts');
     } catch {
       toast.error('Failed to post to LinkedIn', { position: 'top-right' });
+    } finally {
+      setIsPosting(false);
     }
   };
 
@@ -292,6 +302,8 @@ const Dashboard = () => {
               onRegenerate={handleRegenerateVariation}
               onSchedule={hasLinkedIn ? handleSchedulePost : undefined}
               onPostNow={hasLinkedIn ? handlePostNow : undefined}
+              isPosting={isPosting}
+              isScheduling={isScheduling}
             />
           </div>
         )}
@@ -301,6 +313,7 @@ const Dashboard = () => {
           isOpen={showScheduleModal}
           onClose={() => setShowScheduleModal(false)}
           onSchedule={handleSchedule}
+          isScheduling={isScheduling}
         />
       </div>
     </div>

@@ -165,7 +165,7 @@ export default function Posts() {
             </div>
           </div>
         ) : (
-          <div className="columns-1 md:columns-2 lg:columns-3 gap-4 space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 auto-rows-min">
             {posts.map((post) => {
               const MAX_CONTENT_LENGTH = 280;
               const truncatedContent = post.content.length > MAX_CONTENT_LENGTH
@@ -176,7 +176,7 @@ export default function Posts() {
               return (
               <div
                 key={post.id}
-                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden relative flex flex-col break-inside-avoid mb-4"
+                className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden relative flex flex-col self-start"
               >
                 {/* Status Badge - Removed */}
 
