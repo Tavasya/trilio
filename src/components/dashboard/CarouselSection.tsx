@@ -39,24 +39,16 @@ export default function CarouselSection({
     setCurrentCardIndex((prev) => (prev + 1) % cards.length);
   };
 
-  // Measure natural heights and get max
   useEffect(() => {
-    // Reset and remeasure when content changes
     setMaxHeight(0);
 
     const timer = setTimeout(() => {
       const heights = measureRefs.current
         .filter(ref => ref !== null)
-        .map(ref => {
-          const height = ref.offsetHeight;
-          console.log('Measured card height:', height);
-          return height;
-        });
+        .map(ref => ref.offsetHeight);
 
       if (heights.length > 0) {
-        const max = Math.max(...heights);
-        console.log('Setting max height to:', max);
-        setMaxHeight(max);
+        setMaxHeight(Math.max(...heights));
       }
     }, 100);
 
