@@ -22,10 +22,13 @@ const initialState: ChatState = {
 // Async thunk for saving draft to database
 export const saveDraftToDatabase = createAsyncThunk(
   'chat/saveDraft',
-  async ({ postId, content, token }: { postId: string; content: string; token: string }) => {
+  async ({ postId, content, imageUrl, token }: { postId: string; content: string; imageUrl?: string; token: string }) => {
     const response = await postService.updateDraft(
       postId,
-      { content },
+      {
+        content,
+        ...(imageUrl && { image_urls: [imageUrl] })
+      },
       token
     );
     return response;

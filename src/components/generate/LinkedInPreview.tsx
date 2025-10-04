@@ -57,6 +57,13 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   const postContent = generatedPost?.content || "Your LinkedIn post content will appear here as you generate it...";
   const postId = generatedPost?.id;
 
+  // Initialize postImage from Redux when component mounts or generatedPost changes
+  useEffect(() => {
+    if (generatedPost?.imageUrls && generatedPost.imageUrls.length > 0) {
+      setPostImage(generatedPost.imageUrls[0]);
+    }
+  }, [generatedPost?.imageUrls]);
+
   // Add keyboard listener for End key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -96,6 +103,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
           scheduled_for: scheduledFor,
           timezone: timezone,
           visibility: 'PUBLIC',
+          image_urls: postImage ? [postImage] : undefined,
           draft_id: postId  // Include the draft post ID if it exists
         },
         token
@@ -123,7 +131,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
         post: {
           content: postContent,
           visibility: 'PUBLIC',
-          media_url: postImage || undefined,
+          image_urls: postImage ? [postImage] : undefined,
           draft_id: postId  // Include the draft post ID if it exists
         },
         token
@@ -136,19 +144,64 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
     }
   };
 
-  const handleImageUpload = () => {
+  const handleImageUpload = async () => {
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = 'image/*';
-    input.onchange = (e) => {
+    input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const imageUrl = event.target?.result as string;
-          setPostImage(imageUrl);
-        };
-        reader.readAsDataURL(file);
+        try {
+          // Get auth token
+          const token = await getToken();
+          if (!token) {
+            toast.error('Authentication required', { position: 'top-right' });
+            return;
+          }
+
+          // Store old image URL before uploading new one
+          const oldImageUrl = postImage;
+
+          // Upload image to backend
+          const formData = new FormData();
+          formData.append('file', file);
+
+          // If there's an old image, include it for deletion
+          if (oldImageUrl) {
+            formData.append('old_image_url', oldImageUrl);
+          }
+
+          const response = await fetch(`${import.meta.env.VITE_API_BASE_URL || 'http://0.0.0.0:8080'}/api/posting/upload-image`, {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            },
+            body: formData,
+          });
+
+          const data = await response.json();
+
+          if (!response.ok || !data.success) {
+            throw new Error(data.error || 'Failed to upload image');
+          }
+
+          // Store the new image URL
+          setPostImage(data.image_url);
+
+          // Immediately save draft with the new image
+          if (postId) {
+            await dispatch(saveDraftToDatabase({
+              postId,
+              content: postContent,
+              imageUrl: data.image_url,
+              token
+            })).unwrap();
+          }
+
+          toast.success('Image uploaded successfully', { position: 'top-right' });
+        } catch (error) {
+          toast.error(error instanceof Error ? error.message : 'Failed to upload image', { position: 'top-right' });
+        }
       }
     };
     input.click();
@@ -201,6 +254,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
         await dispatch(saveDraftToDatabase({
           postId,
           content: postContent,
+          imageUrl: postImage || undefined,
           token
         })).unwrap();
       } catch {
