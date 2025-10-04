@@ -37,6 +37,9 @@ export default function CarouselSection({
   const measureRefs = useRef<(HTMLDivElement | null)[]>([]);
   const [viewMode, setViewMode] = useState<'carousel' | 'grid'>('carousel');
 
+  // Top bar height: py-3 (0.75rem * 2 = 1.5rem = 24px) + border (1px) = ~61px with padding
+  const TOP_BAR_HEIGHT = 61;
+
   const handlePrevious = () => {
     setCurrentCardIndex((prev) => (prev - 1 + cards.length) % cards.length);
   };
@@ -57,7 +60,8 @@ export default function CarouselSection({
         .map(ref => ref.offsetHeight);
 
       if (heights.length > 0) {
-        setMaxHeight(Math.max(...heights));
+        // Add TOP_BAR_HEIGHT to the calculated max height to accommodate the top bar
+        setMaxHeight(Math.max(...heights) + TOP_BAR_HEIGHT);
       }
     }, 100);
 
