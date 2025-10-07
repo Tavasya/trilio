@@ -13,12 +13,12 @@ export function useOnboarding() {
     isOpen: true,
   });
 
-  useEffect(() => {
-    const completed = localStorage.getItem(ONBOARDING_KEY);
-    if (completed === 'true') {
-      setState({ currentStep: 1, isOpen: false });
-    }
-  }, []);
+  // useEffect(() => {
+  //   const completed = localStorage.getItem(ONBOARDING_KEY);
+  //   if (completed === 'true') {
+  //     setState({ currentStep: 1, isOpen: false });
+  //   }
+  // }, []);
 
   const nextStep = () => {
     setState(prev => {
@@ -50,7 +50,7 @@ export function useOnboarding() {
   };
 
   const closeOnboarding = () => {
-    localStorage.setItem(ONBOARDING_KEY, 'true');
+    // localStorage.setItem(ONBOARDING_KEY, 'true');
     setState(prev => ({ ...prev, isOpen: false }));
   };
 

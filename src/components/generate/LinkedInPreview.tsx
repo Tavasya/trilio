@@ -965,7 +965,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
 
           {/* Formatting Toolbar - Right side */}
           <div className="sticky top-0 flex flex-col gap-1 p-1">
-            <button
+            {/* <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={applyBoldFormatting}
               className="p-2 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
@@ -983,7 +983,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             >
               <Italic className="w-4 h-4 text-gray-700" />
             </button>
-            <div className="h-px w-6 bg-gray-300 my-1" />
+            <div className="h-px w-6 bg-gray-300 my-1" /> */}
             <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={insertBulletList}
