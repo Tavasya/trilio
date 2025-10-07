@@ -44,9 +44,11 @@ export default function Landing() {
     <div className="min-h-screen bg-white">
       {/* Fixed Header */}
       <header className="fixed top-0 left-0 right-0 z-50 backdrop-blur-md">
-        <div className="flex items-center justify-between px-3 sm:px-6 py-4">
-          <div className="flex items-center gap-2 sm:gap-8">
-            <img src={trilioLogo} alt="Trilio - AI LinkedIn Content Platform" className="h-7 sm:h-8 w-auto" />
+        <div className="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
+          <div className="flex items-center gap-3 sm:gap-8">
+            <img src={trilioLogo} alt="Trilio - AI LinkedIn Content Platform" className="h-6 sm:h-8 w-auto" />
+
+            {/* Desktop Navigation */}
             <nav className="hidden sm:flex items-center gap-6">
               <Button
                 variant={mode === 'business' ? 'default' : 'ghost'}
@@ -69,28 +71,29 @@ export default function Landing() {
                 For job seekers
               </Button>
             </nav>
-            {/* Mobile toggle buttons */}
-            <div className="flex sm:hidden gap-1">
-              <Button
-                variant={mode === 'business' ? 'default' : 'ghost'}
-                className={mode === 'business' ?
-                  "px-2 py-1 text-xs bg-primary/10 text-primary hover:bg-primary/20 transition-colors" :
-                  "px-2 py-1 text-xs text-gray-700 hover:bg-gray-100/50 transition-colors"
-                }
+
+            {/* Mobile Segmented Control */}
+            <div className="flex sm:hidden bg-gray-100 rounded-full p-0.5">
+              <button
                 onClick={() => setMode('business')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  mode === 'business'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600'
+                }`}
               >
                 Business
-              </Button>
-              <Button
-                variant={mode === 'student' ? 'default' : 'ghost'}
-                className={mode === 'student' ?
-                  "px-2 py-1 text-xs bg-primary/10 text-primary hover:bg-primary/20 transition-colors" :
-                  "px-2 py-1 text-xs text-gray-700 hover:bg-gray-100/50 transition-colors"
-                }
+              </button>
+              <button
                 onClick={() => setMode('student')}
+                className={`px-3 py-1 rounded-full text-xs font-medium transition-all ${
+                  mode === 'student'
+                    ? 'bg-white text-gray-900 shadow-sm'
+                    : 'text-gray-600'
+                }`}
               >
-                Students
-              </Button>
+                Job Seekers
+              </button>
             </div>
           </div>
 
@@ -99,17 +102,17 @@ export default function Landing() {
               <SignInButton mode="modal">
                 <Button
                   variant="ghost"
-                  className="px-2 sm:px-4 py-2 text-sm sm:text-base text-gray-700 hover:bg-gray-100/50 transition-colors"
+                  className="hidden sm:flex px-4 py-2 text-base text-gray-700 hover:bg-gray-100/50 transition-colors"
                 >
                   Login
                 </Button>
               </SignInButton>
               <SignUpButton mode="modal">
                 <Button
-                  className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-3 sm:px-4 py-2 text-sm sm:text-base"
+                  className="rounded-md bg-primary text-white hover:bg-primary/90 shadow-sm px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-base"
                 >
                   <span className="hidden sm:inline">Try for Free</span>
-                  <span className="sm:hidden">Try Free</span>
+                  <span className="sm:hidden">Sign Up</span>
                 </Button>
               </SignUpButton>
             </SignedOut>

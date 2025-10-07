@@ -58,19 +58,19 @@ export default function CTASection({ mode = 'business' }: CTASectionProps) {
         }`}>
           {mode === 'business' ? 'Try one week on us' : 'Start your job search journey today'}
         </p>
-        <div className={`flex justify-center gap-4 transition-all duration-700 delay-500 ${
+        <div className={`flex flex-col sm:flex-row justify-center gap-4 transition-all duration-700 delay-500 ${
           ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
           <SignedOut>
             <SignUpButton mode="modal">
               <button
-                className="px-6 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium h-12 flex items-center"
+                className="px-6 bg-white text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium h-12 flex items-center justify-center text-sm sm:text-base w-full sm:w-auto"
               >
                 {mode === 'business' ? 'Try for Free' : 'Start Free'}
               </button>
             </SignUpButton>
-            <a href="https://calendly.com/jessie-nativespeaking/meet-jessie?month=2025-09" target="_blank" rel="noopener noreferrer">
-              <button className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center">
+            <a href="https://calendly.com/jessie-nativespeaking/meet-jessie?month=2025-09" target="_blank" rel="noopener noreferrer" className="w-full sm:w-auto">
+              <button className="px-6 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors font-medium h-12 flex items-center justify-center text-sm sm:text-base w-full">
                 {mode === 'business' ? 'Book a Call' : 'Get Career Advice'}
               </button>
             </a>
