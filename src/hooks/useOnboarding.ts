@@ -21,23 +21,22 @@ export function useOnboarding() {
   // }, []);
 
   const nextStep = () => {
-    setState(prev => {
-      const isDesktop = window.innerWidth >= 1024;
+    const isDesktop = window.innerWidth >= 1024;
 
-      if (isDesktop) {
-        // Desktop only has 1 step (edit button), so close after it
-        closeOnboarding();
-        return prev;
-      } else {
-        // Mobile has 2 steps
+    if (isDesktop) {
+      // Desktop only has 1 step (edit button), so close after it
+      closeOnboarding();
+    } else {
+      // Mobile has 2 steps
+      setState(prev => {
         if (prev.currentStep === 1) {
           return { ...prev, currentStep: 2 };
         } else {
-          closeOnboarding();
-          return prev;
+          // On final step, close
+          return { ...prev, isOpen: false };
         }
-      }
-    });
+      });
+    }
   };
 
   const prevStep = () => {

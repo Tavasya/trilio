@@ -53,6 +53,20 @@ export default function OnboardingOverlay({
   useEffect(() => {
     if (!isOpen || !stepConfig) return;
 
+    // Scroll to appropriate position based on step
+    const scrollToElement = () => {
+      if (currentStep === 1) {
+        // Step 1: Edit button at bottom - scroll to bottom
+        window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+      } else if (currentStep === 2) {
+        // Step 2: Preview button at top - scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    };
+
+    // Scroll after a brief delay to ensure content is rendered
+    setTimeout(scrollToElement, 100);
+
     const findVisibleElement = (): { element: Element; rect: DOMRect } | null => {
       const elements = document.querySelectorAll(stepConfig.target);
       for (const el of Array.from(elements)) {
