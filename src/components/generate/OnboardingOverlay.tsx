@@ -72,51 +72,115 @@ export default function OnboardingOverlay({
       setElementRect(rect);
 
       // Calculate tooltip position
-      const padding = 20;
       const tooltipWidth = 320;
       const tooltipHeight = tooltipRef.current?.offsetHeight || 280;
+      const isMobile = window.innerWidth < 1024;
 
       let top = 0;
       let left = 0;
 
-      switch (stepConfig.tooltipPosition) {
-        case 'top':
-          top = rect.top - tooltipHeight - padding;
-          left = rect.left + rect.width / 2 - tooltipWidth / 2;
-          break;
-        case 'bottom':
-          top = rect.bottom + padding;
-          left = rect.left + rect.width / 2 - tooltipWidth / 2;
-          break;
-        case 'left':
-          top = rect.top + rect.height / 2 - tooltipHeight / 2;
-          left = rect.left - tooltipWidth - padding;
-          break;
-        case 'right':
-          top = rect.top + rect.height / 2 - tooltipHeight / 2;
-          left = rect.right + padding;
-          break;
-      }
+      if (isMobile) {
+        // Center on mobile
+        top = (window.innerHeight - tooltipHeight) / 2;
+        left = (window.innerWidth - tooltipWidth) / 2;
+      } else {
+        // Desktop: Use calculated positioning based on element
+        const padding = 20;
 
-      // Clamp to viewport
-      const viewportPadding = 16;
+        switch (stepConfig.tooltipPosition) {
+          case 'top':
+            top = rect.top - tooltipHeight - padding;
+            left = rect.left + rect.width / 2 - tooltipWidth / 2;
+            break;
+          case 'bottom':
+            top = rect.bottom + padding;
+            left = rect.left + rect.width / 2 - tooltipWidth / 2;
+            break;
+          case 'left':
+            top = rect.top + rect.height / 2 - tooltipHeight / 2;
+            left = rect.left - tooltipWidth - padding;
+            break;
+          case 'right':
+            top = rect.top + rect.height / 2 - tooltipHeight / 2;
+            left = rect.right + padding;
+            break;
+        }
 
-      if (top + tooltipHeight > window.innerHeight - viewportPadding) {
-        top = window.innerHeight - tooltipHeight - viewportPadding;
-      }
-      if (top < viewportPadding) {
-        top = viewportPadding;
-      }
+        // Clamp to viewport (desktop only)
+        const viewportPadding = 16;
 
-      if (left + tooltipWidth > window.innerWidth - viewportPadding) {
-        left = window.innerWidth - tooltipWidth - viewportPadding;
-      }
-      if (left < viewportPadding) {
-        left = viewportPadding;
+        if (top + tooltipHeight > window.innerHeight - viewportPadding) {
+          top = window.innerHeight - tooltipHeight - viewportPadding;
+        }
+        if (top < viewportPadding) {
+          top = viewportPadding;
+        }
+
+        if (left + tooltipWidth > window.innerWidth - viewportPadding) {
+          left = window.innerWidth - tooltipWidth - viewportPadding;
+        }
+        if (left < viewportPadding) {
+          left = viewportPadding;
+        }
       }
 
       setTooltipPosition({ top, left });
     };
+
+    // COMMENTED OUT: Original auto-positioning logic (kept for future reference)
+    // const updatePosition = () => {
+    //   const result = findVisibleElement();
+    //   if (!result) return;
+    //
+    //   const { rect } = result;
+    //   setElementRect(rect);
+    //
+    //   // Calculate tooltip position
+    //   const padding = 20;
+    //   const tooltipWidth = 320;
+    //   const tooltipHeight = tooltipRef.current?.offsetHeight || 280;
+    //
+    //   let top = 0;
+    //   let left = 0;
+    //
+    //   switch (stepConfig.tooltipPosition) {
+    //     case 'top':
+    //       top = rect.top - tooltipHeight - padding;
+    //       left = rect.left + rect.width / 2 - tooltipWidth / 2;
+    //       break;
+    //     case 'bottom':
+    //       top = rect.bottom + padding;
+    //       left = rect.left + rect.width / 2 - tooltipWidth / 2;
+    //       break;
+    //     case 'left':
+    //       top = rect.top + rect.height / 2 - tooltipHeight / 2;
+    //       left = rect.left - tooltipWidth - padding;
+    //       break;
+    //     case 'right':
+    //       top = rect.top + rect.height / 2 - tooltipHeight / 2;
+    //       left = rect.right + padding;
+    //       break;
+    //   }
+    //
+    //   // Clamp to viewport
+    //   const viewportPadding = 16;
+    //
+    //   if (top + tooltipHeight > window.innerHeight - viewportPadding) {
+    //     top = window.innerHeight - tooltipHeight - viewportPadding;
+    //   }
+    //   if (top < viewportPadding) {
+    //     top = viewportPadding;
+    //   }
+    //
+    //   if (left + tooltipWidth > window.innerWidth - viewportPadding) {
+    //     left = window.innerWidth - tooltipWidth - viewportPadding;
+    //   }
+    //   if (left < viewportPadding) {
+    //     left = viewportPadding;
+    //   }
+    //
+    //   setTooltipPosition({ top, left });
+    // };
 
     // Poll for element with retries
     let retries = 0;

@@ -399,10 +399,10 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
       </div>
 
       {/* Input Area */}
-      <div className="p-4 flex-shrink-0 space-y-3">
-        <div className="flex gap-2 items-center bg-gray-100 rounded-lg p-2">
+      <div className="p-2 sm:p-4 pb-4 sm:pb-4 flex-shrink-0 space-y-3" style={{ paddingBottom: 'max(1rem, env(safe-area-inset-bottom))' }}>
+        <div className="flex gap-1 sm:gap-2 items-center bg-gray-100 rounded-lg p-1.5 sm:p-2">
           {/* Tool Selector Buttons */}
-          <div className="flex gap-2 pl-2">
+          <div className="flex gap-1 sm:gap-2 pl-1 sm:pl-2 flex-shrink-0">
             {/* {AVAILABLE_TOOLS.map(tool => {
               const Icon = tool.icon;
               const isSelected = selectedTools.includes(tool.id);
@@ -426,14 +426,14 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
               <button
                 onClick={() => dispatch(toggleEditMode())}
                 title={isEditMode ? 'Edit Mode: ON - AI will modify content' : 'Edit Mode: OFF - AI will discuss only'}
-                className={`h-8 w-8 p-0 flex items-center justify-center rounded transition-all ${
+                className={`h-7 w-7 sm:h-8 sm:w-8 p-0 flex items-center justify-center rounded transition-all flex-shrink-0 ${
                   isEditMode
                     ? 'text-white bg-primary shadow-md ring-2 ring-primary/20'
                     : 'text-gray-500 bg-gray-100 hover:bg-gray-200 hover:text-gray-700'
                 }`}
                 data-onboarding="edit-button"
               >
-                <Edit3 className="w-5 h-5" />
+                <Edit3 className="w-4 h-4 sm:w-5 sm:h-5" />
               </button>
             )}
           </div>
@@ -444,21 +444,21 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
             onChange={(e) => setInputValue(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder={isPublishing ? "Publishing post..." : "Type your message here..."}
-            className="flex-1 min-h-[32px] max-h-[120px] p-1.5 bg-transparent border-none resize-none focus:outline-none overflow-y-auto disabled:opacity-50 disabled:cursor-not-allowed"
+            className="flex-1 min-h-[32px] max-h-[120px] p-1.5 bg-transparent border-none resize-none focus:outline-none overflow-y-auto disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
             rows={1}
             style={{ lineHeight: '1.25rem' }}
             disabled={isPublishing}
           />
           <button
             onClick={handleSend}
-            className={`h-8 w-8 flex items-center justify-center rounded transition-colors ${
+            className={`h-7 w-7 sm:h-8 sm:w-8 flex items-center justify-center rounded transition-colors flex-shrink-0 ${
               (!inputValue.trim() || isStreaming || isPublishing)
                 ? 'text-gray-400'
                 : 'text-primary hover:text-primary/80'
             }`}
             disabled={isPublishing}
           >
-            <Send className="w-5 h-5" />
+            <Send className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         </div>
       </div>

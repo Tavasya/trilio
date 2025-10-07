@@ -74,7 +74,7 @@ export default function Generate() {
       {/* Mobile Layout */}
       <div className="lg:hidden h-full overflow-hidden">
         {mobileView === 'chat' ? (
-          <div className="p-4 h-full overflow-hidden">
+          <div className="p-2 sm:p-4 h-full overflow-hidden">
             <ChatInterface
               postId={currentPostId || postId}
               onToggleView={() => setMobileView('preview')}
@@ -82,7 +82,7 @@ export default function Generate() {
             />
           </div>
         ) : (
-          <div className="p-4 h-full overflow-auto">
+          <div className="p-0 sm:p-4 h-full overflow-auto">
             <LinkedInPreview
               onToggleView={() => setMobileView('chat')}
               showToggle={true}

@@ -218,7 +218,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   };
   
   const getPreviewWidth = () => {
-    return viewSize === 'mobile' ? 'w-[375px]' : 'w-[700px]';
+    return viewSize === 'mobile' ? 'w-full max-w-[340px]' : 'w-full max-w-[600px]';
   };
   
   const getTruncatedContent = () => {
@@ -637,7 +637,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
         {/* Skeleton LinkedIn Post */}
         <div className="flex-1 overflow-y-auto bg-gray-100 relative">
           <div className="p-4 flex justify-center items-start">
-            <div className="bg-white border border-gray-200 rounded-lg w-[700px]">
+            <div className="bg-white border border-gray-200 rounded-lg w-full max-w-[700px]">
               {/* Post Header Skeleton */}
               <div className="p-4">
                 <div className="flex items-start justify-between">
@@ -695,11 +695,33 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       <div className="p-4">
         <div className="bg-transparent rounded-lg p-2 min-h-[48px] flex items-center">
           <div className="flex items-center justify-between w-full relative">
-            {/* Left side - Empty spacer */}
-            <div className="w-20"></div>
-            
-            {/* Desktop/Mobile Toggle - Centered */}
-            <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-4">
+            {/* Left side - Formatting Toolbar (Mobile only) */}
+            <div className="flex lg:hidden items-center gap-1">
+              <button
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={insertBulletList}
+                className="p-2 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                title="Bullet list"
+                disabled={isPublishing}
+              >
+                <List className="w-4 h-4 text-gray-700" />
+              </button>
+              <button
+                onMouseDown={(e) => e.preventDefault()}
+                onClick={handleImageUpload}
+                className="p-2 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
+                title="Add image"
+                disabled={isPublishing}
+              >
+                <ImagePlus className="w-4 h-4 text-gray-700" />
+              </button>
+            </div>
+
+            {/* Left side - Empty spacer (Desktop only) */}
+            <div className="hidden lg:block w-20"></div>
+
+            {/* Desktop/Mobile Toggle - Centered - Hidden on mobile */}
+            <div className="hidden lg:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center gap-4">
               <button
                 onClick={() => setViewSize('desktop')}
                 className={`p-2 transition-colors ${
@@ -772,15 +794,15 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
 
       {/* LinkedIn Post Preview */}
       <div ref={previewContainerRef} className="flex-1 overflow-y-auto bg-gray-100 relative custom-scrollbar">
-        <div className="p-4 flex justify-center items-start gap-2 relative min-h-full">
+        <div className="p-2 sm:p-4 flex justify-center items-start gap-2 relative min-h-full">
           {/* Post Card with responsive width */}
           <div className={`bg-white border border-gray-200 rounded-lg ${getPreviewWidth()}`}>
             {/* Post Header */}
-            <div className="p-4">
+            <div className="p-3 sm:p-4">
               <div className="flex items-start justify-between">
                 <div className="flex gap-3 items-center">
                   {/* Avatar */}
-                  <div className="w-12 h-12 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-gray-300 flex items-center justify-center flex-shrink-0">
                     {userAvatar ? (
                       <img src={userAvatar} alt={userName} className="w-full h-full rounded-full object-cover" />
                     ) : (
@@ -963,27 +985,8 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             </div>
           </div>
 
-          {/* Formatting Toolbar - Right side */}
-          <div className="sticky top-0 flex flex-col gap-1 p-1">
-            {/* <button
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={applyBoldFormatting}
-              className="p-2 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-              title="Bold (Unicode characters)"
-              disabled={isPublishing}
-            >
-              <Bold className="w-4 h-4 text-gray-700" />
-            </button>
-            <button
-              onMouseDown={(e) => e.preventDefault()}
-              onClick={applyItalicFormatting}
-              className="p-2 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
-              title="Italic (Unicode characters)"
-              disabled={isPublishing}
-            >
-              <Italic className="w-4 h-4 text-gray-700" />
-            </button>
-            <div className="h-px w-6 bg-gray-300 my-1" /> */}
+          {/* Formatting Toolbar - Right side (Desktop only) */}
+          <div className="hidden lg:flex sticky top-0 flex-col gap-1 p-1">
             <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={insertBulletList}
@@ -1074,8 +1077,8 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       </div>
 
       {/* Schedule Post Button or Connect LinkedIn - Fixed to bottom right of preview container */}
-      <div className="absolute bottom-4 right-4 z-10 p-2">
-        <div className="flex gap-3">
+      <div className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4 z-10 p-1 sm:p-2">
+        <div className="flex flex-row gap-2 sm:gap-3">
           <Button
             onClick={() => {
               navigator.clipboard.writeText(postContent);
@@ -1100,25 +1103,25 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
               </Button>
               <Button
                 onClick={handlePostNow}
-                className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-6 py-3"
+                className="flex items-center justify-center gap-1 sm:gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-base whitespace-nowrap"
                 disabled={isPublishing}
               >
                 {isPublishing ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                     <span className="font-medium">Publishing...</span>
                   </>
                 ) : (
                   <>
-                    <Send className="w-4 h-4" />
-                    <span className="font-medium">Post Now</span>
+                    <Send className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="font-medium">Post</span>
                   </>
                 )}
               </Button>
             </>
           ) : (
             <ConnectLinkedInButton
-              className="shadow-xl rounded-lg px-6 py-3"
+              className="shadow-xl rounded-lg px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
               onSuccess={() => window.location.reload()}
             />
           )}
