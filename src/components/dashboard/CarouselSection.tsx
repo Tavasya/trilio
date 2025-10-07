@@ -276,39 +276,39 @@ export default function CarouselSection({
                 {/* Bottom Section - Engagement + Actions */}
                 <div className="mt-auto">
                   {/* Engagement Stats */}
-                  <div className="px-4 py-2 flex items-center justify-between text-xs text-gray-500">
+                  <div className="px-2 sm:px-4 py-2 flex items-center justify-between text-xs text-gray-500">
                     <div className="flex items-center gap-1">
                       <div className="flex -space-x-1">
-                        <ThumbIcon className="w-4 h-4" />
-                        <HeartIcon className="w-4 h-4" />
-                        <ClapIcon className="w-4 h-4" />
+                        <ThumbIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <HeartIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                        <ClapIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                       </div>
-                      <span className="ml-1">127</span>
+                      <span className="ml-1 text-[10px] sm:text-xs">127</span>
                     </div>
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-1 sm:gap-3 text-[10px] sm:text-xs">
                       <span>23 comments</span>
-                      <span>•</span>
+                      <span className="hidden xs:inline">•</span>
                       <span>8 reposts</span>
                     </div>
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="px-2 py-1 flex items-center justify-between sm:justify-around border-t border-gray-200">
-                    <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
+                  <div className="px-1 sm:px-2 py-1 flex items-center justify-around border-t border-gray-200">
+                    <button className="flex items-center gap-1 px-1 sm:px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
                       <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span className="text-xs sm:text-sm font-medium">Like</span>
+                      <span className="text-xs sm:text-sm font-medium hidden xs:inline">Like</span>
                     </button>
-                    <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                    <button className="flex items-center gap-1 px-1 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
                       <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span className="text-xs sm:text-sm font-medium">Comment</span>
+                      <span className="text-xs sm:text-sm font-medium hidden xs:inline">Comment</span>
                     </button>
-                    <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                    <button className="flex items-center gap-1 px-1 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
                       <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span className="text-xs sm:text-sm font-medium">Repost</span>
+                      <span className="text-xs sm:text-sm font-medium hidden xs:inline">Repost</span>
                     </button>
-                    <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                    <button className="flex items-center gap-1 px-1 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
                       <Send className="w-4 h-4 sm:w-5 sm:h-5" />
-                      <span className="text-xs sm:text-sm font-medium">Send</span>
+                      <span className="text-xs sm:text-sm font-medium hidden xs:inline">Send</span>
                     </button>
                   </div>
                 </div>
@@ -363,7 +363,7 @@ export default function CarouselSection({
                     </Button>
                   )}
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 sm:gap-2">
                   <Button
                     onClick={() => navigator.clipboard.writeText(cards[currentCardIndex].content).then(() => {
                       const toast = (window as any).toast;
@@ -371,34 +371,35 @@ export default function CarouselSection({
                     })}
                     variant="outline"
                     size="icon"
-                    className="bg-white text-gray-700 hover:bg-gray-50"
+                    className="bg-white text-gray-700 hover:bg-gray-50 h-8 w-8 sm:h-9 sm:w-9"
                   >
-                    <Copy className="w-4 h-4" />
+                    <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                   </Button>
                   {onSchedule && (
                     <Button
                       onClick={() => onSchedule(cards[currentCardIndex])}
                       variant="outline"
                       size="icon"
-                      className="bg-white text-gray-700 hover:bg-gray-50"
+                      className="bg-white text-gray-700 hover:bg-gray-50 h-8 w-8 sm:h-9 sm:w-9"
                     >
-                      <Calendar className="w-4 h-4" />
+                      <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
                     </Button>
                   )}
                   <Button
                     onClick={() => onEdit?.(cards[currentCardIndex])}
                     variant="outline"
-                    className="bg-white text-gray-700 hover:bg-gray-50"
+                    className="bg-white text-gray-700 hover:bg-gray-50 px-2 sm:px-4 text-xs sm:text-sm h-8 sm:h-9"
                   >
                     Edit
                   </Button>
                   {onPostNow && (
                     <Button
                       onClick={() => onPostNow(cards[currentCardIndex])}
-                      className="bg-primary text-white hover:bg-primary/90"
+                      className="bg-primary text-white hover:bg-primary/90 px-2 sm:px-4 text-xs sm:text-sm h-8 sm:h-9"
                     >
-                      <Send className="w-4 h-4 mr-2" />
-                      Post Now
+                      <Send className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                      <span className="hidden sm:inline">Post Now</span>
+                      <span className="sm:hidden">Post</span>
                     </Button>
                   )}
                 </div>
@@ -443,39 +444,39 @@ export default function CarouselSection({
             {/* Bottom Section - Engagement + Actions */}
             <div className="mt-auto">
               {/* Engagement Stats */}
-              <div className="px-4 py-2 flex items-center justify-between text-xs text-gray-500">
+              <div className="px-2 sm:px-4 py-2 flex items-center justify-between text-xs text-gray-500">
                 <div className="flex items-center gap-1">
                   <div className="flex -space-x-1">
-                    <ThumbIcon className="w-4 h-4" />
-                    <HeartIcon className="w-4 h-4" />
-                    <ClapIcon className="w-4 h-4" />
+                    <ThumbIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <HeartIcon className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <ClapIcon className="w-3 h-3 sm:w-4 sm:h-4" />
                   </div>
-                  <span className="ml-1">127</span>
+                  <span className="ml-1 text-[10px] sm:text-xs">127</span>
                 </div>
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-1 sm:gap-3 text-[10px] sm:text-xs">
                   <span>23 comments</span>
-                  <span>•</span>
+                  <span className="hidden xs:inline">•</span>
                   <span>8 reposts</span>
                 </div>
               </div>
 
               {/* Action Buttons */}
-              <div className="px-2 py-1 flex items-center justify-between sm:justify-around border-t border-gray-200">
-                <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
+              <div className="px-1 sm:px-2 py-1 flex items-center justify-around border-t border-gray-200">
+                <button className="flex items-center gap-1 px-1 sm:px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
                   <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="text-xs sm:text-sm font-medium">Like</span>
+                  <span className="text-xs sm:text-sm font-medium hidden xs:inline">Like</span>
                 </button>
-                <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                <button className="flex items-center gap-1 px-1 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
                   <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="text-xs sm:text-sm font-medium">Comment</span>
+                  <span className="text-xs sm:text-sm font-medium hidden xs:inline">Comment</span>
                 </button>
-                <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                <button className="flex items-center gap-1 px-1 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
                   <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="text-xs sm:text-sm font-medium">Repost</span>
+                  <span className="text-xs sm:text-sm font-medium hidden xs:inline">Repost</span>
                 </button>
-                <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                <button className="flex items-center gap-1 px-1 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
                   <Send className="w-4 h-4 sm:w-5 sm:h-5" />
-                  <span className="text-xs sm:text-sm font-medium">Send</span>
+                  <span className="text-xs sm:text-sm font-medium hidden xs:inline">Send</span>
                 </button>
               </div>
             </div>

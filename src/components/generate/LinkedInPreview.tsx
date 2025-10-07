@@ -218,7 +218,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   };
   
   const getPreviewWidth = () => {
-    return viewSize === 'mobile' ? 'w-[375px]' : 'w-[700px]';
+    return viewSize === 'mobile' ? 'w-full max-w-[375px]' : 'w-full max-w-[700px]';
   };
   
   const getTruncatedContent = () => {
@@ -637,7 +637,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
         {/* Skeleton LinkedIn Post */}
         <div className="flex-1 overflow-y-auto bg-gray-100 relative">
           <div className="p-4 flex justify-center items-start">
-            <div className="bg-white border border-gray-200 rounded-lg w-[700px]">
+            <div className="bg-white border border-gray-200 rounded-lg w-full max-w-[700px]">
               {/* Post Header Skeleton */}
               <div className="p-4">
                 <div className="flex items-start justify-between">
@@ -772,7 +772,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
 
       {/* LinkedIn Post Preview */}
       <div ref={previewContainerRef} className="flex-1 overflow-y-auto bg-gray-100 relative custom-scrollbar">
-        <div className="p-4 flex justify-center items-start gap-2 relative min-h-full">
+        <div className="p-2 sm:p-4 flex justify-center items-start gap-2 relative min-h-full">
           {/* Post Card with responsive width */}
           <div className={`bg-white border border-gray-200 rounded-lg ${getPreviewWidth()}`}>
             {/* Post Header */}
@@ -1074,8 +1074,8 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       </div>
 
       {/* Schedule Post Button or Connect LinkedIn - Fixed to bottom right of preview container */}
-      <div className="absolute bottom-4 right-4 z-10 p-2">
-        <div className="flex gap-3">
+      <div className="absolute bottom-2 sm:bottom-4 right-2 sm:right-4 z-10 p-1 sm:p-2">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <Button
             onClick={() => {
               navigator.clipboard.writeText(postContent);
@@ -1100,25 +1100,25 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
               </Button>
               <Button
                 onClick={handlePostNow}
-                className="flex items-center gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-6 py-3"
+                className="flex items-center justify-center gap-1 sm:gap-2 bg-primary text-white hover:bg-primary/90 shadow-xl rounded-lg px-3 sm:px-6 py-2 sm:py-3 text-xs sm:text-base whitespace-nowrap"
                 disabled={isPublishing}
               >
                 {isPublishing ? (
                   <>
-                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <Loader2 className="w-3 h-3 sm:w-4 sm:h-4 animate-spin" />
                     <span className="font-medium">Publishing...</span>
                   </>
                 ) : (
                   <>
-                    <Send className="w-4 h-4" />
-                    <span className="font-medium">Post Now</span>
+                    <Send className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="font-medium">Post</span>
                   </>
                 )}
               </Button>
             </>
           ) : (
             <ConnectLinkedInButton
-              className="shadow-xl rounded-lg px-6 py-3"
+              className="shadow-xl rounded-lg px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base"
               onSuccess={() => window.location.reload()}
             />
           )}
