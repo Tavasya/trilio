@@ -293,22 +293,22 @@ export default function CarouselSection({
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="px-2 py-1 flex items-center justify-around border-t border-gray-200">
-                    <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
-                      <ThumbsUp className="w-5 h-5" />
-                      <span className="text-sm font-medium">Like</span>
+                  <div className="px-2 py-1 flex items-center justify-between sm:justify-around border-t border-gray-200">
+                    <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
+                      <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="text-xs sm:text-sm font-medium">Like</span>
                     </button>
-                    <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                      <MessageCircle className="w-5 h-5" />
-                      <span className="text-sm font-medium">Comment</span>
+                    <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                      <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="text-xs sm:text-sm font-medium">Comment</span>
                     </button>
-                    <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                      <Share2 className="w-5 h-5" />
-                      <span className="text-sm font-medium">Repost</span>
+                    <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                      <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="text-xs sm:text-sm font-medium">Repost</span>
                     </button>
-                    <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                      <Send className="w-5 h-5" />
-                      <span className="text-sm font-medium">Send</span>
+                    <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                      <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="text-xs sm:text-sm font-medium">Send</span>
                     </button>
                   </div>
                 </div>
@@ -460,22 +460,22 @@ export default function CarouselSection({
               </div>
 
               {/* Action Buttons */}
-              <div className="px-2 py-1 flex items-center justify-around border-t border-gray-200">
-                <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
-                  <ThumbsUp className="w-5 h-5" />
-                  <span className="text-sm font-medium">Like</span>
+              <div className="px-2 py-1 flex items-center justify-between sm:justify-around border-t border-gray-200">
+                <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
+                  <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs sm:text-sm font-medium">Like</span>
                 </button>
-                <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                  <MessageCircle className="w-5 h-5" />
-                  <span className="text-sm font-medium">Comment</span>
+                <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                  <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs sm:text-sm font-medium">Comment</span>
                 </button>
-                <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                  <Share2 className="w-5 h-5" />
-                  <span className="text-sm font-medium">Repost</span>
+                <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                  <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs sm:text-sm font-medium">Repost</span>
                 </button>
-                <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                  <Send className="w-5 h-5" />
-                  <span className="text-sm font-medium">Send</span>
+                <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                  <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                  <span className="text-xs sm:text-sm font-medium">Send</span>
                 </button>
               </div>
             </div>
@@ -635,22 +635,22 @@ export default function CarouselSection({
                     </div>
                   </div>
 
-                  <div className="px-2 py-1 flex items-center justify-around border-t border-gray-200">
-                    <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
-                      <ThumbsUp className="w-5 h-5" />
-                      <span className="text-sm font-medium">Like</span>
+                  <div className="px-2 py-1 flex items-center justify-between sm:justify-around border-t border-gray-200">
+                    <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
+                      <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="text-xs sm:text-sm font-medium">Like</span>
                     </button>
-                    <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                      <MessageCircle className="w-5 h-5" />
-                      <span className="text-sm font-medium">Comment</span>
+                    <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                      <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="text-xs sm:text-sm font-medium">Comment</span>
                     </button>
-                    <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                      <Share2 className="w-5 h-5" />
-                      <span className="text-sm font-medium">Repost</span>
+                    <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                      <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="text-xs sm:text-sm font-medium">Repost</span>
                     </button>
-                    <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                      <Send className="w-5 h-5" />
-                      <span className="text-sm font-medium">Send</span>
+                    <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                      <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                      <span className="text-xs sm:text-sm font-medium">Send</span>
                     </button>
                   </div>
                 </div>

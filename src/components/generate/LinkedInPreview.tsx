@@ -695,18 +695,9 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       <div className="p-4">
         <div className="bg-transparent rounded-lg p-2 min-h-[48px] flex items-center">
           <div className="flex items-center justify-between w-full relative">
-            {showToggle && (
-              <Button
-                onClick={onToggleView}
-                variant="outline"
-                size="sm"
-                className="lg:hidden"
-              >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Chat
-              </Button>
-            )}
-
+            {/* Left side - Empty spacer */}
+            <div className="w-20"></div>
+            
             {/* Desktop/Mobile Toggle - Centered */}
             <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-4">
               <button
@@ -762,6 +753,19 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                 )}
               </div>
             )} */}
+            
+            {/* Chat Toggle Button - Right side */}
+            {showToggle && (
+              <Button
+                onClick={onToggleView}
+                variant="outline"
+                size="sm"
+                className="lg:hidden"
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Chat
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -937,24 +941,24 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             </div>
 
             {/* Action Buttons */}
-            <div className="px-2 py-1 flex items-center justify-around border-t border-gray-200">
+            <div className="px-2 py-1 flex items-center justify-between sm:justify-around border-t border-gray-200">
               <button
-                className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600"
               >
-                <ThumbsUp className="w-5 h-5" />
-                <span className="text-sm font-medium">Like</span>
+                <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm font-medium">Like</span>
               </button>
-              <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                <MessageCircle className="w-5 h-5" />
-                <span className="text-sm font-medium">Comment</span>
+              <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm font-medium">Comment</span>
               </button>
-              <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                <Share2 className="w-5 h-5" />
-                <span className="text-sm font-medium">Repost</span>
+              <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm font-medium">Repost</span>
               </button>
-              <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                <Send className="w-5 h-5" />
-                <span className="text-sm font-medium">Send</span>
+              <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm font-medium">Send</span>
               </button>
             </div>
           </div>
