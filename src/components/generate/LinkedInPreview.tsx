@@ -41,7 +41,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
   ) || false;
 
   const [viewSize, setViewSize] = useState<ViewSize>('desktop');
-  const [showFullContent, setShowFullContent] = useState(false);
+  const [showFullContent, setShowFullContent] = useState(true);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [imagePreviewUrls, setImagePreviewUrls] = useState<string[]>([]);
