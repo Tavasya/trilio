@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 
-const ONBOARDING_KEY = 'trilio_onboarding_completed';
+// const ONBOARDING_KEY = 'trilio_onboarding_completed';
 
 interface OnboardingState {
   currentStep: number;

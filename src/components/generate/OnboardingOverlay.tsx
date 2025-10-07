@@ -150,7 +150,6 @@ export default function OnboardingOverlay({
 
   // Calculate clip path for cutout around the element
   const padding = 8;
-  const borderRadius = 8;
 
   const clipPath = `polygon(
     evenodd,

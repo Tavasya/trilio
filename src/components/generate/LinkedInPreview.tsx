@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, X, MessageSquare, Bold, Italic, List, ImagePlus, Edit3, Copy, Loader2 } from 'lucide-react';
+import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, X, MessageSquare, List, ImagePlus, Edit3, Copy, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
 import ScheduleModal from './ScheduleModal';
@@ -287,87 +287,87 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
     }
   }, [isEditingContent]);
 
-  const applyBoldFormatting = () => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
+  // const applyBoldFormatting = () => {
+  //   const textarea = textareaRef.current;
+  //   if (!textarea) return;
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = postContent.substring(start, end);
+  //   const start = textarea.selectionStart;
+  //   const end = textarea.selectionEnd;
+  //   const selectedText = postContent.substring(start, end);
 
-    if (!selectedText) {
-      toast.error('Please select text to format', { position: 'top-right' });
-      return;
-    }
+  //   if (!selectedText) {
+  //     toast.error('Please select text to format', { position: 'top-right' });
+  //     return;
+  //   }
 
-    // Convert to Unicode Mathematical Bold (using fromCodePoint for supplementary plane)
-    const boldText = selectedText.split('').map(char => {
-      const code = char.charCodeAt(0);
-      // A-Z: 0x1D400 - 0x1D419
-      if (code >= 65 && code <= 90) {
-        return String.fromCodePoint(0x1D400 + (code - 65));
-      }
-      // a-z: 0x1D41A - 0x1D433
-      if (code >= 97 && code <= 122) {
-        return String.fromCodePoint(0x1D41A + (code - 97));
-      }
-      // 0-9: 0x1D7CE - 0x1D7D7
-      if (code >= 48 && code <= 57) {
-        return String.fromCodePoint(0x1D7CE + (code - 48));
-      }
-      return char;
-    }).join('');
+  //   // Convert to Unicode Mathematical Bold (using fromCodePoint for supplementary plane)
+  //   const boldText = selectedText.split('').map(char => {
+  //     const code = char.charCodeAt(0);
+  //     // A-Z: 0x1D400 - 0x1D419
+  //     if (code >= 65 && code <= 90) {
+  //       return String.fromCodePoint(0x1D400 + (code - 65));
+  //     }
+  //     // a-z: 0x1D41A - 0x1D433
+  //     if (code >= 97 && code <= 122) {
+  //       return String.fromCodePoint(0x1D41A + (code - 97));
+  //     }
+  //     // 0-9: 0x1D7CE - 0x1D7D7
+  //     if (code >= 48 && code <= 57) {
+  //       return String.fromCodePoint(0x1D7CE + (code - 48));
+  //     }
+  //     return char;
+  //   }).join('');
 
-    const beforeText = postContent.substring(0, start);
-    const afterText = postContent.substring(end);
-    const newContent = beforeText + boldText + afterText;
+  //   const beforeText = postContent.substring(0, start);
+  //   const afterText = postContent.substring(end);
+  //   const newContent = beforeText + boldText + afterText;
 
-    handleContentChange(newContent);
+  //   handleContentChange(newContent);
 
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start, start + boldText.length);
-    }, 0);
-  };
+  //   setTimeout(() => {
+  //     textarea.focus();
+  //     textarea.setSelectionRange(start, start + boldText.length);
+  //   }, 0);
+  // };
 
-  const applyItalicFormatting = () => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
+  // const applyItalicFormatting = () => {
+  //   const textarea = textareaRef.current;
+  //   if (!textarea) return;
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = postContent.substring(start, end);
+  //   const start = textarea.selectionStart;
+  //   const end = textarea.selectionEnd;
+  //   const selectedText = postContent.substring(start, end);
 
-    if (!selectedText) {
-      toast.error('Please select text to format', { position: 'top-right' });
-      return;
-    }
+  //   if (!selectedText) {
+  //     toast.error('Please select text to format', { position: 'top-right' });
+  //     return;
+  //   }
 
-    // Convert to Unicode Mathematical Italic (using fromCodePoint for supplementary plane)
-    const italicText = selectedText.split('').map(char => {
-      const code = char.charCodeAt(0);
-      // A-Z: 0x1D434 - 0x1D44D
-      if (code >= 65 && code <= 90) {
-        return String.fromCodePoint(0x1D434 + (code - 65));
-      }
-      // a-z: 0x1D44E - 0x1D467
-      if (code >= 97 && code <= 122) {
-        return String.fromCodePoint(0x1D44E + (code - 97));
-      }
-      return char;
-    }).join('');
+  //   // Convert to Unicode Mathematical Italic (using fromCodePoint for supplementary plane)
+  //   const italicText = selectedText.split('').map(char => {
+  //     const code = char.charCodeAt(0);
+  //     // A-Z: 0x1D434 - 0x1D44D
+  //     if (code >= 65 && code <= 90) {
+  //       return String.fromCodePoint(0x1D434 + (code - 65));
+  //     }
+  //     // a-z: 0x1D44E - 0x1D467
+  //     if (code >= 97 && code <= 122) {
+  //       return String.fromCodePoint(0x1D44E + (code - 97));
+  //     }
+  //     return char;
+  //   }).join('');
 
-    const beforeText = postContent.substring(0, start);
-    const afterText = postContent.substring(end);
-    const newContent = beforeText + italicText + afterText;
+  //   const beforeText = postContent.substring(0, start);
+  //   const afterText = postContent.substring(end);
+  //   const newContent = beforeText + italicText + afterText;
 
-    handleContentChange(newContent);
+  //   handleContentChange(newContent);
 
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start, start + italicText.length);
-    }, 0);
-  };
+  //   setTimeout(() => {
+  //     textarea.focus();
+  //     textarea.setSelectionRange(start, start + italicText.length);
+  //   }, 0);
+  // };
 
   const insertBulletList = () => {
     const textarea = textareaRef.current;
