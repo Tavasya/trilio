@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, X, MessageSquare, Bold, Italic, List, ImagePlus, Edit3, Copy, Loader2 } from 'lucide-react';
+import { MessageCircle, Share2, Send, MoreHorizontal, Monitor, Smartphone, ThumbsUp, Calendar, X, MessageSquare, List, ImagePlus, Edit3, Copy, Loader2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Skeleton } from '../ui/skeleton';
 import ScheduleModal from './ScheduleModal';
@@ -287,87 +287,87 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
     }
   }, [isEditingContent]);
 
-  const applyBoldFormatting = () => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
+  // const applyBoldFormatting = () => {
+  //   const textarea = textareaRef.current;
+  //   if (!textarea) return;
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = postContent.substring(start, end);
+  //   const start = textarea.selectionStart;
+  //   const end = textarea.selectionEnd;
+  //   const selectedText = postContent.substring(start, end);
 
-    if (!selectedText) {
-      toast.error('Please select text to format', { position: 'top-right' });
-      return;
-    }
+  //   if (!selectedText) {
+  //     toast.error('Please select text to format', { position: 'top-right' });
+  //     return;
+  //   }
 
-    // Convert to Unicode Mathematical Bold (using fromCodePoint for supplementary plane)
-    const boldText = selectedText.split('').map(char => {
-      const code = char.charCodeAt(0);
-      // A-Z: 0x1D400 - 0x1D419
-      if (code >= 65 && code <= 90) {
-        return String.fromCodePoint(0x1D400 + (code - 65));
-      }
-      // a-z: 0x1D41A - 0x1D433
-      if (code >= 97 && code <= 122) {
-        return String.fromCodePoint(0x1D41A + (code - 97));
-      }
-      // 0-9: 0x1D7CE - 0x1D7D7
-      if (code >= 48 && code <= 57) {
-        return String.fromCodePoint(0x1D7CE + (code - 48));
-      }
-      return char;
-    }).join('');
+  //   // Convert to Unicode Mathematical Bold (using fromCodePoint for supplementary plane)
+  //   const boldText = selectedText.split('').map(char => {
+  //     const code = char.charCodeAt(0);
+  //     // A-Z: 0x1D400 - 0x1D419
+  //     if (code >= 65 && code <= 90) {
+  //       return String.fromCodePoint(0x1D400 + (code - 65));
+  //     }
+  //     // a-z: 0x1D41A - 0x1D433
+  //     if (code >= 97 && code <= 122) {
+  //       return String.fromCodePoint(0x1D41A + (code - 97));
+  //     }
+  //     // 0-9: 0x1D7CE - 0x1D7D7
+  //     if (code >= 48 && code <= 57) {
+  //       return String.fromCodePoint(0x1D7CE + (code - 48));
+  //     }
+  //     return char;
+  //   }).join('');
 
-    const beforeText = postContent.substring(0, start);
-    const afterText = postContent.substring(end);
-    const newContent = beforeText + boldText + afterText;
+  //   const beforeText = postContent.substring(0, start);
+  //   const afterText = postContent.substring(end);
+  //   const newContent = beforeText + boldText + afterText;
 
-    handleContentChange(newContent);
+  //   handleContentChange(newContent);
 
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start, start + boldText.length);
-    }, 0);
-  };
+  //   setTimeout(() => {
+  //     textarea.focus();
+  //     textarea.setSelectionRange(start, start + boldText.length);
+  //   }, 0);
+  // };
 
-  const applyItalicFormatting = () => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
+  // const applyItalicFormatting = () => {
+  //   const textarea = textareaRef.current;
+  //   if (!textarea) return;
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = postContent.substring(start, end);
+  //   const start = textarea.selectionStart;
+  //   const end = textarea.selectionEnd;
+  //   const selectedText = postContent.substring(start, end);
 
-    if (!selectedText) {
-      toast.error('Please select text to format', { position: 'top-right' });
-      return;
-    }
+  //   if (!selectedText) {
+  //     toast.error('Please select text to format', { position: 'top-right' });
+  //     return;
+  //   }
 
-    // Convert to Unicode Mathematical Italic (using fromCodePoint for supplementary plane)
-    const italicText = selectedText.split('').map(char => {
-      const code = char.charCodeAt(0);
-      // A-Z: 0x1D434 - 0x1D44D
-      if (code >= 65 && code <= 90) {
-        return String.fromCodePoint(0x1D434 + (code - 65));
-      }
-      // a-z: 0x1D44E - 0x1D467
-      if (code >= 97 && code <= 122) {
-        return String.fromCodePoint(0x1D44E + (code - 97));
-      }
-      return char;
-    }).join('');
+  //   // Convert to Unicode Mathematical Italic (using fromCodePoint for supplementary plane)
+  //   const italicText = selectedText.split('').map(char => {
+  //     const code = char.charCodeAt(0);
+  //     // A-Z: 0x1D434 - 0x1D44D
+  //     if (code >= 65 && code <= 90) {
+  //       return String.fromCodePoint(0x1D434 + (code - 65));
+  //     }
+  //     // a-z: 0x1D44E - 0x1D467
+  //     if (code >= 97 && code <= 122) {
+  //       return String.fromCodePoint(0x1D44E + (code - 97));
+  //     }
+  //     return char;
+  //   }).join('');
 
-    const beforeText = postContent.substring(0, start);
-    const afterText = postContent.substring(end);
-    const newContent = beforeText + italicText + afterText;
+  //   const beforeText = postContent.substring(0, start);
+  //   const afterText = postContent.substring(end);
+  //   const newContent = beforeText + italicText + afterText;
 
-    handleContentChange(newContent);
+  //   handleContentChange(newContent);
 
-    setTimeout(() => {
-      textarea.focus();
-      textarea.setSelectionRange(start, start + italicText.length);
-    }, 0);
-  };
+  //   setTimeout(() => {
+  //     textarea.focus();
+  //     textarea.setSelectionRange(start, start + italicText.length);
+  //   }, 0);
+  // };
 
   const insertBulletList = () => {
     const textarea = textareaRef.current;
@@ -695,18 +695,9 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
       <div className="p-4">
         <div className="bg-transparent rounded-lg p-2 min-h-[48px] flex items-center">
           <div className="flex items-center justify-between w-full relative">
-            {showToggle && (
-              <Button
-                onClick={onToggleView}
-                variant="outline"
-                size="sm"
-                className="lg:hidden"
-              >
-                <MessageSquare className="w-4 h-4 mr-2" />
-                Chat
-              </Button>
-            )}
-
+            {/* Left side - Empty spacer */}
+            <div className="w-20"></div>
+            
             {/* Desktop/Mobile Toggle - Centered */}
             <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 flex items-center gap-4">
               <button
@@ -762,6 +753,19 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
                 )}
               </div>
             )} */}
+            
+            {/* Chat Toggle Button - Right side */}
+            {showToggle && (
+              <Button
+                onClick={onToggleView}
+                variant="outline"
+                size="sm"
+                className="lg:hidden"
+              >
+                <MessageSquare className="w-4 h-4 mr-2" />
+                Chat
+              </Button>
+            )}
           </div>
         </div>
       </div>
@@ -937,31 +941,31 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             </div>
 
             {/* Action Buttons */}
-            <div className="px-2 py-1 flex items-center justify-around border-t border-gray-200">
+            <div className="px-2 py-1 flex items-center justify-between sm:justify-around border-t border-gray-200">
               <button
-                className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600"
+                className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600"
               >
-                <ThumbsUp className="w-5 h-5" />
-                <span className="text-sm font-medium">Like</span>
+                <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm font-medium">Like</span>
               </button>
-              <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                <MessageCircle className="w-5 h-5" />
-                <span className="text-sm font-medium">Comment</span>
+              <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm font-medium">Comment</span>
               </button>
-              <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                <Share2 className="w-5 h-5" />
-                <span className="text-sm font-medium">Repost</span>
+              <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm font-medium">Repost</span>
               </button>
-              <button className="flex items-center gap-2 px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
-                <Send className="w-5 h-5" />
-                <span className="text-sm font-medium">Send</span>
+              <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 text-gray-600 transition-colors">
+                <Send className="w-4 h-4 sm:w-5 sm:h-5" />
+                <span className="text-xs sm:text-sm font-medium">Send</span>
               </button>
             </div>
           </div>
 
           {/* Formatting Toolbar - Right side */}
           <div className="sticky top-0 flex flex-col gap-1 p-1">
-            <button
+            {/* <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={applyBoldFormatting}
               className="p-2 hover:bg-gray-200 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent"
@@ -979,7 +983,7 @@ export default function LinkedInPreview({ onToggleView, showToggle }: LinkedInPr
             >
               <Italic className="w-4 h-4 text-gray-700" />
             </button>
-            <div className="h-px w-6 bg-gray-300 my-1" />
+            <div className="h-px w-6 bg-gray-300 my-1" /> */}
             <button
               onMouseDown={(e) => e.preventDefault()}
               onClick={insertBulletList}

@@ -2,10 +2,12 @@ import { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import ChatInterface from '../../components/generate/ChatInterface';
 import LinkedInPreview from '../../components/generate/LinkedInPreview';
+import OnboardingOverlay from '../../components/generate/OnboardingOverlay';
 import { useAuth } from '@clerk/react-router';
 import { toast } from 'sonner';
 import { useAppDispatch } from '@/store/hooks';
 import { loadPostData, startNewConversation } from '@/features/chat/chatSlice';
+import { useOnboarding } from '@/hooks/useOnboarding';
 
 export default function Generate() {
   const [searchParams] = useSearchParams();
@@ -15,6 +17,7 @@ export default function Generate() {
   const postId = searchParams.get('postId');
   const [mobileView, setMobileView] = useState<'chat' | 'preview'>('chat');
   const [currentPostId, setCurrentPostId] = useState<string | null>(postId);
+  const { currentStep, isOpen, nextStep, prevStep, closeOnboarding } = useOnboarding();
 
   useEffect(() => {
     const initializePage = async () => {
@@ -54,7 +57,7 @@ export default function Generate() {
   }, [postId, getToken, dispatch, navigate]);
 
   return (
-    <div className="h-full bg-white flex flex-col">
+    <div className="h-full bg-white flex flex-col relative">
       {/* Desktop Layout */}
       <div className="hidden lg:flex h-full overflow-hidden">
         {/* Chat Interface - 35% width */}
@@ -87,6 +90,15 @@ export default function Generate() {
           </div>
         )}
       </div>
+
+      {/* Onboarding Overlay */}
+      <OnboardingOverlay
+        currentStep={currentStep}
+        isOpen={isOpen}
+        onNext={nextStep}
+        onPrev={prevStep}
+        onClose={closeOnboarding}
+      />
     </div>
   );
 }

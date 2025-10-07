@@ -122,10 +122,10 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
       />
 
       {/* Modal */}
-      <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] overflow-y-auto">
-        <div className="p-6">
-          {/* Header */}
-          <div className="flex items-start justify-between pb-4 border-b border-gray-200">
+      <div className="relative bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[85vh] flex flex-col">
+        {/* Header - Fixed */}
+        <div className="flex-shrink-0 p-6 pb-4">
+          <div className="flex items-start justify-between">
             <div className="flex-1 pr-4">
               <h2 className="text-lg font-semibold text-gray-900">
                 {step === 'icp' ? 'Choose Your Persona' : 'Choose a Hook Type'}
@@ -144,90 +144,92 @@ export default function HooksModal({ isOpen, onClose, onApply }: HooksModalProps
               <X className="w-5 h-5 text-gray-500" />
             </button>
           </div>
+        </div>
 
-          {/* Content */}
-          <div className="mt-6">
-            {step === 'icp' ? (
-              /* ICP Selection */
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <button
-                  onClick={() => handleICPSelect('job-seekers')}
-                  className="group relative bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all duration-200 hover:shadow-lg text-left"
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2.5 bg-blue-100 rounded-lg">
-                      <Briefcase className="w-5 h-5 text-blue-600" />
-                    </div>
-                    <h3 className="text-base font-semibold text-gray-900">Job Seekers</h3>
+        {/* Content - Scrollable */}
+        <div className="flex-1 overflow-y-auto px-6 pb-4">
+          {step === 'icp' ? (
+            /* ICP Selection */
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <button
+                onClick={() => handleICPSelect('job-seekers')}
+                className="group relative bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all duration-200 hover:shadow-lg text-left"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2.5 bg-blue-100 rounded-lg">
+                    <Briefcase className="w-5 h-5 text-blue-600" />
                   </div>
-                  <p className="text-sm text-gray-600">
-                    Optimize your content to attract recruiters and land your dream job
-                  </p>
-                </button>
+                  <h3 className="text-base font-semibold text-gray-900">Job Seekers</h3>
+                </div>
+                <p className="text-sm text-gray-600">
+                  Optimize your content to attract recruiters and land your dream job
+                </p>
+              </button>
 
-                <button
-                  onClick={() => handleICPSelect('engagement')}
-                  className="group relative bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all duration-200 hover:shadow-lg text-left"
-                >
-                  <div className="flex items-center gap-3 mb-3">
-                    <div className="p-2.5 bg-purple-100 rounded-lg">
-                      <TrendingUp className="w-5 h-5 text-purple-600" />
-                    </div>
-                    <h3 className="text-base font-semibold text-gray-900">Engagement</h3>
+              <button
+                onClick={() => handleICPSelect('engagement')}
+                className="group relative bg-white border-2 border-gray-200 rounded-xl p-6 hover:border-primary transition-all duration-200 hover:shadow-lg text-left"
+              >
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="p-2.5 bg-purple-100 rounded-lg">
+                    <TrendingUp className="w-5 h-5 text-purple-600" />
                   </div>
-                  <p className="text-sm text-gray-600">
-                    Create viral content that drives comments, shares, and connections
-                  </p>
+                  <h3 className="text-base font-semibold text-gray-900">Engagement</h3>
+                </div>
+                <p className="text-sm text-gray-600">
+                  Create viral content that drives comments, shares, and connections
+                </p>
+              </button>
+            </div>
+          ) : (
+            /* Hook Categories */
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {currentHooks.map((hook) => (
+                <button
+                  key={hook.id}
+                  onClick={() => handleHookSelect(hook.id as HookType)}
+                  className={`relative bg-white border-2 rounded-xl p-5 text-left transition-all duration-200 h-full flex flex-col ${
+                    selectedHook === hook.id
+                      ? 'border-green-500 bg-green-50/50'
+                      : 'border-gray-200 hover:border-green-500 hover:shadow-lg'
+                  }`}
+                >
+                  {/* Gradient Preview */}
+                  <div className={`h-16 bg-gradient-to-r ${hook.gradient} rounded-lg mb-3 flex items-center justify-center flex-shrink-0`}>
+                    {hook.id === 'question' && <MessageCircle className="w-5 h-5 text-white" />}
+                    {hook.id === 'story' && <Lightbulb className="w-5 h-5 text-white" />}
+                    {hook.id === 'controversial' && <Target className="w-5 h-5 text-white" />}
+                    {hook.id === 'data-driven' && <BarChart3 className="w-5 h-5 text-white" />}
+                    {hook.id === 'personal' && <Briefcase className="w-5 h-5 text-white" />}
+                    {hook.id === 'how-to' && <Lightbulb className="w-5 h-5 text-white" />}
+                  </div>
+
+                  {/* Title */}
+                  <h3 className="text-base font-semibold text-gray-900 mb-2">{hook.title}</h3>
+
+                  {/* Description */}
+                  <p className="text-sm text-gray-600 mb-3 leading-relaxed flex-grow">{hook.description}</p>
+
+                  {/* Used By */}
+                  <div className="mt-auto">
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Used By</p>
+                    <div className="flex flex-wrap gap-1.5">
+                      {hook.usedBy.map((tag, idx) => (
+                        <span key={idx} className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
                 </button>
-              </div>
-            ) : (
-              /* Hook Categories */
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {currentHooks.map((hook) => (
-                  <button
-                    key={hook.id}
-                    onClick={() => handleHookSelect(hook.id as HookType)}
-                    className={`relative bg-white border-2 rounded-xl p-5 text-left transition-all duration-200 h-full flex flex-col ${
-                      selectedHook === hook.id
-                        ? 'border-green-500 bg-green-50/50'
-                        : 'border-gray-200 hover:border-green-500 hover:shadow-lg'
-                    }`}
-                  >
-                    {/* Gradient Preview */}
-                    <div className={`h-16 bg-gradient-to-r ${hook.gradient} rounded-lg mb-3 flex items-center justify-center flex-shrink-0`}>
-                      {hook.id === 'question' && <MessageCircle className="w-5 h-5 text-white" />}
-                      {hook.id === 'story' && <Lightbulb className="w-5 h-5 text-white" />}
-                      {hook.id === 'controversial' && <Target className="w-5 h-5 text-white" />}
-                      {hook.id === 'data-driven' && <BarChart3 className="w-5 h-5 text-white" />}
-                      {hook.id === 'personal' && <Briefcase className="w-5 h-5 text-white" />}
-                      {hook.id === 'how-to' && <Lightbulb className="w-5 h-5 text-white" />}
-                    </div>
+              ))}
+            </div>
+          )}
+        </div>
 
-                    {/* Title */}
-                    <h3 className="text-base font-semibold text-gray-900 mb-2">{hook.title}</h3>
-
-                    {/* Description */}
-                    <p className="text-sm text-gray-600 mb-3 leading-relaxed flex-grow">{hook.description}</p>
-
-                    {/* Used By */}
-                    <div className="mt-auto">
-                      <p className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">Used By</p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {hook.usedBy.map((tag, idx) => (
-                          <span key={idx} className="px-2.5 py-1 bg-gray-100 text-gray-700 text-xs rounded-full">
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
-          {/* Footer */}
-          <div className="mt-6 pt-4 border-t border-gray-200 flex items-center justify-between">
+        {/* Footer - Fixed */}
+        <div className="flex-shrink-0 p-6 pt-4 border-t border-gray-200 bg-white rounded-b-2xl">
+          <div className="flex items-center justify-between">
             <button
               onClick={step === 'icp' ? handleClose : handleBack}
               className="px-5 py-2 bg-gray-100 text-gray-700 text-sm rounded-lg hover:bg-gray-200 transition-colors"

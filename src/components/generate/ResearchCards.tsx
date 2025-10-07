@@ -97,7 +97,7 @@ export default function ResearchCards({ cards }: ResearchCardsProps) {
               </div>
 
               {/* Action Buttons */}
-              <div className="px-2 py-1 flex items-center justify-around border-t border-gray-200">
+              <div className="px-2 py-1 flex items-center justify-between border-t border-gray-200">
                 <button className="flex items-center gap-1 px-2 py-1.5 rounded hover:bg-gray-100 transition-colors text-gray-600">
                   <ThumbsUp className="w-4 h-4" />
                   <span className="text-xs font-medium">Like</span>
