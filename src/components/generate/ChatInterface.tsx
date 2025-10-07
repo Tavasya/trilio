@@ -426,10 +426,10 @@ export default function ChatInterface({ postId, onToggleView, showToggle }: Chat
               <button
                 onClick={() => dispatch(toggleEditMode())}
                 title={isEditMode ? 'Edit Mode: ON - AI will modify content' : 'Edit Mode: OFF - AI will discuss only'}
-                className={`h-8 w-8 p-0 flex items-center justify-center rounded transition-colors ${
+                className={`h-8 w-8 p-0 flex items-center justify-center rounded transition-all ${
                   isEditMode
-                    ? 'text-primary bg-primary/10'
-                    : 'text-gray-500 hover:text-gray-700'
+                    ? 'text-white bg-primary shadow-md ring-2 ring-primary/20'
+                    : 'text-gray-500 bg-gray-100 hover:bg-gray-200 hover:text-gray-700'
                 }`}
                 data-onboarding="edit-button"
               >
