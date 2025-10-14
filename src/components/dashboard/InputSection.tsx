@@ -1,10 +1,9 @@
 import { Loader2, Target, ArrowUp, X, AlignLeft } from 'lucide-react';
 
 interface SelectedHook {
-  icp: string;
-  hookType: string;
+  id: number;
   title: string;
-  gradient: string;
+  template?: string;
 }
 
 type PostLength = 'small' | 'medium' | 'large';
@@ -94,8 +93,8 @@ export default function InputSection({
             </button>
 
             {selectedHook && (
-              <div className={`flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r ${selectedHook.gradient} rounded-lg whitespace-nowrap flex-shrink-0`}>
-                <span className="text-sm text-white font-medium truncate max-w-[120px]">{selectedHook.title}</span>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-900 rounded-lg flex-shrink-0">
+                <span className="text-sm text-white font-medium">{selectedHook.title}</span>
                 <button
                   onClick={onHookRemove}
                   className="hover:bg-white/20 rounded transition-colors p-0.5 flex-shrink-0"

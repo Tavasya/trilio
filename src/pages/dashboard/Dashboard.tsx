@@ -77,12 +77,12 @@ const Dashboard = () => {
     };
 
     const charLimitText = `Keep the post under ${charLimits[postLength]} characters. `;
-    const request: { topic?: string; draft_content?: string; hook_style?: string } = {
+    const request: { topic?: string; draft_content?: string; hook_id?: number } = {
       topic: charLimitText + idea
     };
 
-    if (selectedHook) {
-      request.hook_style = selectedHook.title;
+    if (selectedHook && selectedHook.id) {
+      request.hook_id = selectedHook.id;
     }
 
     try {
@@ -176,9 +176,9 @@ const Dashboard = () => {
     }
   };
 
-  const handleHooksApply = (icp: string, hookType: string, title: string, gradient: string) => {
-    dispatch(setSelectedHook({ icp, hookType, title, gradient }));
-    toast.success(`Applied ${title}`, { position: 'top-right' });
+  const handleHooksApply = (hook: any) => {
+    dispatch(setSelectedHook({ id: hook.id, title: hook.title, template: hook.template }));
+    toast.success(`Applied ${hook.title}`, { position: 'top-right' });
   };
 
   const handleHookRemove = () => {
@@ -317,6 +317,7 @@ const Dashboard = () => {
           isOpen={isHooksModalOpen}
           onClose={() => setIsHooksModalOpen(false)}
           onApply={handleHooksApply}
+          currentlySelected={selectedHook}
         />
 
         {/* Carousel Section - Show when variations are generated */}
