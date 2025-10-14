@@ -3,10 +3,9 @@ import type { PayloadAction } from '@reduxjs/toolkit';
 import type { IdeaVariation } from '../post/postTypes';
 
 interface SelectedHook {
-  icp: string;
-  hookType: string;
+  id: number;
   title: string;
-  gradient: string;
+  template?: string;
 }
 
 type PostLength = 'small' | 'medium' | 'large';
