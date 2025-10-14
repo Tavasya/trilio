@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { X, Search } from 'lucide-react';
+import { X } from 'lucide-react';
 import type { Hook, HookCategory } from '../../types/hooks';
 import { getAllHooks, getHookCategories } from '../../api/hooks';
 
