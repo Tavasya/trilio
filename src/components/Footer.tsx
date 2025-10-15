@@ -41,6 +41,7 @@ export default function Footer() {
           <div>
             <h3 className="font-semibold text-gray-900 mb-4">Tools</h3>
             <ul className="space-y-2">
+              <li><Link to="/rate-linkedin" className="text-sm text-gray-600 hover:text-primary">Profile Rating</Link></li>
               <li><Link to="/tools/linkedin-character-counter" className="text-sm text-gray-600 hover:text-primary">Character Counter</Link></li>
               <li><Link to="/tools/linkedin-hashtag-generator" className="text-sm text-gray-600 hover:text-primary">Hashtag Generator</Link></li>
             </ul>

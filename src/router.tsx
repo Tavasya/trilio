@@ -10,6 +10,7 @@ import PersonalBrandFounder from '@/pages/blog/PersonalBrandFounder';
 import StudentLinkedInGuide from '@/pages/blog/StudentLinkedInGuide';
 import LinkedInCharacterCounter from '@/pages/tools/LinkedInCharacterCounter';
 import LinkedInHashtagGenerator from '@/pages/tools/LinkedInHashtagGenerator';
+import RateLinkedIn from '@/pages/rate-linkedin/RateLinkedIn';
 
 // Lazy load all protected routes
 const Dashboard = lazy(() => import("@/pages/dashboard/Dashboard"));
@@ -38,6 +39,7 @@ export default function AppRoutes() {
                 <Route path="/blog/student-linkedin-opportunities-guide" element={<StudentLinkedInGuide />} />
                 <Route path="/tools/linkedin-character-counter" element={<LinkedInCharacterCounter />} />
                 <Route path="/tools/linkedin-hashtag-generator" element={<LinkedInHashtagGenerator />} />
+                <Route path="/rate-linkedin" element={<RateLinkedIn />} />
                 {/* <Route path="/onboarding" element={<Navigate to="/onboarding/1" replace />} />
                 <Route path="/onboarding/:step" element={
                     <ProtectedRoute>
