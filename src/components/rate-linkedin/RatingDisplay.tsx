@@ -1,4 +1,4 @@
-import { Pencil, CheckCircle2, TrendingUp, RotateCcw, Star, Briefcase, Award, Target, Eye } from 'lucide-react';
+import { Pencil, TrendingUp, RotateCcw, Star, Briefcase, Award, Target, Eye } from 'lucide-react';
 import CircularProgress from './CircularProgress';
 import type { RatingResult } from '@/features/linkedin-rating/linkedinRatingTypes';
 
