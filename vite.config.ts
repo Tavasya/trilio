@@ -13,7 +13,15 @@ export default defineConfig({
     svgr(),
     sitemap({
       hostname: 'https://trilio.app',
-      dynamicRoutes: ['/'],
+      dynamicRoutes: [
+        '/blog/linkedin-content-strategies',
+        '/blog/ai-replacing-linkedin-marketers',
+        '/blog/personal-brand-founder-linkedin',
+        '/blog/student-linkedin-opportunities-guide',
+        '/tools/linkedin-character-counter',
+        '/tools/linkedin-hashtag-generator',
+        '/rate-linkedin',
+      ],
       readable: true,
     })
   ],
