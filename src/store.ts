@@ -6,6 +6,7 @@ import calendarReducer from "./store/slices/calendarSlice";
 import postReducer from "./features/post/postSlice";
 import chatReducer from "./features/chat/chatSlice";
 import dashboardReducer from "./features/dashboard/dashboardSlice";
+import devDashboardReducer from "./features/devDashboard/devDashboardSlice";
 
 const store = configureStore({
     reducer: {
@@ -14,6 +15,7 @@ const store = configureStore({
         post: postReducer,
         chat: chatReducer,
         dashboard: dashboardReducer,
+        devDashboard: devDashboardReducer,
     },
 });
 
