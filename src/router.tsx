@@ -4,6 +4,7 @@ import { Suspense, lazy } from "react";
 import Landing from "@/pages/landing/Landing";
 import AppLayout from "./layouts/AppLayout";
 import ProtectedRoute from '@/components/ProtectedRoute'
+import AdminRoute from '@/components/AdminRoute'
 import LinkedInContentStrategies from '@/pages/blog/LinkedInContentStrategies';
 import AIReplacingMarketers from '@/pages/blog/AIReplacingMarketers';
 import PersonalBrandFounder from '@/pages/blog/PersonalBrandFounder';
@@ -22,6 +23,7 @@ const Posts = lazy(() => import('@/pages/posts/Posts'));
 const CreatePost = lazy(() => import('@/pages/create-post/CreatePost'));
 const Generate = lazy(() => import('@/pages/generate/Generate'));
 const IdentityTest = lazy(() => import('@/pages/test/IdentityTest'));
+const DevDashboard = lazy(() => import('@/pages/dev-dashboard/DevDashboard'));
 
 const LoadingSpinner = () => (
     <div className="min-h-screen flex items-center justify-center">
@@ -62,6 +64,13 @@ export default function AppRoutes() {
                     <Route path="/create-post" element={<CreatePost />} />
                     <Route path="/generate" element={<Generate />} />
                     <Route path="/test/identity" element={<IdentityTest />} />
+                </Route>
+                <Route path="/dev-dashboard" element={
+                    <AdminRoute>
+                        <AppLayout />
+                    </AdminRoute>
+                } >
+                    <Route index element={<DevDashboard />} />
                 </Route>
             </Routes>
         </Suspense>
