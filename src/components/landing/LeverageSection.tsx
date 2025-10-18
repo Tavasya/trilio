@@ -93,7 +93,7 @@ export default function LeverageSection({ mode = 'business' }: LeverageSectionPr
             headerVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-8'
           }`}>
             <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 text-center">
-              {mode === 'business' ? "Building personal branding isn't just about likes, it's leverage" : "It's not about going viral, it's about being found."}
+              {mode === 'business' ? "If you don't show up, your competitor will." : "It's not about going viral, it's about being found."}
             </h2>
 
             <p className="text-xl text-white/90 text-center mb-12">
