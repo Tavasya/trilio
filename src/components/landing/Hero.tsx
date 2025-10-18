@@ -1,39 +1,12 @@
-import { useEffect, useState, useRef } from "react";
 import { Star, ShieldCheck } from "lucide-react";
-import { SignUpButton } from '@clerk/react-router';
-import productScreenshot from '@/lib/product/3.png';
 import RecruiterNotifications from '@/components/landing/RecruiterNotifications';
+import DemoInputSection from '@/components/landing/DemoInputSection';
 
 interface HeroProps {
   mode?: 'business' | 'student';
 }
 
 export default function Hero({ mode = 'business' }: HeroProps) {
-  const screenshotRef = useRef<HTMLDivElement | null>(null);
-  const [tiltAmount, setTiltAmount] = useState(5);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      if (screenshotRef.current) {
-        const rect = screenshotRef.current.getBoundingClientRect();
-        const windowHeight = window.innerHeight;
-
-        // Calculate how much of the element is visible
-        const visiblePercentage = Math.max(0, Math.min(1,
-          (windowHeight - rect.top) / (windowHeight + rect.height)
-        ));
-
-        // Reduce tilt from 5 degrees to 0 as element becomes fully visible
-        const newTilt = 5 * (1 - visiblePercentage);
-        setTiltAmount(newTilt);
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    handleScroll(); // Initial calculation
-
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
 
 
   return (
@@ -80,39 +53,22 @@ export default function Hero({ mode = 'business' }: HeroProps) {
           </span>
         </div>
 
-        {/* CTA Button */}
-        <div className="pt-1">
-          <SignUpButton mode="modal">
-            <button className="bg-primary hover:bg-primary/90 text-white px-8 py-3 rounded-lg font-semibold text-lg transition-colors">
-              Join for Free
-            </button>
-          </SignUpButton>
+        {/* Demo Input Section */}
+        <div className="pt-8">
+          <DemoInputSection />
         </div>
 
-        {/* Product Screenshot for business, Notifications for students */}
-        <div className="mt-10 perspective-1000 w-full max-w-7xl mx-auto h-[700px] flex items-start justify-center pt-10">
-          {mode === 'business' ? (
-            <div
-              ref={screenshotRef}
-              className="rounded-xl w-full max-w-2xl mx-auto overflow-hidden border border-gray-300 shadow-2xl transition-transform duration-700 ease-out"
-              style={{
-                transform: `rotateX(${tiltAmount}deg)`,
-                transformStyle: 'preserve-3d',
-                transformOrigin: 'center bottom'
-              }}
-            >
-              <img
-                src={productScreenshot}
-                alt="Trilio AI LinkedIn content creation dashboard showing post editor and scheduling features"
-                className="w-full h-auto"
-              />
-            </div>
-          ) : (
-            <div className="w-full max-w-2xl mx-auto">
-              <RecruiterNotifications />
-            </div>
-          )}
-        </div>
+        {/* RecruiterNotifications for students only */}
+        {mode === 'student' && (
+          <div className="mt-10 w-full max-w-2xl mx-auto pb-20">
+            <RecruiterNotifications />
+          </div>
+        )}
+
+        {/* Extra padding for business mode */}
+        {mode === 'business' && (
+          <div className="pb-20" />
+        )}
       </div>
     </div>
   );
