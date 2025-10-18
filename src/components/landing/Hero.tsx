@@ -1,5 +1,4 @@
 import { Star, ShieldCheck } from "lucide-react";
-import { SignUpButton } from '@clerk/react-router';
 import RecruiterNotifications from '@/components/landing/RecruiterNotifications';
 import DemoInputSection from '@/components/landing/DemoInputSection';
 
