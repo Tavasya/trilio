@@ -68,7 +68,7 @@ export default function Hero({ mode = 'business' }: HeroProps) {
         {/* Description */}
         <p className="text-base md:text-lg lg:text-xl text-gray-600 mt-8">
           {mode === 'business' ?
-            'Create viral LinkedIn content in seconds with AI that learns your voice and industry' :
+            'Create authentic LinkedIn posts in minutes with AI that learns your voice and industry.' :
             'Optimize your LinkedIn with AI to attract recruiters - it\'s about keywords, not view counts'}
         </p>
 

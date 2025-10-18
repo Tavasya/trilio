@@ -2,6 +2,8 @@ import { useEffect, useRef, useState } from "react";
 import product1 from '@/lib/product/1.png';
 import product2 from '@/lib/product/2.png';
 import product3 from '@/lib/product/3.png';
+import prospectsImage from '@/lib/product/4.png';
+import trendsImage from '@/lib/product/Screenshot 2025-10-18 at 6.19.47 PM.png';
 
 interface SalesSectionProps {
   mode?: 'business' | 'student';
@@ -15,7 +17,7 @@ export default function SalesSection({ mode = 'business' }: SalesSectionProps) {
     {
       title: "Trends Analyzer",
       description: "Trilio scans 20,000+ posts to spot viral content in your niche and recommends what clicks your audience.",
-      image: product1
+      image: trendsImage
     },
     {
       title: "Truly Your Brand Voice",
@@ -26,7 +28,12 @@ export default function SalesSection({ mode = 'business' }: SalesSectionProps) {
       title: "Effortless Content Creating",
       description: "With Trilio, content planning and creation becomes effortless, fully automated and enjoyable. No more wasting hours on guesswork",
       image: product3
-    }
+    },
+    {
+      title: "Prospects Tracking",
+      description: "Know who engages with your content and follow up for business opportunities. Turn LinkedIn interactions into meaningful business relationships.",
+      image: prospectsImage
+    },
   ];
 
   const studentFeatures = [
@@ -77,7 +84,9 @@ export default function SalesSection({ mode = 'business' }: SalesSectionProps) {
   return (
     <div id="features" className="max-w-6xl mx-auto px-6 py-20">
       <h2 className="text-4xl md:text-5xl font-bold text-center text-gray-900 mb-16">
-        {mode === 'business' ? 'Trilio Turns Content Into Prospects' : 'Trilio Gets You Recruited'}
+        {mode === 'business' ? (
+          <span dangerouslySetInnerHTML={{ __html: 'Start turning your <br> Linkedin content into prospects' }} />
+        ) : 'Trilio Gets You Recruited'}
       </h2>
       
       <div className="space-y-24">
