@@ -41,6 +41,23 @@ class SubscriptionService {
 
     return response.json();
   }
+
+  async createBillingPortal(returnUrl: string, token: string): Promise<{ url: string }> {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/payments/create-billing-portal`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ return_url: returnUrl }),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to create billing portal session');
+    }
+
+    return response.json();
+  }
 }
 
 export const subscriptionService = new SubscriptionService();

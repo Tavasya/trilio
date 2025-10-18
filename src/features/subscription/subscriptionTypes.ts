@@ -5,6 +5,9 @@ export interface SubscriptionStatus {
   stripe_subscription_id?: string;
   current_period_end?: string;
   cancel_at_period_end?: boolean;
+  cancel_at?: string;
+  trial_start?: string;
+  trial_end?: string;
 }
 
 export interface CreateCheckoutSessionRequest {

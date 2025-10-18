@@ -9,7 +9,7 @@ import {
   SidebarMenuButton,
   SidebarTrigger
 } from '@/components/ui/sidebar'
-import { Book, FileText, PlusCircle, Calendar, Mic } from 'lucide-react'
+import { Book, FileText, PlusCircle, Calendar, Mic, CreditCard } from 'lucide-react'
 import { Linkedin } from 'lucide-react'
 import { UserButton, useUser, useAuth } from '@clerk/react-router'
 import trilioLogo from '@/lib/logo/trilio-logo.png'
@@ -153,6 +153,18 @@ export default function AppLayout() {
                     <Link to="/scheduler">
                       <Calendar className='h-4 w-4' />
                       <span>Scheduler</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                      asChild
+                      isActive={location.pathname === '/billing'}
+                  >
+                    <Link to="/billing">
+                      <CreditCard className='h-4 w-4' />
+                      <span>Billing</span>
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

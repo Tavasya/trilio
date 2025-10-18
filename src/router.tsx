@@ -25,6 +25,7 @@ const Generate = lazy(() => import('@/pages/generate/Generate'));
 const IdentityTest = lazy(() => import('@/pages/test/IdentityTest'));
 const DevDashboard = lazy(() => import('@/pages/dev-dashboard/DevDashboard'));
 const PaymentSuccess = lazy(() => import('@/pages/payment/PaymentSuccess'));
+const Billing = lazy(() => import('@/pages/billing/Billing'));
 
 const LoadingSpinner = () => (
     <div className="min-h-screen flex items-center justify-center">
@@ -66,6 +67,7 @@ export default function AppRoutes() {
                     <Route path="/research" element={<Research />} />
                     <Route path="/scheduler" element={<Scheduler />} />
                     <Route path="/posts" element={<Posts />} />
+                    <Route path="/billing" element={<Billing />} />
 
                     <Route path="/create-post" element={<CreatePost />} />
                     <Route path="/generate" element={<Generate />} />
