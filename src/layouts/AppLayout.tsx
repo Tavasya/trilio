@@ -11,20 +11,39 @@ import {
 } from '@/components/ui/sidebar'
 import { Book, FileText, PlusCircle, Calendar, Mic } from 'lucide-react'
 import { Linkedin } from 'lucide-react'
-import { UserButton, useUser } from '@clerk/react-router'
+import { UserButton, useUser, useAuth } from '@clerk/react-router'
 import trilioLogo from '@/lib/logo/trilio-logo.png'
 import ConnectLinkedInButton from '@/components/linkedin/ConnectLinkedInButton'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { useAppDispatch, useAppSelector } from '../store/hooks'
+import { checkSubscriptionStatus, selectSubscription } from '@/features/subscription/subscriptionSlice'
+import { subscriptionService } from '@/features/subscription/subscriptionService'
+import { toast } from 'sonner'
 
 export default function AppLayout() {
   const location = useLocation()
   const navigate = useNavigate()
   const { user } = useUser()
+  const { getToken } = useAuth()
+  const dispatch = useAppDispatch()
+  const { isSubscribed } = useAppSelector(selectSubscription)
+  const [isUpgrading, setIsUpgrading] = useState(false)
 
   // Check if LinkedIn is connected via Clerk external accounts
   const hasLinkedIn = user?.externalAccounts?.some(
     account => account.provider === 'linkedin_oidc'
   ) || false
+
+  // Check subscription status on mount
+  useEffect(() => {
+    const checkStatus = async () => {
+      const token = await getToken()
+      if (token) {
+        dispatch(checkSubscriptionStatus(token))
+      }
+    }
+    checkStatus()
+  }, [getToken, dispatch])
 
   // Clean up Clerk modal state from URL after OAuth
   useEffect(() => {
@@ -36,6 +55,33 @@ export default function AppLayout() {
       navigate(newUrl, { replace: true })
     }
   }, [location.search, location.pathname, navigate])
+
+  const handleStartFreeTrial = async () => {
+    setIsUpgrading(true)
+    try {
+      const token = await getToken()
+      if (!token) {
+        toast.error('Authentication required', { position: 'top-right' })
+        setIsUpgrading(false)
+        return
+      }
+
+      const { url } = await subscriptionService.createCheckoutSession(
+        {
+          price_id: 'price_1SJXBVGqPFkjWQieNgHLbhD4',
+          success_url: `${window.location.origin}/payment-success`,
+          cancel_url: window.location.href,
+        },
+        token
+      )
+
+      window.location.href = url
+    } catch (error) {
+      console.error('Checkout error:', error)
+      toast.error('Failed to start checkout', { position: 'top-right' })
+      setIsUpgrading(false)
+    }
+  }
 
   return (
     <div className="min-h-screen flex">
@@ -123,6 +169,17 @@ export default function AppLayout() {
 
               {/* LinkedIn Connection Status & User Profile */}
               <div className="ml-auto flex items-center gap-3">
+                {/* Start Free Trial Button - Only show if not subscribed */}
+                {!isSubscribed && (
+                  <button
+                    onClick={handleStartFreeTrial}
+                    disabled={isUpgrading}
+                    className="bg-primary text-white px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                  >
+                    {isUpgrading ? 'Loading...' : 'Start Free Trial'}
+                  </button>
+                )}
+
                 {hasLinkedIn ? (
                   <button
                     onClick={() => window.open('https://www.linkedin.com/in/me', '_blank')}

@@ -24,6 +24,7 @@ const CreatePost = lazy(() => import('@/pages/create-post/CreatePost'));
 const Generate = lazy(() => import('@/pages/generate/Generate'));
 const IdentityTest = lazy(() => import('@/pages/test/IdentityTest'));
 const DevDashboard = lazy(() => import('@/pages/dev-dashboard/DevDashboard'));
+const PaymentSuccess = lazy(() => import('@/pages/payment/PaymentSuccess'));
 
 const LoadingSpinner = () => (
     <div className="min-h-screen flex items-center justify-center">
@@ -50,6 +51,11 @@ export default function AppRoutes() {
                         <Onboarding />
                     </ProtectedRoute>
                 } /> */}
+                <Route path="/payment-success" element={
+                    <ProtectedRoute>
+                        <PaymentSuccess />
+                    </ProtectedRoute>
+                } />
                 <Route element={
                     <ProtectedRoute>
                         <AppLayout />

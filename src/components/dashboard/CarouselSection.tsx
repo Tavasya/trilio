@@ -20,6 +20,7 @@ interface CarouselSectionProps {
   onPostNow?: (variation: IdeaVariation) => void;
   isPosting?: boolean;
   isScheduling?: boolean;
+  isSubscribed?: boolean;
 }
 
 export default function CarouselSection({
@@ -34,7 +35,8 @@ export default function CarouselSection({
   onSchedule,
   onPostNow,
   isPosting = false,
-  isScheduling = false
+  isScheduling = false,
+  isSubscribed = true
 }: CarouselSectionProps) {
   const [currentCardIndex, setCurrentCardIndex] = useState(0);
   const [maxHeight, setMaxHeight] = useState<number>(0);
@@ -73,19 +75,20 @@ export default function CarouselSection({
   }, [cards, isGenerating, regeneratingIndex]);
 
   return (
-    <div className="mb-12">
-      <div className="flex items-center justify-between mb-8 relative">
-        <div className="w-20"></div>
-        <h2 className="text-xl font-semibold text-gray-900 flex-1 text-center">
-          Choose a variation to continue
-        </h2>
-        <button
-          onClick={() => setViewMode(viewMode === 'carousel' ? 'grid' : 'carousel')}
-          className="text-sm text-gray-600 hover:text-gray-900 transition-colors underline"
-        >
-          {viewMode === 'carousel' ? 'Show All' : 'Show Carousel'}
-        </button>
-      </div>
+    <div className="mb-12 relative">
+      <div>
+        <div className="flex items-center justify-between mb-8 relative">
+          <div className="w-20"></div>
+          <h2 className="text-xl font-semibold text-gray-900 flex-1 text-center">
+            Choose a variation to continue
+          </h2>
+          <button
+            onClick={() => setViewMode(viewMode === 'carousel' ? 'grid' : 'carousel')}
+            className="text-sm text-gray-600 hover:text-gray-900 transition-colors underline"
+          >
+            {viewMode === 'carousel' ? 'Show All' : 'Show Carousel'}
+          </button>
+        </div>
 
       {viewMode === 'carousel' ? (
         <>
@@ -165,8 +168,8 @@ export default function CarouselSection({
                 className="bg-white rounded-lg border border-gray-200 relative flex flex-col"
                 style={{ height: maxHeight > 0 ? maxHeight : 'auto' }}
               >
-                {/* Top Bar - Only show on active card */}
-                {isActive && !isGenerating && card.content && (
+                {/* Top Bar - Only show on active card and if subscribed */}
+                {isActive && !isGenerating && card.content && isSubscribed && (
                   <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       {isRegenerating ? (
@@ -267,7 +270,7 @@ export default function CarouselSection({
 
                 {/* Post Content */}
                 <div className="px-4 pb-3 flex-grow">
-                  <div className="text-gray-900 whitespace-pre-wrap text-sm">
+                  <div className={`text-gray-900 whitespace-pre-wrap text-sm ${!isSubscribed && !isGenerating ? 'blur-sm select-none' : ''}`}>
                     {displayContent}
                     {(isStreaming || !displayContent) && <span className="animate-pulse ml-0.5">▊</span>}
                   </div>
@@ -293,7 +296,7 @@ export default function CarouselSection({
                   </div>
 
                   {/* Action Buttons */}
-                  <div className="px-1 sm:px-2 py-1 flex items-center justify-around border-t border-gray-200">
+                  <div className={`px-1 sm:px-2 py-1 flex items-center justify-around border-t border-gray-200 ${!isSubscribed && !isGenerating ? 'pointer-events-none opacity-60' : ''}`}>
                     <button className="flex items-center gap-1 px-1 sm:px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
                       <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
                       <span className="text-xs sm:text-sm font-medium hidden xs:inline">Like</span>
@@ -343,8 +346,8 @@ export default function CarouselSection({
 
         <div className="px-12 flex items-start h-full">
           <div className="bg-white rounded-lg border border-gray-200 relative h-full w-full flex flex-col">
-            {/* Top Bar - Mobile */}
-            {!isGenerating && cards[currentCardIndex]?.content && (
+            {/* Top Bar - Mobile - Only show if subscribed */}
+            {!isGenerating && cards[currentCardIndex]?.content && isSubscribed && (
               <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   {regeneratingIndex === currentCardIndex ? (
@@ -435,7 +438,7 @@ export default function CarouselSection({
 
             {/* Post Content */}
             <div className="px-4 pb-3 flex-grow">
-              <div className="text-gray-900 whitespace-pre-wrap text-sm">
+              <div className={`text-gray-900 whitespace-pre-wrap text-sm ${!isSubscribed && !isGenerating ? 'blur-sm select-none' : ''}`}>
                 {streamingContents[currentCardIndex] ?? cards[currentCardIndex]?.content}
                 {(streamingContents[currentCardIndex] !== undefined || !cards[currentCardIndex]?.content) && <span className="animate-pulse ml-0.5">▊</span>}
               </div>
@@ -461,7 +464,7 @@ export default function CarouselSection({
               </div>
 
               {/* Action Buttons */}
-              <div className="px-1 sm:px-2 py-1 flex items-center justify-around border-t border-gray-200">
+              <div className={`px-1 sm:px-2 py-1 flex items-center justify-around border-t border-gray-200 ${!isSubscribed && !isGenerating ? 'pointer-events-none opacity-60' : ''}`}>
                 <button className="flex items-center gap-1 px-1 sm:px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
                   <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
                   <span className="text-xs sm:text-sm font-medium hidden xs:inline">Like</span>
@@ -509,8 +512,8 @@ export default function CarouselSection({
 
             return (
               <div key={index} className={`bg-white rounded-lg border border-gray-200 flex flex-col ${isLastAndOdd ? 'lg:col-span-2 lg:max-w-[calc(50%-12px)] lg:mx-auto' : ''}`}>
-                {/* Top Bar - Grid View */}
-                {!isGenerating && card.content && (
+                {/* Top Bar - Grid View - Only show if subscribed */}
+                {!isGenerating && card.content && isSubscribed && (
                   <div className="border-b border-gray-200 bg-gray-50 px-4 py-3 flex items-center justify-between">
                     <div className="flex items-center gap-2">
                       {isRegenerating ? (
@@ -612,7 +615,7 @@ export default function CarouselSection({
 
                 {/* Post Content */}
                 <div className="px-4 pb-3 flex-grow">
-                  <div className="text-gray-900 whitespace-pre-wrap text-sm">
+                  <div className={`text-gray-900 whitespace-pre-wrap text-sm ${!isSubscribed && !isGenerating ? 'blur-sm select-none' : ''}`}>
                     {displayContent}
                     {(isStreaming || !displayContent) && <span className="animate-pulse ml-0.5">▊</span>}
                   </div>
@@ -636,7 +639,7 @@ export default function CarouselSection({
                     </div>
                   </div>
 
-                  <div className="px-2 py-1 flex items-center justify-between sm:justify-around border-t border-gray-200">
+                  <div className={`px-2 py-1 flex items-center justify-between sm:justify-around border-t border-gray-200 ${!isSubscribed && !isGenerating ? 'pointer-events-none opacity-60' : ''}`}>
                     <button className="flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded hover:bg-gray-100 transition-colors text-gray-600">
                       <ThumbsUp className="w-4 h-4 sm:w-5 sm:h-5" />
                       <span className="text-xs sm:text-sm font-medium">Like</span>
@@ -660,6 +663,7 @@ export default function CarouselSection({
           })}
         </div>
       )}
+      </div>
     </div>
   );
 }

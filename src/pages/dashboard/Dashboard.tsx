@@ -17,12 +17,18 @@ import {
   setPostLength
 } from '../../features/dashboard/dashboardSlice';
 import { schedulePost, publishToLinkedIn } from '@/features/post/postSlice';
+import {
+  checkSubscriptionStatus,
+  setPendingRequest,
+  selectSubscription
+} from '@/features/subscription/subscriptionSlice';
 import type { IdeaVariation } from '@/features/post/postTypes';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import HooksModal from '@/components/dashboard/HooksModal';
 import InputSection from '@/components/dashboard/InputSection';
 import CarouselSection from '@/components/dashboard/CarouselSection';
 import ScheduleModal from '@/components/generate/ScheduleModal';
+import PaywallModal from '@/components/dashboard/PaywallModal';
 
 const Dashboard = () => {
   const navigate = useNavigate();
@@ -39,18 +45,30 @@ const Dashboard = () => {
     selectedHook,
     postLength
   } = useAppSelector(selectDashboardState);
+  const { isSubscribed } = useAppSelector(selectSubscription);
   const [regeneratingIndex, setRegeneratingIndex] = useState<number | null>(null);
   const [isHooksModalOpen, setIsHooksModalOpen] = useState(false);
   const [showScheduleModal, setShowScheduleModal] = useState(false);
   const [selectedVariation, setSelectedVariation] = useState<IdeaVariation | null>(null);
   const [isScheduling, setIsScheduling] = useState(false);
   const [isPosting, setIsPosting] = useState(false);
+  const [showPaywallModal, setShowPaywallModal] = useState(false);
 
   // Check if LinkedIn is connected via Clerk external accounts
   const hasLinkedIn = user?.externalAccounts?.some(
     account => account.provider === 'linkedin_oidc'
   ) || false;
 
+  // Check subscription status on mount
+  useEffect(() => {
+    const checkStatus = async () => {
+      const token = await getToken();
+      if (token) {
+        dispatch(checkSubscriptionStatus(token));
+      }
+    };
+    checkStatus();
+  }, [getToken, dispatch]);
 
   const handleGenerateIdeas = async () => {
     // Validation - always require idea for topic mode
@@ -100,6 +118,15 @@ const Dashboard = () => {
         },
         () => {
           dispatch(setGenerating(false));
+          // Show paywall after posts are generated if not subscribed
+          if (!isSubscribed) {
+            dispatch(setPendingRequest({
+              idea,
+              hook_id: selectedHook?.id,
+              postLength,
+            }));
+            setShowPaywallModal(true);
+          }
         },
         (error, index) => {
           dispatch(setError(error.message));
@@ -322,7 +349,7 @@ const Dashboard = () => {
 
         {/* Carousel Section - Show when variations are generated */}
         {(isGenerating || variations.length > 0) && (
-          <div className="mt-12">
+          <div className="mt-12 relative">
             <CarouselSection
               cards={variations}
               userName={userName}
@@ -336,7 +363,16 @@ const Dashboard = () => {
               onPostNow={hasLinkedIn ? handlePostNow : undefined}
               isPosting={isPosting}
               isScheduling={isScheduling}
+              isSubscribed={isSubscribed}
             />
+
+            {/* Paywall Modal - Appears over blurred content */}
+            {showPaywallModal && (
+              <PaywallModal
+                isOpen={showPaywallModal}
+                onClose={() => setShowPaywallModal(false)}
+              />
+            )}
           </div>
         )}
 

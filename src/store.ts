@@ -7,6 +7,7 @@ import postReducer from "./features/post/postSlice";
 import chatReducer from "./features/chat/chatSlice";
 import dashboardReducer from "./features/dashboard/dashboardSlice";
 import devDashboardReducer from "./features/devDashboard/devDashboardSlice";
+import subscriptionReducer from "./features/subscription/subscriptionSlice";
 
 const store = configureStore({
     reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
         chat: chatReducer,
         dashboard: dashboardReducer,
         devDashboard: devDashboardReducer,
+        subscription: subscriptionReducer,
     },
 });
 
