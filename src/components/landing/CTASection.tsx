@@ -56,7 +56,7 @@ export default function CTASection({ mode = 'business' }: CTASectionProps) {
         <p className={`text-xl md:text-2xl text-gray-600 transition-all duration-700 delay-400 ${
           ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
         }`}>
-          {mode === 'business' ? 'Try one week on us' : 'Start your job search journey today'}
+          {mode === 'business' ? 'Unlock Your 7-Day Trial' : 'Start your job search journey today'}
         </p>
         <div className={`flex flex-col sm:flex-row justify-center gap-4 transition-all duration-700 delay-500 ${
           ctaVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'

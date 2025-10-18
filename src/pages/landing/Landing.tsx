@@ -58,7 +58,7 @@ export default function Landing() {
                 }
                 onClick={() => setMode('business')}
               >
-                For businesses
+                For founders
               </Button>
               <Button
                 variant={mode === 'student' ? 'default' : 'ghost'}

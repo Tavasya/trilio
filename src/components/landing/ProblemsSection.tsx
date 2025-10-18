@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 
 const businessProblems = [
-  "It feels cringe… what if people judge me?",
   "I want to post, but I don't even know how to begin",
   "I spend hours editing the post, and it still doesn't feel right",
   "No one engages. I have no clue what's working or what's not",
@@ -69,7 +68,7 @@ export default function ProblemsSection({ mode = 'business' }: ProblemsSectionPr
           </h2>
 
           <p className="text-xl text-gray-600 text-center mb-8">
-            {mode === 'business' ? 'Most founders and creators struggle with:' : 'Most students and job seekers struggle with:'}
+            {mode === 'business' ? 'Most founders struggle with:' : 'Most students and job seekers struggle with:'}
           </p>
         </div>
 
