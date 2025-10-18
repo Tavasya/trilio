@@ -157,17 +157,20 @@ export default function AppLayout() {
                   </SidebarMenuButton>
                 </SidebarMenuItem>
 
-                <SidebarMenuItem>
-                  <SidebarMenuButton
-                      asChild
-                      isActive={location.pathname === '/billing'}
-                  >
-                    <Link to="/billing">
-                      <CreditCard className='h-4 w-4' />
-                      <span>Billing</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
+                {/* Only show Billing for subscribed users */}
+                {isSubscribed && (
+                  <SidebarMenuItem>
+                    <SidebarMenuButton
+                        asChild
+                        isActive={location.pathname === '/billing'}
+                    >
+                      <Link to="/billing">
+                        <CreditCard className='h-4 w-4' />
+                        <span>Billing</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                )}
               </SidebarMenu>
             </SidebarContent>
         </Sidebar>
