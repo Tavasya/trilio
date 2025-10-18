@@ -26,7 +26,6 @@ const PaywallModal = ({ isOpen, onClose }: PaywallModalProps) => {
 
       const { url } = await subscriptionService.createCheckoutSession(
         {
-          price_id: 'price_1SJXBVGqPFkjWQieNgHLbhD4',
           success_url: `${window.location.origin}/payment-success`,
           cancel_url: `${window.location.origin}/dashboard`,
         },

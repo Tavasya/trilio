@@ -11,7 +11,6 @@ export interface SubscriptionStatus {
 }
 
 export interface CreateCheckoutSessionRequest {
-  price_id: string;
   success_url: string;
   cancel_url: string;
 }
