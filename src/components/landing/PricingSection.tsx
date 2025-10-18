@@ -35,7 +35,7 @@ const plans = [
   {
     name: "Business",
     price: { monthly: "Let's talk", yearly: "Let's talk" },
-    description: "For businesses and agencies to amplify their content creation",
+    description: "For founders and agencies to amplify their content creation",
     cta: "Book a Call",
     postGeneration: "Unlimited posts",
     features: [
