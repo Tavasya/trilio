@@ -25,3 +25,9 @@ export interface PendingRequest {
   hook_id?: number;
   postLength: 'small' | 'medium' | 'large';
 }
+
+export interface CancelSubscriptionResponse {
+  success: boolean;
+  message: string;
+  subscription?: SubscriptionStatus;
+}

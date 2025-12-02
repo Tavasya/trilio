@@ -4,13 +4,15 @@ import { selectSubscription } from '@/features/subscription/subscriptionSlice';
 import { subscriptionService } from '@/features/subscription/subscriptionService';
 import { toast } from 'sonner';
 import { useState, useEffect } from 'react';
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, AlertTriangle } from 'lucide-react';
 import type { SubscriptionStatus } from '@/features/subscription/subscriptionTypes';
 
 const Billing = () => {
   const { getToken } = useAuth();
   const { isSubscribed } = useAppSelector(selectSubscription);
   const [isLoading, setIsLoading] = useState(false);
+  const [isCancelling, setIsCancelling] = useState(false);
+  const [showCancelConfirm, setShowCancelConfirm] = useState(false);
   const [subscriptionDetails, setSubscriptionDetails] = useState<SubscriptionStatus | null>(null);
   const [loadingDetails, setLoadingDetails] = useState(true);
 
@@ -71,6 +73,32 @@ const Billing = () => {
       console.error('Billing portal error:', error);
       toast.error('Failed to open billing portal', { position: 'top-right' });
       setIsLoading(false);
+    }
+  };
+
+  const handleCancelSubscription = async () => {
+    setIsCancelling(true);
+    try {
+      const token = await getToken();
+      if (!token) {
+        toast.error('Authentication required', { position: 'top-right' });
+        return;
+      }
+
+      const response = await subscriptionService.cancelSubscription(token);
+
+      if (response.success) {
+        toast.success('Subscription cancelled successfully', { position: 'top-right' });
+        // Refresh subscription details
+        const details = await subscriptionService.checkStatus(token);
+        setSubscriptionDetails(details);
+      }
+    } catch (error) {
+      console.error('Cancel subscription error:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to cancel subscription', { position: 'top-right' });
+    } finally {
+      setIsCancelling(false);
+      setShowCancelConfirm(false);
     }
   };
 
@@ -154,20 +182,30 @@ const Billing = () => {
             )}
 
             {/* CTA */}
-            <div className="pt-4">
+            <div className="pt-4 space-y-3">
               {isSubscribed ? (
-                <button
-                  onClick={handleManageBilling}
-                  disabled={isLoading}
-                  className="flex items-center justify-center gap-2 w-full bg-white border border-gray-300 text-gray-700 font-medium py-2.5 px-4 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {isLoading ? 'Loading...' : (
-                    <>
-                      <span>Manage Subscription</span>
-                      <ExternalLink className="w-4 h-4" />
-                    </>
+                <>
+                  <button
+                    onClick={handleManageBilling}
+                    disabled={isLoading}
+                    className="flex items-center justify-center gap-2 w-full bg-white border border-gray-300 text-gray-700 font-medium py-2.5 px-4 rounded-lg hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isLoading ? 'Loading...' : (
+                      <>
+                        <span>Manage Subscription</span>
+                        <ExternalLink className="w-4 h-4" />
+                      </>
+                    )}
+                  </button>
+                  {!isCancelled && (
+                    <button
+                      onClick={() => setShowCancelConfirm(true)}
+                      className="w-full text-red-600 text-sm font-medium py-2 hover:text-red-700 transition-colors"
+                    >
+                      Cancel Subscription
+                    </button>
                   )}
-                </button>
+                </>
               ) : (
                 <button
                   onClick={() => window.location.href = '/dashboard'}
@@ -184,6 +222,39 @@ const Billing = () => {
           Manage payment methods, view invoices, and cancel anytime
         </p>
       </div>
+
+      {/* Cancel Confirmation Modal */}
+      {showCancelConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg max-w-md w-full p-6">
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                <AlertTriangle className="w-5 h-5 text-red-600" />
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">Cancel Subscription</h3>
+            </div>
+            <p className="text-gray-600 mb-6">
+              Are you sure you want to cancel your subscription? You'll continue to have access until the end of your current billing period.
+            </p>
+            <div className="flex gap-3">
+              <button
+                onClick={() => setShowCancelConfirm(false)}
+                disabled={isCancelling}
+                className="flex-1 bg-gray-100 text-gray-700 font-medium py-2.5 px-4 rounded-lg hover:bg-gray-200 transition-colors disabled:opacity-50"
+              >
+                Keep Subscription
+              </button>
+              <button
+                onClick={handleCancelSubscription}
+                disabled={isCancelling}
+                className="flex-1 bg-red-600 text-white font-medium py-2.5 px-4 rounded-lg hover:bg-red-700 transition-colors disabled:opacity-50"
+              >
+                {isCancelling ? 'Cancelling...' : 'Yes, Cancel'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
