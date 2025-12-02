@@ -3,6 +3,7 @@ import type {
   SubscriptionStatus,
   CreateCheckoutSessionRequest,
   CreateCheckoutSessionResponse,
+  CancelSubscriptionResponse,
 } from './subscriptionTypes';
 
 class SubscriptionService {
@@ -54,6 +55,23 @@ class SubscriptionService {
 
     if (!response.ok) {
       throw new Error('Failed to create billing portal session');
+    }
+
+    return response.json();
+  }
+
+  async cancelSubscription(token: string): Promise<CancelSubscriptionResponse> {
+    const response = await fetch(`${API_CONFIG.BASE_URL}/api/payments/cancel-subscription`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+    });
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({}));
+      throw new Error(error.detail || 'Failed to cancel subscription');
     }
 
     return response.json();

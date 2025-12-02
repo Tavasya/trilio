@@ -29,6 +29,15 @@ export const checkSubscriptionStatus = createAsyncThunk(
   }
 );
 
+// Async thunk to cancel subscription
+export const cancelSubscription = createAsyncThunk(
+  'subscription/cancel',
+  async (token: string) => {
+    const response = await subscriptionService.cancelSubscription(token);
+    return response;
+  }
+);
+
 const subscriptionSlice = createSlice({
   name: 'subscription',
   initialState,
@@ -70,6 +79,17 @@ const subscriptionSlice = createSlice({
       .addCase(checkSubscriptionStatus.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.error.message || 'Failed to check subscription';
+      })
+      .addCase(cancelSubscription.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(cancelSubscription.fulfilled, (state) => {
+        state.isLoading = false;
+      })
+      .addCase(cancelSubscription.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.error.message || 'Failed to cancel subscription';
       });
   },
 });
